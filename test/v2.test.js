@@ -57,3 +57,9 @@ test("daily brief proactively scans saved plans", () => {
   assert.ok(brief.alerts.length >= 1);
   assert.equal(brief.alerts[0].title, "Ký hợp đồng");
 });
+
+test("V3 rules expose normalized evidence metadata", () => {
+  const rules = allRules();
+  assert.ok(rules.every(r => r.evidence?.level && Number.isFinite(r.evidence?.rank)));
+  assert.equal(rules.find(r => r.id === "DUTY-CHENG")?.evidence?.family, "xieji-bianfangshu");
+});
