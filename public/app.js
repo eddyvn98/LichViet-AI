@@ -15,7 +15,10 @@ function setupTabs() {
       $$(".tabpanel").forEach(x => {
         x.hidden = x.id !== btn.dataset.tab;
       });
-      if (btn.dataset.tab === "assistant") refreshBrief();
+      if (btn.dataset.tab === "assistant") {
+        renderPlans();
+        refreshBrief();
+      }
       if (btn.dataset.tab === "planner") refreshPlannerFamilyNote();
       if (btn.dataset.tab === "profile") renderProfile();
     };
