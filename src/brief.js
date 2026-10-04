@@ -39,7 +39,7 @@ export function buildBrief({ date, profile = null, profiles = [], plans = [] }) 
       from,
       days,
       activity:plan.activity,
-      profile:planProfiles.length ? null : profile,
+      profile:participantIds.length ? null : profile,
       profiles:planProfiles,
       constraints:plan.constraints || {}
     })[0];
@@ -59,7 +59,10 @@ export function buildBrief({ date, profile = null, profiles = [], plans = [] }) 
         urgency:preferred && distance <= 1 ? "high" : distance <= 3 ? "medium" : "normal",
         decision:best.recommendationDecision || null,
         match:best.match,
-        familyMemberCount:best.family?.memberCount || (profile ? 1 : 0),
+        familyMemberCount:participantIds.length
+          ? planProfiles.length
+          : best.family?.memberCount || (profile ? 1 : 0),
+        unresolvedParticipantCount:participantIds.length - planProfiles.length,
         constraints:best.constraintEvaluation?.constraints || null,
         message:preferred
           ? distance === 0
