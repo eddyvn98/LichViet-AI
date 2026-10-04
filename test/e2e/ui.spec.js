@@ -86,7 +86,14 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("2.2.0");
+  expect(healthBody.version).toBe("3.0.0");
+  expect(healthBody.engine).toBe("verified-engine");
+
+  const verification = await request.get("/api/verification");
+  expect(verification.ok()).toBeTruthy();
+  const verificationBody = await verification.json();
+  expect(verificationBody.mode).toBe("verified-engine");
+  expect(verificationBody.regressionCaseCount).toBeGreaterThanOrEqual(5);
 
   const rules = await request.get("/api/rules");
   expect((await rules.json()).rules.length).toBeGreaterThanOrEqual(24);
