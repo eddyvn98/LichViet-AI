@@ -220,5 +220,21 @@
       "vietnam-civil-time"
     ],
     "usedFor": "Xác lập múi giờ thứ 7 là giờ chính thức của Việt Nam."
+  },
+  {
+    "id": "hko-solar-terms-2015",
+    "name": "Date and Time information of the 24 Solar Terms in 2015",
+    "publisher": "Hong Kong Observatory",
+    "url": "https://www.hko.gov.hk/en/gts/astron2015/Solar_Term_2015.htm",
+    "type": "dữ liệu thiên văn chính thức",
+    "strength": "cao",
+    "role": "official-astronomy",
+    "family": "hong-kong-observatory",
+    "evidenceLevel": "ASTRONOMY_OFFICIAL",
+    "authorityRank": 5,
+    "canonicalFor": [
+      "solar-term-regression"
+    ],
+    "usedFor": "Golden cases đủ 24 tiết khí, bao gồm toàn bộ 12 ranh giới tháng tiết khí của Bát Tự."
   }
 ]
