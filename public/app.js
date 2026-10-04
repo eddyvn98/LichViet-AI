@@ -4,7 +4,7 @@ import { loadNotificationSettings, saveNotificationPreferences } from "./notific
 import { addPlan, refreshBrief, renderPlans } from "./assistant-ui.js";
 import { findDays } from "./planner-ui.js";
 import {
-  renderProfile, saveProfileForm
+  newFamilyMemberForm, renderProfile, saveProfileForm
 } from "./profile-ui.js";
 import { loadDay } from "./today.js";
 
@@ -54,6 +54,7 @@ async function init() {
   $("#addPlan").onclick = addPlan;
   $("#refreshBrief").onclick = refreshBrief;
   $("#saveProfile").onclick = saveProfileForm;
+  $("#newFamilyMember").onclick = newFamilyMemberForm;
   $("#enableReminder").onclick = saveNotificationPreferences;
   $("#askGemini").onclick = askGemini;
 
