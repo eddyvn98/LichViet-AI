@@ -16,6 +16,11 @@ const HIDDEN = {
   "戌":[["丁",.1],["辛",.3],["戊",.6]],"亥":[["壬",.7],["甲",.3]]
 };
 
+const HIDDEN_MAIN = {
+  "子":"癸","丑":"己","寅":"甲","卯":"乙","辰":"戊","巳":"丙",
+  "午":"丁","未":"己","申":"庚","酉":"辛","戌":"戊","亥":"壬"
+};
+
 const ELEMENT_VI = {
   wood:"Mộc", fire:"Hỏa", earth:"Thổ", metal:"Kim", water:"Thủy"
 };
@@ -84,7 +89,7 @@ function elementBalance(rawPillars) {
 function strengthHeuristic(dayStem, monthBranch, balance) {
   const dayElement = STEM_META[dayStem][0];
   const resource = generatedBy(dayElement);
-  const monthMainStem = HIDDEN[monthBranch]?.[0]?.[0];
+  const monthMainStem = HIDDEN_MAIN[monthBranch] || null;
   const monthElement = monthMainStem ? STEM_META[monthMainStem][0] : null;
 
   let support = balance[dayElement].score + balance[resource].score;
@@ -159,7 +164,8 @@ export function analyzeBirthProfile(birthDate, birthTime = "", options = {}) {
     tenGods:stemGods,
     tenGodMethod:{
       id:"five-elements-polarity-derivation",
-      evidenceLevel:"PRIMARY_EXACT_STRUCTURE",
+      evidenceLevel:"PRIMARY_EXACT",
+      sourceAuthority:"supplemental-classic-authority-3",
       evidenceRefs:["SFTK-TEN-GODS"],
       affectsRanking:false
     },
