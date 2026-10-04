@@ -18,7 +18,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -40,7 +40,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -63,7 +63,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -83,7 +83,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -108,7 +108,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -128,7 +128,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -154,7 +154,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -176,7 +176,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -204,7 +204,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -224,7 +224,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -251,7 +251,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
@@ -274,7 +274,7 @@
       "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
+    "scorePolicy": "ranking-tiebreak-v2",
     "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
     "evidenceLevel": "PRODUCT_POLICY",
     "policyClass": "activity-normalization"
