@@ -13,6 +13,7 @@ import {
 } from "./evidence.js";
 import { scoreDayBase } from "./scoring.js";
 import { composeGeneralDayAssessment } from "./recommendation-engine.js";
+import { reproducibilityTrace } from "./trace.js";
 import { calculateTwelveDuty } from "./twelve-duty.js";
 import {
   calculateEclipticDay,
@@ -359,6 +360,19 @@ export function buildDayInfo(isoDate, profile = null) {
     ...(personal?.evidence?.flatMap(x => x.evidence?.evidenceRefs || []) || [])
   ]);
 
+  const trace = reproducibilityTrace({
+    type:"day",
+    date:isoDate,
+    lunar:{ year:vnLunar.year, month:vnLunar.month, day:vnLunar.day, leap:vnLunar.leap },
+    canChi:{ year:bazi.raw.year, month:bazi.raw.month, day:bazi.raw.day },
+    dutyRaws:dutyState.dutyRaws,
+    ecliptic:eclipticState.candidates.map(x => ({ deity:x.deity, good:x.good })),
+    ruleIds,
+    evidenceRecordIds,
+    verdict:generalAssessment.code,
+    confidence:factConfidence.code
+  });
+
   return {
     date:isoDate,
     lunar:vnLunar,
@@ -406,6 +420,7 @@ export function buildDayInfo(isoDate, profile = null) {
       dutyCalculation:dutyState,
       eclipticCalculation:eclipticState,
       evidenceRecords:resolveEvidenceRecords(evidenceRecordIds),
+      trace,
       implementationNotes:[
         "12 Trực do verified engine tự tính; ngày giao tiết giữ cả trạng thái trước/sau theo nguyên điển.",
         "Hoàng/Hắc đạo ngày và giờ do verified engine tự tính theo Hiệp Kỷ Biện Phương Thư.",
