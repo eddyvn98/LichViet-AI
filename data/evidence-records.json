@@ -250,5 +250,18 @@
       ]
     ],
     "reviewStatus": "reviewed"
+  },
+  {
+    "id": "VN-UTC7-OFFICIAL",
+    "sourceId": "vn-timezone-decision-134",
+    "claimType": "official-timezone",
+    "locator": "Điều 1, Quyết định 134/2002/QĐ-TTg ngày 14/10/2002",
+    "evidenceLevel": "OFFICIAL_SECONDARY",
+    "applicability": "vietnam-civil-time",
+    "normalized": {
+      "utcOffsetHours": 7,
+      "official": true
+    },
+    "reviewStatus": "reviewed"
   }
 ]
