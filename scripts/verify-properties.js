@@ -1,7 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { buildDayInfo, publicDay } from "../src/traditional.js";
-import { ACTIVITIES, rankDays } from "../src/planner.js";
+import { ACTIVITIES, compareDays, rankDays } from "../src/planner.js";
+import { analyzeBirthProfile } from "../src/bazi-profile.js";
 import { allDutyClassifications } from "../src/rule-engine.js";
 import { engineManifest } from "../src/version.js";
 
@@ -46,8 +47,16 @@ const summary = {
   decisionFailures:0,
   confidenceFailures:0,
   provenanceFailures:0,
-  traceFailures:0
+  traceFailures:0,
+  familyPlannerSamples:0,
+  familyFailures:0,
+  compareSamples:0
 };
+
+const familyProfiles = [
+  { ...analyzeBirthProfile("1995-04-14", "12:00"), id:"audit-a", name:"Audit A" },
+  { ...analyzeBirthProfile("1997-11-17", "12:00"), id:"audit-b", name:"Audit B" }
+];
 
 let index = 0;
 for (let date = from; date <= to; date = nextDay(date), index += 1) {
@@ -124,6 +133,56 @@ for (let date = from; date <= to; date = nextDay(date), index += 1) {
           failures.push({ date, type:"unknown-duty-state", activity, raw:state.raw });
         }
       }
+    }
+  }
+
+  if (index % 28 === 0) {
+    const familyResults = rankDays({
+      from:date,
+      days:14,
+      activity:"meeting",
+      profiles:familyProfiles,
+      constraints:{ dayType:"weekend" }
+    });
+    summary.familyPlannerSamples += 1;
+
+    for (const item of familyResults) {
+      if (item.family?.memberCount !== 2 ||
+          item.constraintEvaluation?.policy?.id !== "selection-constraints-v1" ||
+          item.recommendationDecision?.trace?.engine !== manifest.engine) {
+        summary.familyFailures += 1;
+        failures.push({
+          date:item.date,
+          type:"family-planner-invariant",
+          family:item.family,
+          constraints:item.constraintEvaluation
+        });
+      }
+      if (item.constraintEvaluation?.weekend !== true) {
+        summary.familyFailures += 1;
+        failures.push({
+          date:item.date,
+          type:"family-weekend-constraint-failed"
+        });
+      }
+    }
+
+    const next = nextDay(date);
+    const comparison = compareDays({
+      dates:[date,next],
+      activity:"contract",
+      profiles:familyProfiles
+    });
+    summary.compareSamples += 1;
+    if (comparison.familyMemberCount !== 2 ||
+        !comparison.explanation ||
+        comparison.candidates.length !== 2) {
+      summary.familyFailures += 1;
+      failures.push({
+        date,
+        type:"family-compare-invariant",
+        comparison
+      });
     }
   }
 }
