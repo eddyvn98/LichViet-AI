@@ -104,9 +104,13 @@ function uniqueFamilies(items) {
   );
 }
 
-function recordCanSupportStrongClaim(record) {
+function recordCanSupportStrongClaim(record, allowedApplicabilities = null) {
   if (!record) return false;
   if (record.applicability === "historical-support") return false;
+  if (allowedApplicabilities?.length &&
+      !allowedApplicabilities.includes(record.applicability)) {
+    return false;
+  }
   if (record.level === "ASTRONOMY_OFFICIAL") return true;
   if (record.level !== "PRIMARY_EXACT") return false;
   return record.authorityRank >= 4;
@@ -115,7 +119,8 @@ function recordCanSupportStrongClaim(record) {
 export function assessEvidence({
   evidence = [],
   crossChecks = [],
-  experimental = false
+  experimental = false,
+  strongClaimApplicabilities = null
 } = {}) {
   const disputes = crossChecks.filter(item => item?.status === "disputed");
   if (disputes.length) {
@@ -133,19 +138,32 @@ export function assessEvidence({
       : item
   );
 
-  const records = normalized.flatMap(item => item.records || []);
+  const records = normalized.flatMap(item =>
+    item?.records?.length
+      ? item.records
+      : item?.id && item?.sourceId
+        ? [item]
+        : []
+  );
   const maxRank = Math.max(0, ...normalized.map(item => Number(item.rank) || 0));
   const maxAuthority = Math.max(0, ...normalized.map(item => Number(item.authorityRank) || 0));
   const agreeingChecks = crossChecks.filter(item => item?.status === "agree");
   const families = uniqueFamilies(agreeingChecks);
-  const hasStrongRecord = records.some(recordCanSupportStrongClaim);
+  const hasStrongRecord = records.some(record =>
+    recordCanSupportStrongClaim(record, strongClaimApplicabilities)
+  );
   const hasStrongLegacy = normalized.some(item =>
     item?.strongClaim === true &&
     Number(item.authorityRank || 0) >= 4 &&
-    !(item.records || []).length
+    !(item.records || []).length &&
+    !(item?.id && item?.sourceId)
+  );
+  const qualifications = crossChecks.filter(item =>
+    item?.status === "timezone-sensitive"
   );
 
-  if (!experimental && (hasStrongRecord || hasStrongLegacy)) {
+  if (!experimental && (hasStrongRecord || hasStrongLegacy) &&
+      qualifications.length === 0) {
     return {
       code:"high",
       label:"Độ tin cậy cao",
@@ -158,10 +176,13 @@ export function assessEvidence({
   if (!experimental && maxRank >= 4 && maxAuthority >= 3) {
     return {
       code:"medium",
-      label:"Độ tin cậy khá",
+      label:qualifications.length
+        ? "Độ tin cậy khá, có khác biệt quy ước/múi giờ"
+        : "Độ tin cậy khá",
       canMakeStrongClaim:false,
       independentFamilies:families.size,
-      maxAuthority
+      maxAuthority,
+      qualifiedBy:qualifications.map(item => item.id || item.provider)
     };
   }
 
@@ -171,5 +192,38 @@ export function assessEvidence({
     canMakeStrongClaim:false,
     independentFamilies:families.size,
     maxAuthority
+  };
+}
+
+
+const CONFIDENCE_ORDER = {
+  disputed:0,
+  low:1,
+  medium:2,
+  high:3
+};
+
+export function combineConfidence(domains = {}) {
+  const entries = Object.entries(domains)
+    .filter(([,value]) => value?.code && value.code in CONFIDENCE_ORDER);
+  if (!entries.length) {
+    return {
+      code:"low",
+      label:"Chưa đủ dữ liệu theo miền",
+      canMakeStrongClaim:false,
+      domains:{}
+    };
+  }
+
+  const [weakestName, weakest] = [...entries].sort((a,b) =>
+    CONFIDENCE_ORDER[a[1].code] - CONFIDENCE_ORDER[b[1].code]
+  )[0];
+
+  return {
+    code:weakest.code,
+    label:`Độ tin cậy tổng hợp: ${weakest.label}`,
+    canMakeStrongClaim:entries.every(([,value]) => value.canMakeStrongClaim === true),
+    weakestDomain:weakestName,
+    domains:Object.fromEntries(entries.map(([name,value]) => [name,value.code]))
   };
 }
