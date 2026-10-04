@@ -3,7 +3,12 @@
     "id": "VN-LUNAR-2026-03-01",
     "date": "2026-03-01",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 1, "day": 13, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 1,
+      "day": 13,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED",
     "note": "Ca vang noi bo; khong dung de tu tuyen bo la primary-source verified."
   },
@@ -11,21 +16,36 @@
     "id": "VN-LUNAR-2026-03-19",
     "date": "2026-03-19",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 2, "day": 1, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 2,
+      "day": 1,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED"
   },
   {
     "id": "VN-LUNAR-2026-07-14",
     "date": "2026-07-14",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 6, "day": 1, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 6,
+      "day": 1,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED"
   },
   {
     "id": "VN-LUNAR-2026-10-04",
     "date": "2026-10-04",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 8, "day": 24, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 8,
+      "day": 24,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED"
   },
   {
@@ -40,6 +60,42 @@
       "solarTerm": "Thu phân"
     },
     "status": "REGRESSION_LOCKED",
-    "crossCheck": ["lunar-javascript", "tyme4ts"]
+    "crossCheck": [
+      "lunar-javascript",
+      "tyme4ts"
+    ]
+  },
+  {
+    "id": "HKO-SOLAR-2026-300",
+    "kind": "solar-longitude-official",
+    "date": "2026-01-20",
+    "time": "08:45",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 300,
+    "toleranceDegrees": 0.25,
+    "evidenceRef": "HKO-2026-MAJOR-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-SOLAR-2026-330",
+    "kind": "solar-longitude-official",
+    "date": "2026-02-18",
+    "time": "22:52",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 330,
+    "toleranceDegrees": 0.25,
+    "evidenceRef": "HKO-2026-MAJOR-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-SOLAR-2026-000",
+    "kind": "solar-longitude-official",
+    "date": "2026-03-20",
+    "time": "21:46",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 0,
+    "toleranceDegrees": 0.25,
+    "evidenceRef": "HKO-2026-MAJOR-TERMS",
+    "status": "OFFICIAL_GOLDEN"
   }
 ]
