@@ -12,7 +12,7 @@
   <header class="topbar">
     <div>
       <a class="brand" href="/">Lịch Việt <b>AI</b></a>
-      <p class="tagline">Nguồn, rule & giới hạn</p>
+      <p class="tagline">Nguồn, rule, policy & giới hạn</p>
     </div>
     <a class="source-link" href="/">← Quay lại</a>
   </header>
@@ -20,10 +20,10 @@
   <main class="panel">
     <div class="section-head">
       <div>
-        <p class="eyebrow">Verified Engine V3</p>
+        <p class="eyebrow">Verified Engine V6</p>
         <h1>App biết gì, và chưa biết gì?</h1>
       </div>
-      <p>Không nguồn nào được dùng để biến niềm tin truyền thống thành sự thật khoa học.</p>
+      <p>Fact từ nguồn và chính sách của app được tách riêng. Không nguồn nào biến niềm tin truyền thống thành sự thật khoa học.</p>
     </div>
 
     <div class="mini-card">
@@ -31,10 +31,11 @@
       <p class="meta">
         <b>1. Lịch Việt UTC+7</b> →
         <b>2. Can Chi / tiết khí</b> →
-        <b>3. rule có ID + provenance</b> →
-        <b>4. Bát Tự cá nhân hóa</b> →
-        <b>5. planner / daily brief</b> →
-        <b>6. AI chỉ diễn giải.</b>
+        <b>3. source fact</b> →
+        <b>4. PRODUCT_POLICY</b> →
+        <b>5. multi-signal composition</b> →
+        <b>6. score chỉ tie-break</b> →
+        <b>7. AI chỉ diễn giải.</b>
       </p>
     </div>
 
@@ -49,13 +50,35 @@
     <hr>
 
     <div class="section-title">
+      <h2>12 Trực · source fact</h2>
+      <span id="dutyCount"></span>
+    </div>
+    <p class="meta">
+      Phân loại cát/hung tổng quát lấy từ evidence đã review. Đây không phải mapping cho từng loại việc.
+    </p>
+    <div id="dutyList" class="plan-results"></div>
+
+    <hr>
+
+    <div class="section-title">
+      <h2>Activity policy</h2>
+      <span id="policyCount"></span>
+    </div>
+    <p class="meta">
+      Preferred / avoid / caution dưới đây là <b>PRODUCT_POLICY</b> công khai của app.
+      Primary evidence không được phép biến các mapping này thành rule cổ điển.
+    </p>
+    <div id="policyList" class="plan-results"></div>
+
+    <hr>
+
+    <div class="section-title">
       <h2>Rule catalog</h2>
       <span id="ruleCount"></span>
     </div>
     <p class="meta">
-      V3 gắn evidence level cho từng rule. Nguồn gốc/chính thức được ưu tiên hơn implementation.
-      Hai thư viện cùng một family không được tính như hai bằng chứng độc lập. Rule chưa có locator chính xác
-      không được hiển thị như đã canonical verified.
+      Rule canonical có source riêng. Rule activity normalization được khóa ở PRODUCT_POLICY;
+      source mạnh nếu có chỉ xuất hiện dưới dạng supporting evidence.
     </p>
     <div id="ruleList" class="plan-results"></div>
 
@@ -63,52 +86,87 @@
 
     <h2>Giới hạn hiện tại</h2>
     <p class="meta">
-      Âm lịch hiện đại dùng thuật toán thiên văn UTC+7. Với lịch sử xa, lịch thực dùng có thể khác
-      do thay đổi múi giờ và lịch pháp. Nghi/kỵ của Tyme4TS vẫn là implementation cross-check. lunar-javascript được thêm để kiểm tra Can Chi/lịch âm,
-      nhưng cả hai cùng family 6tail nên chỉ tạo một cụm implementation evidence. Bất đồng được giữ trong provenance.
+      Âm lịch hiện đại dùng thuật toán thiên văn UTC+7. Ngày trước phạm vi hiện đại được gắn
+      <b>historical-proleptic-utc7</b>: đó là phép tính lùi hiện đại, không phải khẳng định lịch chính thức lịch sử.
     </p>
     <p class="meta">
-      Bát Tự dùng Lập Xuân để đổi năm và 12 tiết để đổi tháng. Mốc đổi ngày mặc định là 00:00 dân dụng.
-      Mô hình “thiên mạnh / thiên yếu” là EXPERIMENTAL; app không tự tuyên bố Dụng thần chuẩn
-      của một trường phái cụ thể.
+      Tyme4TS và lunar-javascript chỉ là implementation cross-check; cùng family 6tail.
+      Nghi/kỵ implementation không đổi verdict, decision hay ranking. Numeric score chỉ dùng tie-break.
+    </p>
+    <p class="meta">
+      Bát Tự dùng Lập Xuân để đổi năm và 12 tiết để đổi tháng. Nếu thiếu giờ sinh đúng ngày giao tiết,
+      app giữ bất định và ẩn phân tích sâu phụ thuộc trụ chưa chốt.
     </p>
   </main>
 </div>
 
 <script type="module">
-const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({
+const escapeHtml=s=>String(s ?? "").replace(/[&<>"']/g,c=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[c]));
 
-const [meta, ruleData] = await Promise.all([
+const [meta, ruleData, dutyData, policyData] = await Promise.all([
   fetch("/api/meta").then(r=>r.json()),
-  fetch("/api/rules").then(r=>r.json())
+  fetch("/api/rules").then(r=>r.json()),
+  fetch("/api/duty-classification").then(r=>r.json()),
+  fetch("/api/activity-policies").then(r=>r.json())
 ]);
 
 document.querySelector("#sourceCount").textContent = meta.sources.length + " nguồn";
 document.querySelector("#ruleCount").textContent = ruleData.rules.length + " rule";
+document.querySelector("#dutyCount").textContent = dutyData.duties.length + " Trực";
+document.querySelector("#policyCount").textContent = policyData.policies.length + " loại việc";
 
 document.querySelector("#sourceList").innerHTML = meta.sources.map(s =>
   '<article class="plan-card" style="grid-template-columns:1fr auto">' +
     '<div><h3>' + escapeHtml(s.name) + '</h3>' +
     '<p>' + escapeHtml(s.publisher) + ' · ' + escapeHtml(s.type) + '</p>' +
     '<p>' + escapeHtml(s.usedFor) + '</p>' +
-    '<a class="source-link" href="' + s.url + '" target="_blank" rel="noreferrer">Mở nguồn ↗</a></div>' +
-    '<span class="badge">' + escapeHtml(s.strength) + '</span>' +
+    '<a class="source-link" href="' + escapeHtml(s.url) + '" target="_blank" rel="noreferrer">Mở nguồn ↗</a></div>' +
+    '<span class="badge">' + escapeHtml(s.evidenceLevel || s.strength) + '</span>' +
   '</article>'
 ).join("");
 
-document.querySelector("#ruleList").innerHTML = ruleData.rules.map(r =>
-  '<article class="plan-card" style="grid-template-columns:120px 1fr auto">' +
-    '<div class="plan-date"><b>' + escapeHtml(r.id) + '</b><small>' + escapeHtml(r.kind) + '</small></div>' +
-    '<div><h3>' + escapeHtml(r.vi || (r.a + "–" + r.b)) + '</h3>' +
-    '<p>Nguồn: ' + escapeHtml(r.source) + '</p>' +
-    '<p>' + escapeHtml(r.locator || "—") + '</p>' +
-    '<small>Evidence: ' + escapeHtml(r.evidence?.level || r.verification) +
-    ' · ' + escapeHtml(r.evidence?.label || "") + '</small></div>' +
-    '<span class="badge">' + escapeHtml(r.evidence?.level || r.verification) + '</span>' +
+document.querySelector("#dutyList").innerHTML = dutyData.duties.map(d =>
+  '<article class="plan-card" style="grid-template-columns:100px 1fr auto">' +
+    '<div class="plan-date"><b>' + escapeHtml(d.vi) + '</b><small>' + escapeHtml(d.raw) + '</small></div>' +
+    '<div><h3>' + escapeHtml(d.traditionalClass) + ' · ' + escapeHtml(d.tier) + '</h3>' +
+    '<p>Evidence: ' + escapeHtml(d.evidenceRef) + '</p></div>' +
+    '<span class="badge">PRIMARY FACT</span>' +
   '</article>'
 ).join("");
+
+document.querySelector("#policyList").innerHTML = policyData.policies.map(p =>
+  '<article class="plan-card">' +
+    '<div><h3>' + escapeHtml(p.label) + '</h3>' +
+    '<p>Ưu tiên: ' + escapeHtml(p.preferredDuties.join(", ") || "—") + '</p>' +
+    '<p>Tránh: ' + escapeHtml(p.avoidDuties.join(", ") || "—") +
+    ' · Thận trọng: ' + escapeHtml(p.cautionDuties.join(", ") || "—") + '</p>' +
+    '<small>' + escapeHtml(p.note) + '</small></div>' +
+    '<span class="badge">PRODUCT_POLICY</span>' +
+  '</article>'
+).join("");
+
+document.querySelector("#ruleList").innerHTML = ruleData.rules.map(r => {
+  const source = r.source
+    ? r.source
+    : r.evidence?.level === "PRODUCT_POLICY"
+      ? "PRODUCT_POLICY nội bộ"
+      : "—";
+  const supporting = (r.evidence?.records || [])
+    .map(x => x.id)
+    .slice(0,3)
+    .join(", ");
+  return '<article class="plan-card" style="grid-template-columns:120px 1fr auto">' +
+    '<div class="plan-date"><b>' + escapeHtml(r.id) + '</b><small>' + escapeHtml(r.kind) + '</small></div>' +
+    '<div><h3>' + escapeHtml(r.vi || ((r.a || "") + "–" + (r.b || ""))) + '</h3>' +
+    '<p>Nguồn/policy: ' + escapeHtml(source) + '</p>' +
+    '<p>' + escapeHtml(r.locator || "—") + '</p>' +
+    (supporting ? '<small>Supporting evidence: ' + escapeHtml(supporting) + '</small><br>' : '') +
+    '<small>Evidence level: ' + escapeHtml(r.evidence?.level || r.verification) + '</small></div>' +
+    '<span class="badge">' + escapeHtml(r.evidence?.level || r.verification) + '</span>' +
+  '</article>';
+}).join("");
 </script>
 </body>
 </html>
