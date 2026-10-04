@@ -12,8 +12,10 @@ function basePolicy() {
     "Không tự tính lại âm lịch, Can Chi, Bát Tự, ngày tốt/xấu hoặc giờ tốt.",
     "Không tạo rule, nguồn, locator hoặc bằng chứng mới.",
     "Không thay đổi verdict, rule ID, confidence, provenance hoặc crossChecks.",
-    "Nếu confidence.code là disputed hoặc low, phải nói rõ đây là mức tham khảo/chưa đủ căn cứ; không được viết kết luận chắc chắn.",
+    "Đọc confidence.facts.code cho độ tin cậy facts; nếu disputed/low thì phải nói rõ đây là mức tham khảo/chưa đủ căn cứ.",
     "Nếu một cross-check có status disputed, phải nêu ngắn gọn rằng có bất đồng kỹ thuật.",
+    "Nếu dutyTransition/eclipticTransition tồn tại, phải nói đây là ngày giao tiết và phân biệt trước/sau giờ chuyển.",
+    "recommended/avoid có recommendationOrigin=tyme4ts-advisory chỉ là lớp tham khảo implementation, không được mô tả như fact canonical.",
     "Nguồn implementation không được mô tả như nguyên điển hay nguồn chính thức.",
     "Heuristic/EXPERIMENTAL không được diễn đạt như quy tắc cổ điển đã xác minh.",
     "Không nói các hệ cát/hung là sự thật khoa học.",
@@ -29,7 +31,7 @@ function basePolicy() {
 export function aiStatus() {
   return {
     ...geminiConfig(),
-    evidencePolicy:"verified-engine-v3"
+    evidencePolicy:"verified-engine-v4"
   };
 }
 
