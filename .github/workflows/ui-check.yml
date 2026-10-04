@@ -35,6 +35,9 @@ jobs:
       - name: Verified engine audit smoke
         run: npm run verify:engine -- --from=2026-01-01 --days=366 --strict=true --out=artifacts/engine-audit.json > engine-audit.txt
 
+      - name: Multi-year property audit
+        run: npm run verify:properties -- --from=2025-01-01 --to=2027-12-31 --out=artifacts/property-audit.json > property-audit.txt
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
@@ -49,6 +52,7 @@ jobs:
           path: |
             artifacts/
             engine-audit.txt
+            property-audit.txt
             playwright-report/
             test-results/
           if-no-files-found: ignore
