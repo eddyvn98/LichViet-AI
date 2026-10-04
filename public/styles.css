@@ -52,3 +52,10 @@ hr{border:0;border-top:1px solid var(--line);margin:26px 0}.reminder-row{display
 .element-row{display:grid;grid-template-columns:45px 1fr 38px;gap:8px;align-items:center;margin:7px 0;font-size:12px}.bar{height:7px;background:#eceeea;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:#6f8977;border-radius:99px}
 .god-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.god-grid span{background:var(--soft);border-radius:11px;padding:9px}.god-grid b,.god-grid small{display:block}.god-grid small{color:var(--muted);margin-top:3px;font-size:11px}
 @media(max-width:650px){.tabs{overflow:auto}.tab{min-width:84px}.intent-form{grid-template-columns:1fr 1fr}.god-grid{grid-template-columns:1fr 1fr}.brief-card h2{font-size:19px}}
+
+.ai-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.ai-box input{margin-top:10px}
+.ai-box .ghost{margin-top:9px}
+.ai-answer{margin-top:10px;background:var(--soft);border-radius:14px;padding:13px}
+.ai-answer-text{white-space:pre-wrap;line-height:1.55;color:#465049}
+.ai-answer small{display:block;margin-top:8px;color:var(--muted)}

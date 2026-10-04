@@ -73,6 +73,16 @@
             <p id="confidenceLine"></p>
             <div id="glossaryInline" class="glossary-inline"></div>
             <p class="disclaimer" id="disclaimer"></p>
+            <div class="ai-box">
+              <div class="section-title">
+                <h2>Hỏi Gemini</h2>
+                <span>3.8 Flash · Google OAuth</span>
+              </div>
+              <input id="aiQuestion" type="text" maxlength="1000"
+                placeholder="Ví dụ: Vì sao hôm nay không ưu tiên ký hợp đồng?">
+              <button id="askGemini" class="ghost">Giải thích bằng Gemini</button>
+              <div id="aiAnswer" class="ai-answer" hidden></div>
+            </div>
           </div>
         </details>
 
@@ -160,8 +170,8 @@
       <button id="addPlan" class="primary">Theo dõi kế hoạch</button>
 
       <p class="note">
-        Daily brief được tạo từ engine deterministic. Sau này AI chỉ được phép viết lại câu chữ,
-        không được tự thay ngày, Can Chi hay kết luận rule.
+        Daily brief được tạo từ engine deterministic. Gemini 3.8 chỉ được phép diễn giải câu chữ,
+        không được tự thay ngày, Can Chi, Bát Tự hay kết luận rule.
       </p>
     </section>
 

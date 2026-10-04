@@ -39,3 +39,20 @@ Dương lịch + UTC+7
 - `src/planner.js` — xếp hạng theo loại việc.
 - `src/brief.js` — proactive brief.
 - `src/push.js` — Web Push.
+
+
+## Windows personal runtime V2.1
+
+```
+Windows 11 Pro
+  └─ PowerShell / Scheduled Task
+      └─ Node.js server
+          ├─ deterministic calendar/rule engine
+          ├─ PWA
+          └─ AI adapter
+              └─ Gemini CLI headless
+                  ├─ gemini-3.8-flash
+                  └─ cached Google OAuth
+```
+
+AI adapter chạy Gemini CLI trong thư mục runtime rỗng, dùng `--approval-mode plan` và loại các biến API key khỏi child process. Không có provider fallback.

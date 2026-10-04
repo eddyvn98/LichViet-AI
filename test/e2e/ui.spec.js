@@ -21,6 +21,7 @@ test("V2 today view stays minimal and provenance-aware", async ({ page }, testIn
 
   await page.locator("#why").click();
   await expect(page.getByText("Rule:", { exact:false })).toBeVisible();
+  await expect(page.getByRole("button", { name:"Giải thích bằng Gemini" })).toBeVisible();
 
   const overflow = await page.evaluate(() =>
     document.documentElement.scrollWidth - document.documentElement.clientWidth
@@ -85,7 +86,7 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("2.0.0");
+  expect(healthBody.version).toBe("2.1.0");
 
   const rules = await request.get("/api/rules");
   expect((await rules.json()).rules.length).toBeGreaterThanOrEqual(24);
@@ -105,4 +106,12 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const push = await request.get("/api/push/config");
   expect(push.ok()).toBeTruthy();
   expect(typeof (await push.json()).enabled).toBe("boolean");
+
+  const ai = await request.get("/api/ai/status");
+  expect(ai.ok()).toBeTruthy();
+  const aiBody = await ai.json();
+  expect(aiBody.provider).toBe("gemini-cli");
+  expect(aiBody.model).toBe("gemini-3.8-flash");
+  expect(aiBody.auth).toBe("google-oauth");
+  expect(aiBody.apiKeysAllowed).toBe(false);
 });

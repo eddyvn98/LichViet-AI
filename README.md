@@ -60,3 +60,27 @@ Scheduler gọi `POST /api/tasks/daily-push` với header `x-cron-secret`.
 4. Không giả khoa học.
 5. Không đoán dữ liệu thiếu.
 6. Cái gì còn phụ thuộc trường phái phải ghi rõ.
+
+
+## Personal Windows runtime (V2.1)
+
+Môi trường chính thức trước mắt:
+
+- Windows 11 Pro.
+- Chạy trực tiếp bằng PowerShell/terminal, không Docker.
+- AI duy nhất: Gemini CLI.
+- Model cố định mặc định: `gemini-3.8-flash`.
+- Xác thực: **Sign in with Google (OAuth)**.
+- Không dùng OpenAI, Claude, OpenRouter hay AI provider khác.
+- Không dùng `GEMINI_API_KEY` hoặc `GOOGLE_API_KEY`.
+
+Thiết lập:
+
+```powershell
+.\scripts\setup-windows.ps1
+gemini
+# Chọn Sign in with Google
+.\scripts\start-windows.ps1
+```
+
+Xem `docs/WINDOWS_HOSTING.md`.

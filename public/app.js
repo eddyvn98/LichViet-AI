@@ -1,4 +1,5 @@
-import { $, $$, api, setMeta, state, todayVN } from "./core.js";
+import { $, $, api, setMeta, state, todayVN } from "./core.js";
+import { askGemini } from "./ai-ui.js";
 import { addPlan, refreshBrief, renderPlans } from "./assistant-ui.js";
 import { findDays } from "./planner-ui.js";
 import {
@@ -53,6 +54,7 @@ async function init() {
   $("#refreshBrief").onclick = refreshBrief;
   $("#saveProfile").onclick = saveProfileForm;
   $("#enableReminder").onclick = enableNotifications;
+  $("#askGemini").onclick = askGemini;
 
   if (state.reminder?.time) {
     $("#reminderTime").value = state.reminder.time;

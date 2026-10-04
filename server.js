@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyzeBirthProfile } from "./src/bazi-profile.js";
+import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-service.js";
 import { buildBrief } from "./src/brief.js";
 import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
 import { allRules } from "./src/rule-engine.js";
@@ -52,7 +53,7 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:"2.0.0", calendar:"Vietnam UTC+7", push:pushStatus().enabled });
+    return json(res,200,{ ok:true, version:"2.1.0", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -92,6 +93,26 @@ async function api(req,url,res) {
       profile:profileFromPayload(payload.profile),
       plans:Array.isArray(payload.plans) ? payload.plans : []
     }));
+  }
+  if (req.method === "GET" && url.pathname === "/api/ai/status") {
+    return json(res,200,aiStatus(),"public, max-age=60");
+  }
+  if (req.method === "POST" && url.pathname === "/api/ai/explain") {
+    const payload = await bodyJson(req);
+    const date = payload.date || todayVN();
+    const profile = profileFromPayload(payload.profile);
+    const context = publicDay(buildDayInfo(date,profile));
+    const question = String(payload.question || "").slice(0,1000);
+    return json(res,200,await explainWithGemini({ context,question }));
+  }
+  if (req.method === "POST" && url.pathname === "/api/ai/brief") {
+    const payload = await bodyJson(req);
+    const brief = buildBrief({
+      date:payload.date || todayVN(),
+      profile:profileFromPayload(payload.profile),
+      plans:Array.isArray(payload.plans) ? payload.plans : []
+    });
+    return json(res,200,await rewriteBriefWithGemini(brief));
   }
   if (req.method === "GET" && url.pathname === "/api/push/config") {
     return json(res,200,pushStatus(),"public, max-age=300");
@@ -149,4 +170,4 @@ http.createServer(async(req,res) => {
   } catch(error) {
     json(res,error.code === "ENOENT" ? 404 : 400,{ error:error.message || "Có lỗi xảy ra" });
   }
-}).listen(port,() => console.log(`LichViet AI v2 listening on ${port}`));
+}).listen(port,() => console.log(`LichViet AI v2.1 listening on ${port}`));
