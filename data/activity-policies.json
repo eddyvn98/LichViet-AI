@@ -1,0 +1,180 @@
+[
+  {
+    "id": "ACT-CONTRACT",
+    "activity": "contract",
+    "label": "Ký hợp đồng / giao dịch",
+    "preferredDuties": [
+      "定",
+      "成",
+      "开"
+    ],
+    "avoidDuties": [
+      "破"
+    ],
+    "cautionDuties": [
+      "闭"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-WEDDING",
+    "activity": "wedding",
+    "label": "Cưới hỏi / đính hôn",
+    "preferredDuties": [
+      "定",
+      "成"
+    ],
+    "avoidDuties": [
+      "破"
+    ],
+    "cautionDuties": [
+      "闭"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-MOVE",
+    "activity": "move",
+    "label": "Chuyển nhà / nhập trạch",
+    "preferredDuties": [
+      "定",
+      "成",
+      "开"
+    ],
+    "avoidDuties": [
+      "破"
+    ],
+    "cautionDuties": [
+      "闭"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-OPENING",
+    "activity": "opening",
+    "label": "Khai trương",
+    "preferredDuties": [
+      "满",
+      "成",
+      "开"
+    ],
+    "avoidDuties": [
+      "破",
+      "闭"
+    ],
+    "cautionDuties": [],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-TRAVEL",
+    "activity": "travel",
+    "label": "Xuất hành",
+    "preferredDuties": [
+      "成",
+      "开"
+    ],
+    "avoidDuties": [
+      "闭"
+    ],
+    "cautionDuties": [
+      "破"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-BUILD",
+    "activity": "build",
+    "label": "Sửa nhà / động thổ",
+    "preferredDuties": [
+      "定",
+      "成"
+    ],
+    "avoidDuties": [
+      "建",
+      "破",
+      "危"
+    ],
+    "cautionDuties": [
+      "闭"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-MEDICAL",
+    "activity": "medical",
+    "label": "Khám chữa bệnh",
+    "preferredDuties": [
+      "除",
+      "开"
+    ],
+    "avoidDuties": [],
+    "cautionDuties": [
+      "破"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  },
+  {
+    "id": "ACT-MEETING",
+    "activity": "meeting",
+    "label": "Gặp gỡ / trao đổi",
+    "preferredDuties": [
+      "建",
+      "满",
+      "成",
+      "开"
+    ],
+    "avoidDuties": [],
+    "cautionDuties": [
+      "破"
+    ],
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyVersion": "activity-composition-v2",
+    "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR"
+    ],
+    "note": "Mapping theo normalization công khai của app; không được mô tả như danh sách nghi/kỵ nguyên điển."
+  }
+]
