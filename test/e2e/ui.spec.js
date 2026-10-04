@@ -54,9 +54,11 @@ test("assistant tracks a plan and generates a proactive brief", async ({ page })
   await page.locator("#intentActivity").selectOption("contract");
   await page.locator("#intentFrom").fill("2026-10-04");
   await page.locator("#intentTo").fill("2026-10-11");
+  await page.locator("#intentDayType").selectOption("weekend");
   await page.getByRole("button", { name:"Theo dõi kế hoạch" }).click();
 
   await expect(page.locator("#savedPlans .saved-plan")).toHaveCount(1);
+  await expect(page.locator("#savedPlans .saved-plan")).toContainText("chỉ cuối tuần");
   await expect(page.locator("#savedPlans").getByText("Ký hợp đồng căn hộ", { exact:true })).toBeVisible();
   await expect(page.locator("#briefHeadline")).not.toHaveText("Đang chuẩn bị…");
   await expect(page.locator(".alert-card").first()).toBeVisible();
@@ -162,6 +164,9 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   expect(health.ok()).toBeTruthy();
   expect(healthBody.version).toBe("7.0.0");
   expect(healthBody.engine).toBe("verified-engine-v7");
+  expect(healthBody.familyPolicy).toBe("family-personalization-v1");
+  expect(healthBody.constraintPolicy).toBe("selection-constraints-v1");
+  expect(healthBody.comparisonPolicy).toBe("deterministic-date-comparison-v1");
 
   const conversion = await request.post("/api/convert/lunar-to-solar", {
     data: { day:24, month:8, year:2026, leap:false }
@@ -217,6 +222,7 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   });
   expect(compare.ok()).toBeTruthy();
   const compareBody = await compare.json();
+  expect(compareBody.policy.id).toBe("deterministic-date-comparison-v1");
   expect(compareBody.winner.date).toBe("2026-10-05");
   expect(compareBody.explanation).toBeTruthy();
 
@@ -231,7 +237,10 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
     }
   });
   expect(feedback.ok()).toBeTruthy();
-  expect((await feedback.json()).engine).toBe("verified-engine-v7");
+  const feedbackBody = await feedback.json();
+  expect(feedbackBody.engine).toBe("verified-engine-v7");
+  expect(feedbackBody.familyPolicy).toBe("family-personalization-v1");
+  expect(feedbackBody.constraintPolicy).toBe("selection-constraints-v1");
 
   const feedbackList = await request.get("/api/feedback?limit=20");
   expect(feedbackList.ok()).toBeTruthy();
