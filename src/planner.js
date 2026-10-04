@@ -25,8 +25,13 @@ function activityScore(day, activity) {
   const reasons = [...dutyEval.reasons];
   const ruleIds = [...dutyEval.ruleIds];
 
-  const recommendedHit = cfg.positive.find(x => day._rawRecommended.includes(x));
-  const avoidHit = cfg.positive.find(x => day._rawAvoid.includes(x));
+  const advisoryAllowed = day._implementationAdviceUsable === true;
+  const recommendedHit = advisoryAllowed
+    ? cfg.positive.find(x => day._rawRecommended.includes(x))
+    : null;
+  const avoidHit = advisoryAllowed
+    ? cfg.positive.find(x => day._rawAvoid.includes(x))
+    : null;
   const ranking = scoreActivity({
     baseScore:day._ranking,
     activityDelta:dutyEval.activityDelta,
@@ -50,7 +55,11 @@ function activityScore(day, activity) {
     reasons.push("Không có tín hiệu mạnh; xếp hạng theo chính sách heuristic công khai của app.");
   }
 
-  return { score:ranking.score, ranking, reasons, ruleIds };
+  if (!advisoryAllowed) {
+    reasons.push("Nghi/kỵ chi tiết từ implementation bị loại khỏi điểm vì lịch UTC+7 không khớp reference ngày này.");
+  }
+
+  return { score:ranking.score, ranking, reasons, ruleIds, advisoryAllowed };
 }
 
 export function rankDays({ from, days = 14, activity = "contract", profile = null }) {
@@ -61,12 +70,15 @@ export function rankDays({ from, days = 14, activity = "contract", profile = nul
   for (let i = 0; i < count; i += 1) {
     const date = addDays(from, i);
     const day = buildDayInfo(date, profile);
-    const { score, ranking, reasons, ruleIds } = activityScore(day, activity);
+    const {
+      score, ranking, reasons, ruleIds, advisoryAllowed
+    } = activityScore(day, activity);
     ranked.push({
       ...publicDay(day),
       match:score >= 72 ? "Ưu tiên" : score >= 52 ? "Có thể cân nhắc" : "Không ưu tiên",
       reasons,
       activityRanking:ranking,
+      advisoryImplementationUsed:advisoryAllowed,
       rankingProvenance:ruleSummary(ruleIds),
       _score:score
     });
