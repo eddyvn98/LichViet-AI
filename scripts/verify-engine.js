@@ -1,5 +1,10 @@
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { buildDayInfo, publicDay } from "../src/traditional.js";
+import {
+  solarToVietnameseLunar,
+  vietnameseLunarToSolar
+} from "../src/vietnamese-lunar.js";
 
 function addDays(iso, amount) {
   const date = new Date(iso + "T12:00:00+07:00");
@@ -7,6 +12,10 @@ function addDays(iso, amount) {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone:"Asia/Ho_Chi_Minh"
   }).format(date);
+}
+
+function bool(value) {
+  return ["true","1","yes","on"].includes(String(value || "").toLowerCase());
 }
 
 function parseArgs() {
@@ -17,24 +26,29 @@ function parseArgs() {
     })
   );
   return {
-    from: args.from || "2026-01-01",
-    days: Math.max(1, Math.min(Number(args.days) || 366, 3660)),
-    out: args.out || ""
+    from:args.from || "2026-01-01",
+    days:Math.max(1, Math.min(Number(args.days) || 366, 36525)),
+    step:Math.max(1, Math.min(Number(args.step) || 1, 365)),
+    strict:bool(args.strict),
+    out:args.out || ""
   };
 }
 
-const { from, days, out } = parseArgs();
+const { from, days, step, strict, out } = parseArgs();
 const rows = [];
+const invariantCases = [];
 const summary = {
-  from,
-  days,
+  from, days, step,
   checked:0,
   baziDisputes:0,
   lunarTimezoneSensitive:0,
-  otherDisputes:0
+  otherDisputes:0,
+  lunarRoundTripFailures:0,
+  invariantFailures:0,
+  nearSolarTermBoundaries:0
 };
 
-for (let i = 0; i < days; i += 1) {
+for (let i = 0; i < days; i += step) {
   const date = addDays(from, i);
   const day = publicDay(buildDayInfo(date));
   const checks = day.provenance.crossChecks || [];
@@ -43,14 +57,57 @@ for (let i = 0; i < days; i += 1) {
   );
 
   summary.checked += 1;
+  if (day.baziBoundary?.nearBoundary) summary.nearSolarTermBoundaries += 1;
+
   for (const check of noteworthy) {
     if (check.scope === "bazi-year-month-day" && check.status === "disputed") {
       summary.baziDisputes += 1;
-    } else if (check.scope === "lunar-calendar" && check.status === "timezone-sensitive") {
+    } else if (
+      check.scope === "lunar-calendar" &&
+      check.status === "timezone-sensitive"
+    ) {
       summary.lunarTimezoneSensitive += 1;
     } else {
       summary.otherDisputes += 1;
     }
+  }
+
+  const lunar = solarToVietnameseLunar(date);
+  let reversed = null;
+  try {
+    reversed = vietnameseLunarToSolar(lunar);
+    if (reversed.iso !== date) {
+      summary.lunarRoundTripFailures += 1;
+      invariantCases.push({
+        date, type:"lunar-round-trip",
+        lunar, reversed:reversed.iso
+      });
+    }
+  } catch (error) {
+    summary.lunarRoundTripFailures += 1;
+    invariantCases.push({
+      date, type:"lunar-round-trip-error",
+      lunar, error:String(error?.message || error)
+    });
+  }
+
+  const violations = [];
+  if (!Number.isFinite(day.ranking?.score) ||
+      day.ranking.score < 0 || day.ranking.score > 100) {
+    violations.push("ranking-out-of-range");
+  }
+  if (!day.confidence?.facts?.code) violations.push("missing-fact-confidence");
+  if (day.confidence?.ranking?.code !== "experimental") {
+    violations.push("ranking-not-marked-experimental");
+  }
+  if (!Array.isArray(day.provenance?.rules) ||
+      !Array.isArray(day.provenance?.crossChecks)) {
+    violations.push("missing-provenance");
+  }
+
+  if (violations.length) {
+    summary.invariantFailures += 1;
+    invariantCases.push({ date, type:"invariant", violations });
   }
 
   if (noteworthy.length) {
@@ -65,14 +122,25 @@ for (let i = 0; i < days; i += 1) {
 
 const report = {
   generatedAt:new Date().toISOString(),
-  engine:"verified-engine-v3",
+  engine:"verified-engine-v4",
+  strict,
   summary,
-  cases:rows
+  noteworthyCases:rows,
+  invariantCases
 };
 
 const json = JSON.stringify(report, null, 2);
 if (out) {
+  await mkdir(dirname(out), { recursive:true });
   await writeFile(out, json);
-  console.log(`Wrote ${rows.length} noteworthy cases to ${out}`);
+  console.log(`Wrote audit report to ${out}`);
 }
 console.log(json);
+
+if (strict && (
+  summary.baziDisputes > 0 ||
+  summary.lunarRoundTripFailures > 0 ||
+  summary.invariantFailures > 0
+)) {
+  process.exitCode = 1;
+}
