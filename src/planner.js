@@ -48,16 +48,14 @@ function activityScore(day, activity) {
     : null;
   const ranking = scoreActivity({
     baseScore:day._ranking,
-    activityDelta:dutyEval.activityDelta,
-    recommendedHit:Boolean(recommendedHit),
-    avoidHit:Boolean(avoidHit)
+    activityDelta:dutyEval.activityDelta
   });
 
   if (recommendedHit) {
-    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên làm của ngày.");
+    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên làm; chỉ hiển thị tham khảo, không cộng điểm.");
   }
   if (avoidHit) {
-    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên tránh của ngày.");
+    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên tránh; chỉ hiển thị tham khảo, không trừ điểm.");
   }
   if (day.personal?.signals?.some(x => x.level === "caution")) {
     reasons.push(day.personal.signals.find(x => x.level === "caution").detail);
@@ -92,7 +90,8 @@ export function rankDays({ from, days = 14, activity = "contract", profile = nul
       match:score >= 72 ? "Ưu tiên" : score >= 52 ? "Có thể cân nhắc" : "Không ưu tiên",
       reasons,
       activityRanking:ranking,
-      advisoryImplementationUsed:advisoryAllowed,
+      advisoryImplementationUsed:false,
+      advisoryImplementationVisible:advisoryAllowed,
       rankingProvenance:ruleSummary(ruleIds),
       _score:score
     });
