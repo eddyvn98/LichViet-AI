@@ -1,0 +1,6 @@
+[
+  {"id":"tyme4ts","name":"Tyme4TS","type":"engine","version":"1.5.3","license":"MIT","status":"active"},
+  {"id":"vn-archives-kham-thien-giam","name":"Tư liệu Khâm Thiên Giám triều Nguyễn","type":"vietnam-primary/history","status":"reference"},
+  {"id":"hko-calendar","name":"Hong Kong Observatory Almanac / Calendar Conversion","type":"calendar-reference","status":"validation"},
+  {"id":"xieji","name":"欽定協紀辨方書","type":"classical-day-selection","status":"rule-provenance-in-progress"}
+]
