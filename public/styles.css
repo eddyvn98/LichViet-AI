@@ -67,3 +67,10 @@ hr{border:0;border-top:1px solid var(--line);margin:26px 0}.reminder-row{display
 .topic-option b{font-size:13px;color:var(--ink)}
 .topic-option small{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
 @media(max-width:650px){.topic-grid{grid-template-columns:1fr}}
+
+.family-select{display:flex;gap:10px;align-items:flex-start;flex:1;cursor:pointer}
+.family-select input{width:auto;margin:3px 0 0}
+.family-select b,.family-select small{display:block}
+.family-actions,.feedback-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.active-family{outline:2px solid rgba(69,99,77,.16)}
+.feedback-actions{margin-top:10px}
