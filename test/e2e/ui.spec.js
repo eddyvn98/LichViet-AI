@@ -9,8 +9,10 @@ test("homepage is readable and interactive", async ({ page }, testInfo) => {
   await expect(page.getByText("Hôm nay nên làm gì?")).toBeVisible();
 
   const date = page.locator("#date");
-  await date.fill("2026-10-04");
-  await page.waitForResponse(r => r.url().includes("/api/day?date=2026-10-04") && r.ok());
+  await Promise.all([
+    page.waitForResponse(r => r.url().includes("/api/day?date=2026-10-04") && r.ok()),
+    date.fill("2026-10-04")
+  ]);
 
   await expect(page.locator("#label")).not.toHaveText("");
   await expect(page.locator("#canchi")).toContainText("Can Chi:");
