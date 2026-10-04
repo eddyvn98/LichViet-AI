@@ -10,7 +10,7 @@ import { allRules } from "./src/rule-engine.js";
 import { verificationCases, verificationSummary } from "./src/verification.js";
 import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src/push.js";
 import { buildDayInfo, publicDay } from "./src/traditional.js";
-import { vietnameseLunarToSolar } from "./src/vietnamese-lunar.js";
+import { vietnameseLunarToSolar, vietnameseLunarYearStructure } from "./src/vietnamese-lunar.js";
 import { telegramStatus } from "./src/telegram.js";
 import {
   getNotificationSettings,
@@ -68,6 +68,10 @@ async function api(req,url,res) {
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
+  }
+  if (req.method === "GET" && url.pathname === "/api/lunar-year") {
+    const year = Number(url.searchParams.get("year") || new Date().getFullYear());
+    return json(res,200,vietnameseLunarYearStructure(year),"public, max-age=86400");
   }
   if (req.method === "POST" && url.pathname === "/api/convert/lunar-to-solar") {
     const payload = await bodyJson(req);
