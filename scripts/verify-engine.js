@@ -139,6 +139,7 @@ console.log(json);
 
 if (strict && (
   summary.baziDisputes > 0 ||
+  summary.otherDisputes > 0 ||
   summary.lunarRoundTripFailures > 0 ||
   summary.invariantFailures > 0
 )) {
