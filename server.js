@@ -11,13 +11,35 @@ const VI = {
   "嫁娶":"cưới hỏi","移徙":"chuyển nhà","交易":"giao dịch","开市":"khai trương",
   "安床":"an giường","修造":"sửa chữa","作灶":"làm bếp","求嗣":"cầu con",
   "求财":"cầu tài","出行":"xuất hành","赴任":"nhận chức","祈福":"cầu phúc",
-  "祭祀":"祭祀 / lễ cúng","安葬":"an táng","动土":"động thổ","破土":"phá thổ",
-  "入宅":"nhập trạch","纳财":"nạp tài","订盟":"đính ước","开光":"khai quang"
+  "祭祀":"lễ cúng","安葬":"an táng","动土":"động thổ","破土":"phá thổ",
+  "入宅":"nhập trạch","纳财":"nạp tài","订盟":"đính ước","开光":"khai quang",
+  "立券":"ký kết giấy tờ","安机械":"lắp đặt máy móc","出火":"di chuyển bếp / lửa",
+  "造桥":"làm cầu","纳采":"lễ nạp thái","订婚":"đính hôn","问名":"lễ vấn danh",
+  "安门":"lắp cửa","上梁":"cất nóc / thượng lương","竖柱":"dựng cột",
+  "拆卸":"tháo dỡ","伐木":"đốn gỗ","扫舍":"dọn dẹp nhà cửa","放水":"xả nước",
+  "开仓":"mở kho","置产":"mua sắm tài sản","买车":"mua xe","雇佣":"thuê nhân công",
+  "栽种":"trồng cây","牧养":"chăn nuôi","入学":"nhập học","理发":"cắt tóc",
+  "探病":"thăm bệnh","乘船":"đi thuyền","渡水":"qua sông / đường thủy",
+  "求医":"khám chữa bệnh","治病":"chữa bệnh","会亲友":"gặp người thân, bạn bè",
+  "纳畜":"nuôi thêm gia súc","捕捉":"đánh bắt","畋猎":"săn bắt","造船":"đóng thuyền",
+  "开渠":"đào kênh","掘井":"đào giếng","筑堤":"đắp đê","开池":"đào ao",
+  "造仓":"làm kho","造屋":"làm nhà","修门":"sửa cửa","挂匾":"treo biển",
+  "裁衣":"may cắt quần áo","解除":"giải trừ / tháo bỏ","词讼":"kiện tụng",
+  "诸事不宜":"không nên làm việc lớn","馀事勿取":"chỉ nên làm việc thường ngày"
 };
 const DUTY = {"建":"Kiến","除":"Trừ","满":"Mãn","平":"Bình","定":"Định","执":"Chấp","破":"Phá","危":"Nguy","成":"Thành","收":"Thu","开":"Khai","闭":"Bế"};
 const STAR = {"青龙":"Thanh Long","明堂":"Minh Đường","天刑":"Thiên Hình","朱雀":"Chu Tước","金匮":"Kim Quỹ","天德":"Thiên Đức","白虎":"Bạch Hổ","玉堂":"Ngọc Đường","天牢":"Thiên Lao","玄武":"Huyền Vũ","司命":"Tư Mệnh","勾陈":"Câu Trần"};
+const STEM = {"甲":"Giáp","乙":"Ất","丙":"Bính","丁":"Đinh","戊":"Mậu","己":"Kỷ","庚":"Canh","辛":"Tân","壬":"Nhâm","癸":"Quý"};
+const BRANCH = {"子":"Tý","丑":"Sửu","寅":"Dần","卯":"Mão","辰":"Thìn","巳":"Tỵ","午":"Ngọ","未":"Mùi","申":"Thân","酉":"Dậu","戌":"Tuất","亥":"Hợi"};
 
-function mapTaboos(items){ return items.map(x => VI[x.getName()] || x.getName()).slice(0,6); }
+function cycleName(stem, branch){ return `${STEM[stem] || stem} ${BRANCH[branch] || branch}`; }
+function formatCanChi(raw){
+  const m = raw.match(/^(.)(.)年(.)(.)月(.)(.)日$/u);
+  if(!m) return raw;
+  return `Năm ${cycleName(m[1],m[2])} · tháng ${cycleName(m[3],m[4])} · ngày ${cycleName(m[5],m[6])}`;
+}
+
+function mapTaboos(items){ return items.map(x => VI[x.getName()]).filter(Boolean).slice(0,6); }
 
 function dayData(iso){
   const [y,m,d] = iso.split("-").map(Number);
@@ -34,7 +56,7 @@ function dayData(iso){
   return {
     date: iso,
     lunar: { year:lunar.getYear(), month:lunar.getMonth(), day:lunar.getDay() },
-    canChi: sc,
+    canChi: formatCanChi(sc),
     duty: DUTY[duty] || duty,
     twelveStar: STAR[star.getName()] || star.getName(),
     ecliptic: star.getEcliptic().getName() === "黄道" ? "Hoàng đạo" : "Hắc đạo",

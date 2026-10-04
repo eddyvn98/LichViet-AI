@@ -6,12 +6,12 @@ function tags(el,arr){el.innerHTML=arr.map(x=>`<span class="tag">${x}</span>`).j
 async function load(){
   loading.hidden=false;content.hidden=true;why.hidden=true;
   const r=await fetch("/api/day?date="+date.value); const d=await r.json();
-  $("#solar").textContent=vnDate(d.date); $("#label").textContent=d.label; $("#score").textContent=d.score+"/100";
+  $("#solar").textContent=vnDate(d.date); $("#label").textContent=d.label;
   $("#dot").style.background=d.score>=72?"#5c8b68":d.score>=52?"#b29855":"#a9645e";
   $("#lunar").textContent=`Âm lịch: ${d.lunar.day}/${Math.abs(d.lunar.month)}/${d.lunar.year}`;
   $("#canchi").textContent=`Can Chi: ${d.canChi}`;
   tags($("#good"),d.recommended);tags($("#bad"),d.avoid);
-  $("#route").textContent=d.duty;$("#star").textContent=`${d.twelveStar} · ${d.ecliptic}`;
+  $("#route").textContent=`Trực ${d.duty}`;$("#star").textContent=`Thần trực nhật: ${d.twelveStar} · ${d.ecliptic}`;
   $("#sources").innerHTML=d.evidence.map(x=>`<div class="source"><b>${x.label}</b><small>${x.note}</small></div>`).join("")+`<p><small>${d.disclaimer}</small></p>`;
   loading.hidden=true;content.hidden=false;
 }
