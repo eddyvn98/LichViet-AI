@@ -277,5 +277,23 @@
       "stepDegrees": 15
     },
     "reviewStatus": "reviewed"
+  },
+  {
+    "id": "VN-LUNAR-HND-ALGORITHM",
+    "sourceId": "vn-lunar-hnd",
+    "claimType": "vietnamese-lunar-algorithm",
+    "locator": "Thuật toán: New Moon, Sun Longitude, Lunar Month 11, Leap Month Offset, Solar↔Lunar conversion",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "applicability": "modern-vietnamese-lunar-calculation",
+    "normalized": {
+      "timezone": 7,
+      "basis": "astronomical new moon + solar longitude",
+      "conversion": [
+        "solar-to-lunar",
+        "lunar-to-solar"
+      ]
+    },
+    "reviewStatus": "reviewed",
+    "note": "Reference algorithm for modern UTC+7 calculation; historical promulgated calendars are a separate scope."
   }
 ]
