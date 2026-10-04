@@ -11,7 +11,8 @@ import {
   evidenceRecordById,
   resolveEvidenceRecords
 } from "./evidence.js";
-import { classifyScore, scoreDayBase } from "./scoring.js";
+import { scoreDayBase } from "./scoring.js";
+import { composeGeneralDayAssessment } from "./recommendation-engine.js";
 import { calculateTwelveDuty } from "./twelve-duty.js";
 import {
   calculateEclipticDay,
@@ -227,6 +228,11 @@ export function buildDayInfo(isoDate, profile = null) {
       : "single-state"
   };
 
+  const generalAssessment = composeGeneralDayAssessment({
+    dutyRaws:dutyState.dutyRaws,
+    eclipticGoods:eclipticState.candidates.map(x => x.good)
+  });
+
   const ruleIds = unique([
     ...dutyState.ruleIds,
     ...(personal?.ruleIds || [])
@@ -385,8 +391,8 @@ export function buildDayInfo(isoDate, profile = null) {
       },
       evidenceRefs:eclipticState.evidenceRefs
     } : null,
-    verdict:classifyScore(ranking.score),
-    ranking,
+    verdict:generalAssessment,
+    ranking:{ ...ranking, role:"tie-break-only" },
     recommended,
     avoid,
     recommendationOrigin,
@@ -406,7 +412,8 @@ export function buildDayInfo(isoDate, profile = null) {
         "Tyme4TS chỉ cung cấp nghi/kỵ chi tiết dạng advisory và cross-check các phép tính cốt lõi.",
         "lunar-javascript dùng để cross-check Can Chi và lịch âm.",
         "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập.",
-        "Điểm ranking là heuristic của app, tách biệt với độ tin cậy của facts."
+        "Verdict ngày dùng multi-signal composition; không lấy score làm kết luận.",
+        "Điểm ranking chỉ là tie-break PRODUCT_POLICY, tách biệt với độ tin cậy của facts."
       ]
     },
     confidence:{
