@@ -397,5 +397,71 @@
       "note": "Không xác nhận các trọng số số học của ứng dụng."
     },
     "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XJ-HUANGHEI",
+    "sourceId": "xieji-huanghei",
+    "claimType": "yellow-black-path",
+    "locator": "卷七・義例五・黃道黑道・考原",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "day-and-hour-ecliptic-deity",
+    "normalized": {
+      "sequence": [
+        "青龙",
+        "明堂",
+        "天刑",
+        "朱雀",
+        "金匮",
+        "天德",
+        "白虎",
+        "玉堂",
+        "天牢",
+        "玄武",
+        "司命",
+        "勾陈"
+      ],
+      "good": [
+        "青龙",
+        "明堂",
+        "金匮",
+        "天德",
+        "玉堂",
+        "司命"
+      ],
+      "starts": {
+        "子": "申",
+        "午": "申",
+        "丑": "戌",
+        "未": "戌",
+        "寅": "子",
+        "申": "子",
+        "卯": "寅",
+        "酉": "寅",
+        "辰": "辰",
+        "戌": "辰",
+        "巳": "午",
+        "亥": "午"
+      }
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "QMDJ-HUANGHEI",
+    "sourceId": "qimen-huanghei",
+    "claimType": "yellow-black-path-crosscheck",
+    "locator": "卷二十・黃黑道日時・CTP chapter 703617 lines 1-3",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "day-and-hour-ecliptic-deity-crosscheck",
+    "normalized": {
+      "good": [
+        "青龙",
+        "明堂",
+        "金匮",
+        "天德",
+        "玉堂",
+        "司命"
+      ]
+    },
+    "reviewStatus": "reviewed"
   }
 ]
