@@ -67,7 +67,7 @@ test("profile exposes advanced BaZi while keeping deep analysis folded", async (
   await page.getByRole("button", { name:"Hồ sơ" }).click();
   await page.locator("#birthDate").fill("2026-10-04");
   await page.locator("#birthTime").fill("12:00");
-  await page.getByRole("button", { name:"Lưu hồ sơ" }).click();
+  await page.getByRole("button", { name:"Lưu thành viên" }).click();
 
   await expect(page.locator(".pillar")).toHaveCount(4);
   await expect(page.getByText("Nhật chủ", { exact:false }).first()).toBeVisible();
@@ -81,12 +81,67 @@ test("profile with missing time on Jie boundary shows uncertainty instead of dee
   await page.getByRole("button", { name:"Hồ sơ" }).click();
   await page.locator("#birthDate").fill("2026-02-04");
   await page.locator("#birthTime").fill("");
-  await page.getByRole("button", { name:"Lưu hồ sơ" }).click();
+  await page.getByRole("button", { name:"Lưu thành viên" }).click();
 
   await expect(page.locator(".pillar")).toHaveCount(3);
   await expect(page.getByText("Phân tích sâu tạm ẩn.", { exact:false })).toBeVisible();
   await expect(page.getByText("giữ cả khả năng", { exact:false })).toBeVisible();
   await expect(page.locator(".deep-profile")).toHaveCount(0);
+});
+
+test("family registry drives constrained planner compare and feedback", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+
+  await page.locator("#profileName").fill("Anh");
+  await page.locator("#birthDate").fill("1995-04-14");
+  await page.locator("#birthTime").fill("12:00");
+  await page.getByRole("button", { name:"Lưu thành viên" }).click();
+
+  await page.locator("#newFamilyMember").click();
+  await page.locator("#profileName").fill("Chị");
+  await page.locator("#birthDate").fill("1997-11-17");
+  await page.locator("#birthTime").fill("12:00");
+  await page.getByRole("button", { name:"Lưu thành viên" }).click();
+
+  await expect(page.locator(".family-member")).toHaveCount(2);
+  await expect(page.locator("[data-family-select]:checked")).toHaveCount(2);
+
+  await page.getByRole("button", { name:"Chọn ngày" }).click();
+  await expect(page.locator("#plannerFamilyNote")).toContainText("2 thành viên");
+  await page.locator("#planFrom").fill("2026-10-01");
+  await page.locator("#activity").selectOption("meeting");
+  await page.locator("#planDayType").selectOption("weekend");
+  await page.getByRole("button", { name:"Tìm ngày" }).click();
+
+  const count = await page.locator(".plan-card").count();
+  expect(count).toBeGreaterThan(0);
+  await expect(page.locator(".plan-card").first()).toContainText("gia đình 2/2");
+
+  await page.locator("#compareDates").fill("2026-10-04, 2026-10-05");
+  await page.getByRole("button", { name:"So sánh trực tiếp" }).click();
+  await expect(page.getByText("Ưu tiên trong nhóm so sánh:", { exact:false })).toBeVisible();
+
+  await page.locator('[data-feedback="review"]').first().click();
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+  await expect(page.locator("#feedbackHistory")).toContainText("Cần rà");
+});
+
+test("legacy single profile migrates into family registry", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("lichviet.profile.v2", JSON.stringify({
+      name:"Hồ sơ cũ",
+      birthDate:"1995-04-14",
+      birthTime:"12:00"
+    }));
+    localStorage.removeItem("lichviet.family.v1");
+    localStorage.removeItem("lichviet.family.selection.v1");
+    localStorage.removeItem("lichviet.family.active.v1");
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+  await expect(page.locator(".family-member")).toHaveCount(1);
+  await expect(page.getByText("Hồ sơ cũ", { exact:true })).toBeVisible();
 });
 
 test("sources page exposes rule catalog and limits", async ({ page }) => {
@@ -105,8 +160,8 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("6.0.0");
-  expect(healthBody.engine).toBe("verified-engine-v6");
+  expect(healthBody.version).toBe("7.0.0");
+  expect(healthBody.engine).toBe("verified-engine-v7");
 
   const conversion = await request.post("/api/convert/lunar-to-solar", {
     data: { day:24, month:8, year:2026, leap:false }
@@ -130,6 +185,57 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const activityPolicies = await request.get("/api/activity-policies");
   expect(activityPolicies.ok()).toBeTruthy();
   expect((await activityPolicies.json()).policies).toHaveLength(8);
+
+  const familyProfiles = [
+    { id:"a", name:"A", birthDate:"1995-04-14", birthTime:"12:00" },
+    { id:"b", name:"B", birthDate:"1997-11-17", birthTime:"12:00" }
+  ];
+  const familyPlan = await request.post("/api/plan", {
+    data:{
+      activity:"meeting",
+      from:"2026-10-01",
+      days:20,
+      profiles:familyProfiles,
+      constraints:{ dayType:"weekend" }
+    }
+  });
+  expect(familyPlan.ok()).toBeTruthy();
+  const familyPlanBody = await familyPlan.json();
+  expect(familyPlanBody.results.length).toBeGreaterThan(0);
+  expect(familyPlanBody.results.every(x =>
+    x.family?.memberCount === 2 &&
+    x.constraintEvaluation?.weekend === true
+  )).toBeTruthy();
+
+  const compare = await request.post("/api/compare", {
+    data:{
+      activity:"contract",
+      dates:["2026-10-04","2026-10-05"],
+      profiles:familyProfiles,
+      constraints:{ excludeDates:["2026-10-04"] }
+    }
+  });
+  expect(compare.ok()).toBeTruthy();
+  const compareBody = await compare.json();
+  expect(compareBody.winner.date).toBe("2026-10-05");
+  expect(compareBody.explanation).toBeTruthy();
+
+  const traceHash = compareBody.candidates[1].recommendationDecision.trace.hash;
+  const feedback = await request.post("/api/feedback", {
+    data:{
+      feedback:"review",
+      date:"2026-10-05",
+      activity:"contract",
+      decision:compareBody.candidates[1].recommendationDecision.code,
+      traceHash
+    }
+  });
+  expect(feedback.ok()).toBeTruthy();
+  expect((await feedback.json()).engine).toBe("verified-engine-v7");
+
+  const feedbackList = await request.get("/api/feedback?limit=20");
+  expect(feedbackList.ok()).toBeTruthy();
+  expect((await feedbackList.json()).items.some(x => x.traceHash === traceHash)).toBeTruthy();
 
   const evidence = await request.get("/api/evidence?id=XJ-HUANGHEI");
   expect(evidence.ok()).toBeTruthy();
@@ -156,7 +262,7 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
     }
   });
   expect(brief.ok()).toBeTruthy();
-  expect((await brief.json()).generatedBy).toBe("deterministic-brief-v3");
+  expect((await brief.json()).generatedBy).toBe("deterministic-brief-v4");
 
   const push = await request.get("/api/push/config");
   expect(push.ok()).toBeTruthy();
