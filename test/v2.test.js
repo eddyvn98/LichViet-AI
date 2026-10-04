@@ -99,3 +99,24 @@ test("daily brief resolves plan participant IDs against family profiles", () => 
   assert.ok(brief.alerts.length >= 1);
   assert.equal(brief.alerts[0].familyMemberCount, 2);
 });
+
+
+test("deleted family participant is not replaced by active profile", () => {
+  const active = analyzeBirthProfile("1995-04-14", "12:00");
+  const brief = buildBrief({
+    date:"2026-10-04",
+    profile:active,
+    profiles:[],
+    plans:[{
+      id:"stale-plan",
+      title:"Kế hoạch cũ",
+      activity:"meeting",
+      from:"2026-10-04",
+      to:"2026-10-11",
+      participantIds:["deleted-member"]
+    }]
+  });
+  assert.ok(brief.alerts.length >= 1);
+  assert.equal(brief.alerts[0].familyMemberCount, 0);
+  assert.equal(brief.alerts[0].unresolvedParticipantCount, 1);
+});
