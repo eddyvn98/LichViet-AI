@@ -188,5 +188,21 @@
       "solar-term-regression"
     ],
     "usedFor": "Golden cases tiết khí 2026; chuyển UTC+8 sang UTC+7 khi đối chiếu thời điểm."
+  },
+  {
+    "id": "mingli-tanyuan",
+    "name": "命理探源 · 卷一本原",
+    "publisher": "Chinese Text Project",
+    "url": "https://ctext.org/wiki.pl?chapter=184118&if=en&remap=gb",
+    "type": "cổ thư bổ trợ về quan hệ Địa Chi",
+    "strength": "bổ trợ, không phải nguồn chính của lịch Việt",
+    "role": "supplemental-classic",
+    "family": "mingli-tanyuan",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "authorityRank": 3,
+    "canonicalFor": [
+      "branch-relations-supplement"
+    ],
+    "usedFor": "Locator rõ cho Lục xung và Lục hại; dùng bổ trợ, không vượt quyền Hiệp Kỷ."
   }
 ]
