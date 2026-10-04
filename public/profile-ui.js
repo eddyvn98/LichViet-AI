@@ -15,7 +15,20 @@ function elementBars(elements) {
 
 export async function renderProfile() {
   if (!state.profile?.birthDate) {
-    const dayMasterText = d.dayMaster
+    $("#profileResult").innerHTML =
+      '<p class="note">Chưa có hồ sơ. App vẫn dùng được; hồ sơ chỉ thêm lớp Bát Tự cá nhân hóa.</p>';
+    return;
+  }
+
+  $("#profileName").value = state.profile.name || "";
+  $("#birthDate").value = state.profile.birthDate;
+  $("#birthTime").value = state.profile.birthTime || "";
+
+  const p = new URLSearchParams({ birth: state.profile.birthDate });
+  if (state.profile.birthTime) p.set("birthTime", state.profile.birthTime);
+  const d = await api("/api/profile?" + p.toString());
+
+  const dayMasterText = d.dayMaster
     ? 'Nhật chủ <strong>' + escapeHtml(d.dayMaster.name) + ' ' +
       escapeHtml(d.dayMaster.element) + '</strong>'
     : 'Nhật chủ chưa thể chốt';
