@@ -1,16 +1,21 @@
 import { runGemini, geminiConfig } from "./gemini-cli.js";
 
-function compact(value, limit = 12000) {
+function compact(value, limit = 16000) {
   const text = JSON.stringify(value);
   return text.length <= limit ? text : text.slice(0, limit) + "...";
 }
 
 function basePolicy() {
   return [
-    "Bạn là lớp diễn giải của ứng dụng Lịch Việt AI.",
-    "Chỉ dùng dữ liệu deterministic trong CONTEXT.",
+    "Bạn là lớp diễn giải của ứng dụng Lịch Việt AI Verified Engine.",
+    "Chỉ dùng dữ liệu deterministic và evidence trong CONTEXT.",
     "Không tự tính lại âm lịch, Can Chi, Bát Tự, ngày tốt/xấu hoặc giờ tốt.",
-    "Không thay đổi verdict, rule ID, confidence hoặc provenance.",
+    "Không tạo rule, nguồn, locator hoặc bằng chứng mới.",
+    "Không thay đổi verdict, rule ID, confidence, provenance hoặc crossChecks.",
+    "Nếu confidence.code là disputed hoặc low, phải nói rõ đây là mức tham khảo/chưa đủ căn cứ; không được viết kết luận chắc chắn.",
+    "Nếu một cross-check có status disputed, phải nêu ngắn gọn rằng có bất đồng kỹ thuật.",
+    "Nguồn implementation không được mô tả như nguyên điển hay nguồn chính thức.",
+    "Heuristic/EXPERIMENTAL không được diễn đạt như quy tắc cổ điển đã xác minh.",
     "Không nói các hệ cát/hung là sự thật khoa học.",
     "Viết ngắn, rõ, dùng từ phổ thông.",
     "Không nói mơ hồ hoặc cao siêu.",
@@ -22,7 +27,10 @@ function basePolicy() {
 }
 
 export function aiStatus() {
-  return geminiConfig();
+  return {
+    ...geminiConfig(),
+    evidencePolicy:"verified-engine-v3"
+  };
 }
 
 export async function explainWithGemini({ context, question = "" }) {
@@ -43,6 +51,7 @@ export async function explainWithGemini({ context, question = "" }) {
     "- Tối đa 3 ý.",
     "- Câu ngắn, đọc lướt được.",
     "- Nói kết luận trước, lý do sau.",
+    "- Nếu user hỏi vì sao, ưu tiên rule ID + tên nguồn + mức tin cậy.",
     "- Không mở đầu bằng lời chào.",
     "",
     "Chỉ trả phần trả lời cho người dùng."
@@ -62,6 +71,7 @@ export async function rewriteBriefWithGemini(brief) {
     "Tối đa 60 từ và tối đa 4 dòng.",
     "Ưu tiên cảnh báo kế hoạch nếu có.",
     "Không thêm ngày hoặc kết luận mới.",
+    "Nếu evidence yếu hoặc disputed, dùng ngôn ngữ thận trọng.",
     "Không mở đầu bằng lời chào.",
     "Chỉ trả phần bản tin."
   ].join("\n");
