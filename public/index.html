@@ -200,7 +200,25 @@
         <label>Đến
           <input id="intentTo" type="date">
         </label>
+        <label>Loại ngày
+          <select id="intentDayType">
+            <option value="any">Bất kỳ</option>
+            <option value="weekend">Chỉ cuối tuần</option>
+            <option value="weekday">Chỉ ngày thường</option>
+          </select>
+        </label>
+        <label>Tránh ngày âm
+          <input id="intentAvoidLunarDays" type="text" maxlength="40" placeholder="Ví dụ: 1, 15">
+        </label>
+        <label>Loại ngày cụ thể
+          <input id="intentExcludeDates" type="text" maxlength="200" placeholder="2026-10-10, 2026-10-18">
+        </label>
       </div>
+      <p class="note" id="intentFamilyNote"></p>
+      <label class="topic-option">
+        <input id="intentAvoidJieTransition" type="checkbox">
+        <span><b>Tránh ngày giao tiết</b><small>Áp dụng cho kế hoạch này khi trợ lý tự tìm ngày.</small></span>
+      </label>
       <button id="addPlan" class="primary">Theo dõi kế hoạch</button>
 
       <p class="note">
