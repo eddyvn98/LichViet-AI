@@ -56,8 +56,8 @@ test("assistant tracks a plan and generates a proactive brief", async ({ page })
   await page.locator("#intentTo").fill("2026-10-11");
   await page.getByRole("button", { name:"Theo dõi kế hoạch" }).click();
 
-  await expect(page.locator(".saved-plan")).toHaveCount(1);
-  await expect(page.getByText("Ký hợp đồng căn hộ", { exact:true })).toBeVisible();
+  await expect(page.locator("#savedPlans .saved-plan")).toHaveCount(1);
+  await expect(page.locator("#savedPlans").getByText("Ký hợp đồng căn hộ", { exact:true })).toBeVisible();
   await expect(page.locator("#briefHeadline")).not.toHaveText("Đang chuẩn bị…");
   await expect(page.locator(".alert-card").first()).toBeVisible();
 });
