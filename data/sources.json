@@ -282,5 +282,21 @@
     "authorityRank": 3,
     "canonicalFor": [],
     "usedFor": "Đối chiếu độc lập công thức khởi Thanh Long và sáu thần Hoàng đạo."
+  },
+  {
+    "id": "xingli-kaoyuan-yuejian",
+    "name": "御定星歷考原 卷五・月建十二神",
+    "publisher": "Chinese Text Project",
+    "url": "https://ctext.org/wiki.pl?chapter=656830&if=en",
+    "type": "nguyên điển lịch pháp/chọn ngày",
+    "strength": "cao trong hệ truyền thống",
+    "role": "primary-text",
+    "family": "xingli-kaoyuan",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "authorityRank": 4,
+    "canonicalFor": [
+      "twelve-duty-transition"
+    ],
+    "usedFor": "Quy tắc 12 Trực và trường hợp ngày giao tiết chồng hai Trực."
   }
 ]
