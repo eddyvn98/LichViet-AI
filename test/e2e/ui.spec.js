@@ -16,8 +16,8 @@ test("homepage is readable and interactive", async ({ page }, testInfo) => {
 
   await expect(page.locator("#label")).not.toHaveText("");
   await expect(page.locator("#canchi")).toContainText("Can Chi:");
-  await expect(page.getByRole("heading", { name: "Nên" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Nên tránh" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nên", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nên tránh", exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Vì sao?" }).click();
   await expect(page.getByRole("heading", { name: "Giải thích ngắn" })).toBeVisible();
