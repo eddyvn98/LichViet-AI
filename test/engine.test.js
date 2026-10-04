@@ -163,7 +163,7 @@ test("reproducibility fingerprint is stable for identical deterministic input", 
   const b = publicDay(buildDayInfo("2026-10-04"));
   const c = publicDay(buildDayInfo("2026-10-05"));
   assert.equal(a.provenance.trace.algorithm, "sha256");
-  assert.equal(a.provenance.trace.engine, "verified-engine-v6");
+  assert.equal(a.provenance.trace.engine, "verified-engine-v7");
   assert.equal(a.provenance.trace.hash, b.provenance.trace.hash);
   assert.notEqual(a.provenance.trace.hash, c.provenance.trace.hash);
   assert.match(a.provenance.trace.hash, /^[0-9a-f]{64}$/);
