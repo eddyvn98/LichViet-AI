@@ -11,6 +11,8 @@ function basePolicy() {
     "Chỉ dùng dữ liệu deterministic và evidence trong CONTEXT.",
     "Không tự tính lại âm lịch, Can Chi, Bát Tự, ngày tốt/xấu hoặc giờ tốt.",
     "Không tạo rule, nguồn, locator hoặc bằng chứng mới.",
+    "Nếu CONTEXT không đủ để trả lời, nói rõ: Chưa đủ dữ liệu đã xác minh trong engine.",
+    "Nếu user hỏi nguồn hoặc lý do, chỉ nêu source/rule/evidence/locator thật sự có trong CONTEXT; không suy đoán phần còn thiếu.",
     "Không thay đổi verdict, rule ID, confidence, provenance hoặc crossChecks.",
     "Đọc confidence.facts.code cho độ tin cậy facts; nếu disputed/low thì phải nói rõ đây là mức tham khảo/chưa đủ căn cứ.",
     "Nếu một cross-check có status disputed, phải nêu ngắn gọn rằng có bất đồng kỹ thuật.",
