@@ -1,5 +1,5 @@
 import {
-  $, $, api, escapeHtml, familyPayload, profilePayload, removeFamilyMember,
+  $, $$, api, escapeHtml, familyPayload, profilePayload, removeFamilyMember,
   saveProfile, saveReminder, setActiveFamilyMember, setSelectedFamilyIds,
   startNewFamilyMember, state, toast
 } from "./core.js";
@@ -46,9 +46,9 @@ export function renderFamilyMembers() {
     '</article>';
   }).join("");
 
-  $("[data-family-select]").forEach(input => {
+  $$("[data-family-select]").forEach(input => {
     input.onchange = () => {
-      const selected = $("[data-family-select]")
+      const selected = $$("[data-family-select]")
         .filter(x => x.checked)
         .map(x => x.dataset.familySelect);
       setSelectedFamilyIds(selected);
@@ -59,14 +59,14 @@ export function renderFamilyMembers() {
     };
   });
 
-  $("[data-family-edit]").forEach(button => {
+  $$("[data-family-edit]").forEach(button => {
     button.onclick = async () => {
       setActiveFamilyMember(button.dataset.familyEdit);
       await renderProfile();
     };
   });
 
-  $("[data-family-remove]").forEach(button => {
+  $$("[data-family-remove]").forEach(button => {
     button.onclick = async () => {
       removeFamilyMember(button.dataset.familyRemove);
       await renderProfile();
