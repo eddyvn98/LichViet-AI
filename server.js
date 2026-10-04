@@ -80,7 +80,7 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:manifest.version, engine:manifest.engine, calendar:manifest.calendar, decisionPolicy:manifest.decisionPolicy, rankingPolicy:manifest.rankingPolicy, push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+    return json(res,200,{ ok:true, version:manifest.version, engine:manifest.engine, calendar:manifest.calendar, decisionPolicy:manifest.decisionPolicy, rankingPolicy:manifest.rankingPolicy, familyPolicy:manifest.familyPolicy, constraintPolicy:manifest.constraintPolicy, comparisonPolicy:manifest.comparisonPolicy, push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -152,6 +152,9 @@ async function api(req,url,res) {
       glossary,sources,ruleCount:allRules().length,
       decisionPolicy:manifest.decisionPolicy,
       rankingPolicy:manifest.rankingPolicy,
+      familyPolicy:manifest.familyPolicy,
+      constraintPolicy:manifest.constraintPolicy,
+      comparisonPolicy:manifest.comparisonPolicy,
       verification:verificationSummary(),push:pushStatus()
     },"public, max-age=3600");
   }
