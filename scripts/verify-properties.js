@@ -45,7 +45,8 @@ const summary = {
   goodHourFailures:0,
   decisionFailures:0,
   confidenceFailures:0,
-  provenanceFailures:0
+  provenanceFailures:0,
+  traceFailures:0
 };
 
 let index = 0;
@@ -85,6 +86,12 @@ for (let date = from; date <= to; date = nextDay(date), index += 1) {
       !day.provenance.evidenceRecords.some(x => x.id === "XLKY-SELECTION-MULTIFACTOR")) {
     summary.provenanceFailures += 1;
     failures.push({ date, type:"missing-selection-principle-evidence" });
+  }
+
+  if (day.provenance?.trace?.algorithm !== "sha256" ||
+      !/^[0-9a-f]{64}$/.test(day.provenance?.trace?.hash || "")) {
+    summary.traceFailures += 1;
+    failures.push({ date, type:"invalid-reproducibility-trace" });
   }
 
   if (day.dutyTransition) summary.transitionDays += 1;
