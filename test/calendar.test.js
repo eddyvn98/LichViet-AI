@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { solarToVietnameseLunar, vietnameseLunarToSolar, vietnameseLunarYearStructure } from "../src/vietnamese-lunar.js";
-import { getBaZi } from "../src/bazi.js";
+import { birthPillarUncertainty, getBaZi } from "../src/bazi.js";
 import { branchRelationship } from "../src/personal.js";
 
 test("Vietnam lunar golden: 2026-10-04 is 24/8", () => {
@@ -87,4 +87,26 @@ test("Vietnam lunar year structure has 12/13 valid months", () => {
 test("Vietnam lunar core rejects nonexistent Gregorian dates", () => {
   assert.throws(() => solarToVietnameseLunar("2026-02-31"), /không tồn tại/i);
   assert.throws(() => solarToVietnameseLunar("2026-13-01"), /không hợp lệ|phạm vi/i);
+});
+
+
+test("missing birth time preserves Jie-boundary pillar ambiguity", () => {
+  const uncertainty = birthPillarUncertainty("2026-02-04");
+  assert.equal(uncertainty.ambiguous, true);
+  assert.ok(uncertainty.ambiguousFields.includes("year"));
+  assert.ok(uncertainty.ambiguousFields.includes("month"));
+  assert.equal(uncertainty.candidates.year.length, 2);
+  assert.equal(uncertainty.candidates.month.length, 2);
+
+  const start = getBaZi("2026-02-04", "00:00");
+  const end = getBaZi("2026-02-04", "23:59");
+  assert.notEqual(start.raw.year, end.raw.year);
+  assert.notEqual(start.raw.month, end.raw.month);
+  assert.equal(start.raw.day, end.raw.day);
+});
+
+test("ordinary birth date without time keeps stable three pillars", () => {
+  const uncertainty = birthPillarUncertainty("1995-04-14");
+  assert.equal(uncertainty.ambiguous, false);
+  assert.deepEqual(uncertainty.ambiguousFields, []);
 });

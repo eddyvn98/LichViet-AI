@@ -97,6 +97,22 @@ for (let i = 0; i < days; i += step) {
     violations.push("ranking-out-of-range");
   }
   if (!day.confidence?.facts?.code) violations.push("missing-fact-confidence");
+  const confidenceDomains = day.confidence?.domains || {};
+  for (const name of ["calendar","bazi","traditional"]) {
+    if (!confidenceDomains[name]?.code) {
+      violations.push(`missing-confidence-domain-${name}`);
+    }
+  }
+  const confidenceRank = { disputed:0, low:1, medium:2, high:3 };
+  const domainRanks = ["calendar","bazi","traditional"]
+    .map(name => confidenceRank[confidenceDomains[name]?.code])
+    .filter(Number.isFinite);
+  const overallRank = confidenceRank[day.confidence?.facts?.code];
+  if (domainRanks.length === 3 &&
+      Number.isFinite(overallRank) &&
+      overallRank > Math.min(...domainRanks)) {
+    violations.push("aggregate-confidence-exceeds-weakest-domain");
+  }
   if (day.confidence?.ranking?.code !== "experimental") {
     violations.push("ranking-not-marked-experimental");
   }
@@ -122,7 +138,7 @@ for (let i = 0; i < days; i += step) {
 
 const report = {
   generatedAt:new Date().toISOString(),
-  engine:"verified-engine-v4",
+  engine:"verified-engine-v5",
   strict,
   summary,
   noteworthyCases:rows,

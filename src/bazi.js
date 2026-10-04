@@ -258,25 +258,64 @@ export function getBaZi(isoDate, time = "12:00", options = {}) {
   };
 }
 
+export function birthPillarUncertainty(isoDate, options = {}) {
+  validateIsoDate(isoDate);
+  const start = getBaZi(isoDate, "00:00", options);
+  const end = getBaZi(isoDate, "23:59", options);
+  const fields = ["year", "month", "day"];
+  const candidates = Object.fromEntries(fields.map(field => [
+    field,
+    [...new Set([start.raw[field], end.raw[field]])]
+  ]));
+  const ambiguousFields = fields.filter(field => candidates[field].length > 1);
+
+  return {
+    ambiguous:ambiguousFields.length > 0,
+    requiresBirthTime:ambiguousFields.length > 0,
+    ambiguousFields,
+    candidates,
+    window:{
+      start:"00:00",
+      end:"23:59",
+      timezone:"Asia/Ho_Chi_Minh"
+    },
+    reason:ambiguousFields.length
+      ? "Ngày sinh đi qua ranh giới trụ trong ngày; cần giờ sinh để chốt trụ chính xác."
+      : null
+  };
+}
+
 export function birthProfile(birthDate, birthTime = "", options = {}) {
   if (!birthDate) return null;
   const hasTime = /^\d{2}:\d{2}$/.test(birthTime);
   const bazi = getBaZi(birthDate, hasTime ? birthTime : "12:00", options);
+  const uncertainty = hasTime ? null : birthPillarUncertainty(birthDate, options);
+  const display = field => uncertainty?.candidates?.[field]?.length > 1
+    ? uncertainty.candidates[field].map(pillarVi).join(" / ")
+    : bazi.vi[field];
+
   return {
     birthDate,
     birthTime:hasTime ? birthTime : null,
     pillars:hasTime
       ? [bazi.vi.year, bazi.vi.month, bazi.vi.day, bazi.vi.hour]
-      : [bazi.vi.year, bazi.vi.month, bazi.vi.day],
+      : [display("year"), display("month"), display("day")],
     rawPillars:hasTime
       ? [bazi.raw.year, bazi.raw.month, bazi.raw.day, bazi.raw.hour]
       : [bazi.raw.year, bazi.raw.month, bazi.raw.day],
-    yearBranch:bazi.branches.year,
-    yearBranchVi:BRANCH[bazi.branches.year],
+    pillarUncertainty:uncertainty,
+    yearBranch:uncertainty?.ambiguousFields.includes("year")
+      ? null
+      : bazi.branches.year,
+    yearBranchVi:uncertainty?.ambiguousFields.includes("year")
+      ? null
+      : BRANCH[bazi.branches.year],
     boundary:bazi.boundary,
     calculation:bazi.calculation,
     note:hasTime
       ? "Đủ 4 trụ theo giờ sinh đã nhập."
-      : "Chưa có giờ sinh nên chỉ hiển thị 3 trụ; app không tự đoán giờ."
+      : uncertainty?.ambiguous
+        ? "Chưa có giờ sinh và ngày sinh đi qua ranh giới tiết khí; app giữ các trụ có thể xảy ra, không tự chốt theo 12:00."
+        : "Chưa có giờ sinh nên chỉ hiển thị 3 trụ; app không tự đoán giờ."
   };
 }

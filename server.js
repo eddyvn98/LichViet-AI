@@ -66,7 +66,7 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:"4.0.0", engine:"verified-engine-v4", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+    return json(res,200,{ ok:true, version:"5.0.0", engine:"verified-engine-v5", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -235,6 +235,6 @@ http.createServer(async(req,res) => {
     json(res,error.code === "ENOENT" ? 404 : 400,{ error:error.message || "Có lỗi xảy ra" });
   }
 }).listen(port,() => {
-  console.log(`LichViet AI v4 verified engine listening on ${port}`);
+  console.log(`LichViet AI v5 verified engine listening on ${port}`);
   startLocalNotificationScheduler();
 });

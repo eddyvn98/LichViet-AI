@@ -32,7 +32,7 @@ export function verificationSummary() {
   }
 
   return {
-    version:"4.0",
+    version:"5.0",
     mode:"verified-engine",
     integrity,
     ruleCount:rules.length,
@@ -49,6 +49,7 @@ export function verificationSummary() {
       "Bất đồng cross-check phải được giữ lại trong provenance.",
       "Heuristic phải được gắn nhãn và hạ confidence.",
       "Evidence precision và source authority được đánh giá riêng.",
+      "Confidence được tách theo calendar, BaZi và traditional; tổng hợp lấy miền yếu nhất.",
       "Knowledge base phải qua validator trước test/UI."
     ]
   };

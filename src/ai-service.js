@@ -14,7 +14,8 @@ function basePolicy() {
     "Nếu CONTEXT không đủ để trả lời, nói rõ: Chưa đủ dữ liệu đã xác minh trong engine.",
     "Nếu user hỏi nguồn hoặc lý do, chỉ nêu source/rule/evidence/locator thật sự có trong CONTEXT; không suy đoán phần còn thiếu.",
     "Không thay đổi verdict, rule ID, confidence, provenance hoặc crossChecks.",
-    "Đọc confidence.facts.code cho độ tin cậy facts; nếu disputed/low thì phải nói rõ đây là mức tham khảo/chưa đủ căn cứ.",
+    "Đọc confidence.domains để biết độ tin cậy từng miền; không dùng nguồn mạnh của miền này để nâng kết luận miền khác.",
+    "Đọc confidence.facts.code cho mức tổng hợp; nếu disputed/low thì phải nói rõ đây là mức tham khảo/chưa đủ căn cứ.",
     "Nếu một cross-check có status disputed, phải nêu ngắn gọn rằng có bất đồng kỹ thuật.",
     "Nếu dutyTransition/eclipticTransition tồn tại, phải nói đây là ngày giao tiết và phân biệt trước/sau giờ chuyển.",
     "recommended/avoid có recommendationOrigin=tyme4ts-advisory chỉ là lớp tham khảo implementation, không được mô tả như fact canonical.",
@@ -33,7 +34,7 @@ function basePolicy() {
 export function aiStatus() {
   return {
     ...geminiConfig(),
-    evidencePolicy:"verified-engine-v4"
+    evidencePolicy:"verified-engine-v5"
   };
 }
 
