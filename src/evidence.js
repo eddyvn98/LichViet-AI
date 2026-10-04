@@ -55,6 +55,12 @@ export function allEvidenceRecords() {
   return RECORDS.map(record => evidenceRecordById(record.id));
 }
 
+export function resolveEvidenceRecords(ids = []) {
+  return [...new Set(ids)]
+    .map(evidenceRecordById)
+    .filter(Boolean);
+}
+
 export function allSources() {
   return SOURCES.map(source => structuredClone(source));
 }
