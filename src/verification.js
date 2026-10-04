@@ -60,6 +60,10 @@ export function verificationSummary() {
       "Fact nguyên điển và PRODUCT_POLICY phải tách riêng; evidence mạnh không được nâng policy nội bộ thành canonical.",
       "Verdict/chọn ngày dùng multi-signal composition; ranking score chỉ tie-break.",
       "Lịch tính lùi trước phạm vi hiện đại phải giữ nhãn historical-proleptic.",
+      "Family personalization là PRODUCT_POLICY bảo thủ; good của người này không xóa caution của người khác và lớp gia đình không tự tạo veto.",
+      "Ràng buộc chọn ngày là preference của gia đình, không được trình bày như rule cổ.",
+      "So sánh ngày phải giải thích rõ thắng bằng decision band hay chỉ tie-break.",
+      "Feedback chỉ lưu engine/policy/fingerprint và metadata cần rà, không lưu dữ liệu sinh.",
       "Knowledge base phải qua validator trước test/UI."
     ]
   };
