@@ -90,7 +90,7 @@ async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/meta") {
     return json(res,200,{
       activities:Object.entries(ACTIVITIES).map(([id,x]) => ({ id,label:x.label })),
-      glossary,sources,ruleCount:allRules().length,push:pushStatus()
+      glossary,sources,ruleCount:allRules().length,verification:verificationSummary(),push:pushStatus()
     },"public, max-age=3600");
   }
   if (req.method === "GET" && url.pathname === "/api/rules") {
