@@ -14,7 +14,9 @@ test("day API model uses Vietnamese lunar date", () => {
   assert.ok(["Hoàng đạo","Hắc đạo"].includes(d.ecliptic));
   assert.ok(Array.isArray(d.provenance.crossChecks));
   assert.ok(d.provenance.crossChecks.some(x => x.provider === "lunar-javascript"));
-  assert.ok(d.confidence.overall?.code);
+  assert.ok(d.confidence.facts?.code);
+  assert.equal(d.confidence.ranking.code, "experimental");
+  assert.equal(d.ranking.policy.id, "ranking-heuristic-v1");
 });
 
 test("birth profile does not invent missing hour", () => {
@@ -36,4 +38,12 @@ test("planner returns ranked shortlist", () => {
   assert.equal(r.length, 5);
   assert.ok(r.every(x => x.reasons.length));
   assert.ok(r.every(x => !("_score" in x)));
+});
+
+test("planner exposes one heuristic score pipeline without hidden double count", () => {
+  const r = rankDays({ from:"2026-10-04", days:1, activity:"contract" });
+  assert.equal(r.length, 1);
+  const ids = r[0].activityRanking.components.map(x => x.id);
+  assert.equal(ids.filter(x => x === "DUTY_ACTIVITY").length <= 1, true);
+  assert.equal(r[0].activityRanking.policy.id, "ranking-heuristic-v1");
 });
