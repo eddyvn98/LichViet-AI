@@ -1,5 +1,6 @@
 import {
-  $, $$, api, escapeHtml, profilePayload, savePlans, state, todayVN, toast
+  $, $, api, escapeHtml, familyPayload, profilePayload, savePlans,
+  state, todayVN, toast
 } from "./core.js";
 import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
 
@@ -15,13 +16,17 @@ export function renderPlans() {
     return;
   }
 
-  el.innerHTML = state.plans.map(p =>
-    '<article class="saved-plan">' +
+  el.innerHTML = state.plans.map(p => {
+    const names = (p.participantIds || [])
+      .map(id => state.family.find(x => x.id === id)?.name)
+      .filter(Boolean);
+    return '<article class="saved-plan">' +
       '<div><b>' + escapeHtml(p.title || planLabel(p)) + '</b>' +
-      '<small>' + escapeHtml(planLabel(p)) + ' · ' + p.from + ' → ' + p.to + '</small></div>' +
+      '<small>' + escapeHtml(planLabel(p)) + ' · ' + p.from + ' → ' + p.to +
+      (names.length ? ' · ' + escapeHtml(names.join(", ")) : '') + '</small></div>' +
       '<button class="icon-btn" data-remove="' + p.id + '" aria-label="Xóa kế hoạch">×</button>' +
-    '</article>'
-  ).join("");
+    '</article>';
+  }).join("");
 
   $$("[data-remove]").forEach(b => {
     b.onclick = () => {
@@ -47,6 +52,7 @@ export async function addPlan() {
     activity,
     from,
     to,
+    participantIds:state.selectedFamilyIds.slice(0,8),
     createdAt: new Date().toISOString()
   };
 
@@ -66,6 +72,7 @@ export async function refreshBrief() {
       body: {
         date: todayVN(),
         profile: profilePayload(),
+        profiles: familyPayload(false),
         plans: state.plans
       }
     });
