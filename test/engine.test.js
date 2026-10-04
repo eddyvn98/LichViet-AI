@@ -86,3 +86,31 @@ test("planner marks Jie transition scoring as conservative", () => {
   assert.equal(r[0].ranking.transitionPolicy, "conservative-minimum-across-jie-transition");
   assert.match(r[0].reasons.join(" "), /hai Trực|giao tiết/i);
 });
+
+
+test("implementation advisory never changes activity score", async () => {
+  const { scoreActivity } = await import("../src/scoring.js");
+  const base = scoreActivity({ baseScore:60, activityDelta:7 });
+  const withIgnoredAdvisoryArgs = scoreActivity({
+    baseScore:60,
+    activityDelta:7,
+    recommendedHit:true,
+    avoidHit:true
+  });
+  assert.equal(base.score, 67);
+  assert.equal(withIgnoredAdvisoryArgs.score, 67);
+  assert.equal(
+    withIgnoredAdvisoryArgs.components.some(x =>
+      x.id === "DIRECT_RECOMMENDATION" || x.id === "DIRECT_AVOID"
+    ),
+    false
+  );
+});
+
+test("ecliptic component is labeled as engine rule normalization", async () => {
+  const { scoreDayBase } = await import("../src/scoring.js");
+  const result = scoreDayBase({ dutyBase:0, eclipticGood:true, personalDelta:0 });
+  const component = result.components.find(x => x.id === "ECLIPTIC_DAY");
+  assert.ok(component);
+  assert.equal(component.origin, "traditional-rule-normalization");
+});
