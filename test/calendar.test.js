@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { solarToVietnameseLunar } from "../src/vietnamese-lunar.js";
+import { solarToVietnameseLunar, vietnameseLunarToSolar } from "../src/vietnamese-lunar.js";
 import { getBaZi } from "../src/bazi.js";
 import { branchRelationship } from "../src/personal.js";
 
@@ -52,4 +52,21 @@ test("BaZi carries primary evidence refs and solar-term boundary metadata", () =
   assert.ok(x.calculation.evidenceRefs.includes("XJ-WUHU"));
   assert.ok(x.calculation.evidenceRefs.includes("XJ-WUSHU"));
   assert.equal(typeof x.boundary.distanceDegrees, "number");
+});
+
+test("Vietnam lunar conversion round-trips across representative dates", () => {
+  for (const date of ["2025-01-29","2025-08-01","2026-02-17","2026-03-19","2026-10-04","2027-02-06"]) {
+    const lunar = solarToVietnameseLunar(date);
+    const solar = vietnameseLunarToSolar(lunar);
+    assert.equal(solar.iso, date, `${date} -> ${JSON.stringify(lunar)} -> ${solar.iso}`);
+  }
+});
+
+test("Vietnam lunar reverse conversion rejects impossible leap flag", () => {
+  const normal = solarToVietnameseLunar("2026-10-04");
+  assert.equal(normal.leap, false);
+  assert.throws(
+    () => vietnameseLunarToSolar({ ...normal, leap:true }),
+    /nhuận|không tồn tại/i
+  );
 });
