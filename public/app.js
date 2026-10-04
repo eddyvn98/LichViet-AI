@@ -17,6 +17,7 @@ function setupTabs() {
       });
       if (btn.dataset.tab === "assistant") refreshBrief();
       if (btn.dataset.tab === "planner") refreshPlannerFamilyNote();
+      if (btn.dataset.tab === "profile") renderProfile();
     };
   });
 }
