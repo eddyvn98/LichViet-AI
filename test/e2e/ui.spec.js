@@ -99,8 +99,8 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("5.0.0");
-  expect(healthBody.engine).toBe("verified-engine-v5");
+  expect(healthBody.version).toBe("6.0.0");
+  expect(healthBody.engine).toBe("verified-engine-v6");
 
   const conversion = await request.post("/api/convert/lunar-to-solar", {
     data: { day:24, month:8, year:2026, leap:false }
@@ -116,6 +116,14 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
 
   const rules = await request.get("/api/rules");
   expect((await rules.json()).rules.length).toBeGreaterThanOrEqual(24);
+
+  const dutyClassification = await request.get("/api/duty-classification");
+  expect(dutyClassification.ok()).toBeTruthy();
+  expect((await dutyClassification.json()).duties).toHaveLength(12);
+
+  const activityPolicies = await request.get("/api/activity-policies");
+  expect(activityPolicies.ok()).toBeTruthy();
+  expect((await activityPolicies.json()).policies).toHaveLength(8);
 
   const evidence = await request.get("/api/evidence?id=XJ-HUANGHEI");
   expect(evidence.ok()).toBeTruthy();
@@ -142,7 +150,7 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
     }
   });
   expect(brief.ok()).toBeTruthy();
-  expect((await brief.json()).generatedBy).toBe("deterministic-brief-v2");
+  expect((await brief.json()).generatedBy).toBe("deterministic-brief-v3");
 
   const push = await request.get("/api/push/config");
   expect(push.ok()).toBeTruthy();
