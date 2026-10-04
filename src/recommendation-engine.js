@@ -215,3 +215,72 @@ export function composeActivityDecision({
 export function decisionLabel(code) {
   return LABELS[code] || LABELS.neutral;
 }
+
+
+export function composeGeneralDayAssessment({
+  dutyRaws = [],
+  eclipticGoods = []
+} = {}) {
+  const raws = [...new Set(dutyRaws.filter(Boolean))];
+  if (!raws.length) throw new Error("Thiếu Trực để đánh giá ngày");
+
+  const dutySignals = raws.map(raw => {
+    const classification = getDutyClassification(raw);
+    if (!classification) throw new Error("Thiếu classification cho Trực");
+    return {
+      raw,
+      classification,
+      good:classification.traditionalClass === "good",
+      veryBad:classification.tier === "very-bad"
+    };
+  });
+  const eclipticSignals = eclipticGoods.length
+    ? eclipticGoods.map(Boolean)
+    : [false];
+
+  const positives =
+    dutySignals.filter(x => x.good).length +
+    eclipticSignals.filter(Boolean).length;
+  const negatives =
+    dutySignals.filter(x => !x.good).length +
+    eclipticSignals.filter(x => !x).length;
+  const hasVeryBad = dutySignals.some(x => x.veryBad);
+
+  let code = "normal";
+  let label = "Tín hiệu truyền thống đang lẫn tốt/xấu";
+  if (negatives === 0 && positives > 0) {
+    code = "good";
+    label = "Khá thuận theo lớp truyền thống đang bật";
+  } else if (positives === 0 && negatives > 0) {
+    code = "careful";
+    label = "Nên thận trọng theo lớp truyền thống đang bật";
+  } else if (hasVeryBad && eclipticSignals.every(x => x === false)) {
+    code = "careful";
+    label = "Nhiều tín hiệu truyền thống cùng hướng thận trọng";
+  }
+
+  return {
+    code,
+    label,
+    policy:{
+      id:"general-day-composition-v1",
+      evidenceLevel:"PRODUCT_POLICY",
+      evidenceRefs:[
+        "XLKY-12-DUTY-CLASSIFICATION",
+        "XLKY-SELECTION-MULTIFACTOR",
+        "XJ-HUANGHEI"
+      ],
+      note:"Verdict tổng quát cần nhiều tín hiệu cùng hướng; không dựa một Trực hay một điểm số duy nhất."
+    },
+    signals:{
+      duties:dutySignals.map(x => ({
+        raw:x.raw,
+        class:x.classification.traditionalClass,
+        tier:x.classification.tier,
+        evidenceRef:x.classification.evidenceRef
+      })),
+      ecliptic:eclipticSignals
+    },
+    transition:raws.length > 1
+  };
+}
