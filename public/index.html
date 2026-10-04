@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lịch Việt AI</title><meta name="theme-color" content="#f6f4ee">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="shell">
+  <header><div><div class="brand">Lịch Việt <b>AI</b></div><p>Hôm nay nên làm gì?</p></div><button id="todayBtn">Hôm nay</button></header>
+  <section class="hero">
+    <input id="date" type="date" aria-label="Chọn ngày">
+    <div id="loading">Đang tính…</div>
+    <div id="content" hidden>
+      <div class="eyebrow" id="solar"></div>
+      <div class="status"><span id="dot"></span><h1 id="label"></h1><b id="score"></b></div>
+      <p class="lunar" id="lunar"></p>
+      <p class="canchi" id="canchi"></p>
+      <div class="grid">
+        <article><h2>Nên</h2><div id="good"></div></article>
+        <article><h2>Nên tránh</h2><div id="bad"></div></article>
+      </div>
+      <button class="why" id="whyBtn">Vì sao?</button>
+    </div>
+  </section>
+  <section id="why" class="whyPanel" hidden>
+    <h2>Giải thích ngắn</h2>
+    <p><b id="route"></b> · <span id="star"></span></p>
+    <p><b>12 Trực:</b> một vòng 12 trạng thái truyền thống dùng để phân loại tính chất ngày.</p>
+    <p><b>Hoàng/Hắc đạo:</b> cách phân loại truyền thống dựa trên 12 thần trực nhật; không phải đánh giá khoa học.</p>
+    <div id="sources"></div>
+  </section>
+  <footer>Engine tính trước, AI chỉ nên dùng để diễn giải. <a href="/sources.html">Nguồn & phương pháp</a></footer>
+</main>
+<script type="module" src="/app.js"></script>
+</body></html>
