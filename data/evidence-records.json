@@ -263,5 +263,19 @@
       "official": true
     },
     "reviewStatus": "reviewed"
+  },
+  {
+    "id": "HKO-2015-ALL-24-TERMS",
+    "sourceId": "hko-solar-terms-2015",
+    "claimType": "astronomy-regression",
+    "locator": "Official HKO 2015 table: all 24 Solar Terms",
+    "evidenceLevel": "ASTRONOMY_OFFICIAL",
+    "applicability": "solar-term-regression",
+    "normalized": {
+      "timezone": "UTC+8",
+      "coverage": "all-24-terms",
+      "stepDegrees": 15
+    },
+    "reviewStatus": "reviewed"
   }
 ]
