@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyzeBirthProfile } from "./src/bazi-profile.js";
+import { solarTermsForYear } from "./src/bazi.js";
 import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-service.js";
 import { buildBrief } from "./src/brief.js";
 import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
@@ -68,6 +69,10 @@ async function api(req,url,res) {
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
+  }
+  if (req.method === "GET" && url.pathname === "/api/solar-terms") {
+    const year = Number(url.searchParams.get("year") || new Date().getFullYear());
+    return json(res,200,{ year, terms:solarTermsForYear(year) },"public, max-age=86400");
   }
   if (req.method === "GET" && url.pathname === "/api/lunar-year") {
     const year = Number(url.searchParams.get("year") || new Date().getFullYear());
