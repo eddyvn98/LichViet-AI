@@ -8,17 +8,23 @@ const STEM_META = {
 };
 
 const HIDDEN = {
-  "子":[["癸",1]],"丑":[["己",.6],["癸",.3],["辛",.1]],
+  "子":[["癸",1]],"丑":[["己",.6],["辛",.1],["癸",.3]],
   "寅":[["甲",.6],["丙",.3],["戊",.1]],"卯":[["乙",1]],
   "辰":[["戊",.6],["乙",.3],["癸",.1]],"巳":[["丙",.6],["戊",.3],["庚",.1]],
-  "午":[["丁",.7],["己",.3]],"未":[["己",.6],["丁",.3],["乙",.1]],
+  "午":[["丁",.7],["己",.3]],"未":[["丁",.3],["乙",.1],["己",.6]],
   "申":[["庚",.6],["壬",.3],["戊",.1]],"酉":[["辛",1]],
-  "戌":[["戊",.6],["辛",.3],["丁",.1]],"亥":[["壬",.7],["甲",.3]]
+  "戌":[["丁",.1],["辛",.3],["戊",.6]],"亥":[["壬",.7],["甲",.3]]
 };
 
-const ELEMENT_VI = { wood:"Mộc", fire:"Hỏa", earth:"Thổ", metal:"Kim", water:"Thủy" };
-const GENERATES = { wood:"fire", fire:"earth", earth:"metal", metal:"water", water:"wood" };
-const CONTROLS = { wood:"earth", earth:"water", water:"fire", fire:"metal", metal:"wood" };
+const ELEMENT_VI = {
+  wood:"Mộc", fire:"Hỏa", earth:"Thổ", metal:"Kim", water:"Thủy"
+};
+const GENERATES = {
+  wood:"fire", fire:"earth", earth:"metal", metal:"water", water:"wood"
+};
+const CONTROLS = {
+  wood:"earth", earth:"water", water:"fire", fire:"metal", metal:"wood"
+};
 
 function generatedBy(element) {
   return Object.entries(GENERATES).find(([,to]) => to === element)?.[0];
@@ -37,6 +43,25 @@ function tenGod(dayStem, otherStem) {
   return "Không xác định";
 }
 
+function hiddenStemDetails(rawPillars, dayStem) {
+  return rawPillars.map((pillar, index) => {
+    const branch = pillar[1];
+    return {
+      pillar:["Năm","Tháng","Ngày","Giờ"][index],
+      branch,
+      branchVi:BRANCH[branch] || branch,
+      stems:(HIDDEN[branch] || []).map(([stem, weight]) => ({
+        raw:stem,
+        name:STEM[stem] || stem,
+        element:ELEMENT_VI[STEM_META[stem][0]],
+        relation:tenGod(dayStem, stem),
+        weight,
+        weightStatus:"EXPERIMENTAL"
+      }))
+    };
+  });
+}
+
 function elementBalance(rawPillars) {
   const score = { wood:0, fire:0, earth:0, metal:0, water:0 };
   for (const p of rawPillars) {
@@ -48,7 +73,11 @@ function elementBalance(rawPillars) {
   }
   const total = Object.values(score).reduce((a,b) => a+b, 0) || 1;
   return Object.fromEntries(Object.entries(score).map(([k,v]) => [
-    k, { label:ELEMENT_VI[k], score:Number(v.toFixed(2)), pct:Math.round(v / total * 100) }
+    k, {
+      label:ELEMENT_VI[k],
+      score:Number(v.toFixed(2)),
+      pct:Math.round(v / total * 100)
+    }
   ]));
 }
 
@@ -68,17 +97,19 @@ function strengthHeuristic(dayStem, monthBranch, balance) {
 
   const ratio = support / Math.max(.1, support + pressure);
   return {
-    label: ratio >= .58 ? "thiên mạnh" : ratio <= .42 ? "thiên yếu" : "tương đối cân bằng",
+    label:ratio >= .58 ? "thiên mạnh" : ratio <= .42 ? "thiên yếu" : "tương đối cân bằng",
     ratio:Number(ratio.toFixed(2)),
-    method:"heuristic-v2",
-    warning:"Đây là mô hình định lượng đơn giản để giải thích, không thay cho kết luận Dụng thần của một trường phái cụ thể."
+    method:"experimental-strength-v1",
+    evidenceLevel:"EXPERIMENTAL",
+    affectsRanking:false,
+    warning:"Đây là heuristic định lượng của ứng dụng. Không phải kết luận Dụng thần, vượng suy canonical hay quy tắc đã được nguyên điển xác minh."
   };
 }
 
-export function analyzeBirthProfile(birthDate, birthTime = "") {
+export function analyzeBirthProfile(birthDate, birthTime = "", options = {}) {
   if (!birthDate) return null;
   const hasTime = /^\d{2}:\d{2}$/.test(birthTime);
-  const bazi = getBaZi(birthDate, hasTime ? birthTime : "12:00");
+  const bazi = getBaZi(birthDate, hasTime ? birthTime : "12:00", options);
   const rawPillars = hasTime
     ? [bazi.raw.year,bazi.raw.month,bazi.raw.day,bazi.raw.hour]
     : [bazi.raw.year,bazi.raw.month,bazi.raw.day];
@@ -89,6 +120,7 @@ export function analyzeBirthProfile(birthDate, birthTime = "") {
   const stemGods = rawPillars.map((p, i) => ({
     pillar:["Năm","Tháng","Ngày","Giờ"][i],
     stem:STEM[p[0]] || p[0],
+    rawStem:p[0],
     relation:i === 2 ? "Nhật chủ" : tenGod(dayStem, p[0])
   }));
 
@@ -101,6 +133,8 @@ export function analyzeBirthProfile(birthDate, birthTime = "") {
     dayBranch:bazi.branches.day,
     yearBranchVi:BRANCH[bazi.branches.year],
     dayBranchVi:BRANCH[bazi.branches.day],
+    boundary:bazi.boundary,
+    calculation:bazi.calculation,
     dayMaster:{
       raw:dayStem,
       name:STEM[dayStem],
@@ -108,8 +142,25 @@ export function analyzeBirthProfile(birthDate, birthTime = "") {
       polarity:STEM_META[dayStem][1] === "yang" ? "Dương" : "Âm"
     },
     elements:balance,
+    elementBalanceMethod:{
+      id:"weighted-hidden-stems-v1",
+      evidenceLevel:"EXPERIMENTAL",
+      affectsRanking:false,
+      note:"Tàng can membership có provenance; trọng số số học dùng cho biểu đồ là heuristic."
+    },
+    hiddenStems:hiddenStemDetails(rawPillars, dayStem),
+    hiddenStemEvidence:{
+      evidenceRefs:["SFTK-HIDDEN-STEMS"],
+      membershipVerified:true,
+      numericWeightsVerified:false
+    },
     strength,
     tenGods:stemGods,
+    tenGodMethod:{
+      id:"five-elements-polarity-derivation",
+      evidenceLevel:"TRADITIONAL_DERIVED",
+      affectsRanking:false
+    },
     completeness:hasTime ? "four-pillars" : "three-pillars",
     note:hasTime
       ? "Đủ 4 trụ theo giờ sinh đã nhập."
@@ -118,5 +169,18 @@ export function analyzeBirthProfile(birthDate, birthTime = "") {
 }
 
 export function tenGodForStem(dayMasterRaw, otherStemRaw) {
+  if (!STEM_META[dayMasterRaw] || !STEM_META[otherStemRaw]) {
+    throw new Error("Thiên Can không hợp lệ");
+  }
   return tenGod(dayMasterRaw, otherStemRaw);
+}
+
+export function hiddenStemsForBranch(branchRaw) {
+  if (!HIDDEN[branchRaw]) throw new Error("Địa Chi không hợp lệ");
+  return HIDDEN[branchRaw].map(([stem, weight]) => ({
+    raw:stem,
+    name:STEM[stem] || stem,
+    weight,
+    weightStatus:"EXPERIMENTAL"
+  }));
 }
