@@ -4,6 +4,8 @@ import { personalizeDay } from "./personal-v2.js";
 import { evaluateDuty, ruleSummary } from "./rule-engine.js";
 import { branchVi, translateDuty, translateStar, translateTaboos } from "./i18n.js";
 import { solarToVietnameseLunar } from "./vietnamese-lunar.js";
+import { crossCheckDay } from "./crosscheck.js";
+import { assessEvidence } from "./evidence.js";
 
 const DUTY_FALLBACK = {
   "建":["khởi động việc nhỏ","lập kế hoạch"],
@@ -43,7 +45,13 @@ function goodHours(y,m,d) {
     if (star.getEcliptic().getLuck().getName() === "吉") {
       const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
       const branchRaw = branches[Math.floor((hour + 1) / 2) % 12];
-      out.push({ range:hourRange(hour), branch:branchVi(branchRaw), star:translateStar(star.getName()) });
+      out.push({
+        range:hourRange(hour),
+        branch:branchVi(branchRaw),
+        star:translateStar(star.getName()),
+        source:"tyme4ts",
+        evidenceLevel:"IMPLEMENTATION_CROSSCHECK"
+      });
     }
   }
   return out.slice(0, 6);
@@ -71,8 +79,15 @@ export function buildDayInfo(isoDate, profile = null) {
 
   let recommended = aligned ? translateTaboos(rawRecommended) : [];
   let avoid = aligned ? translateTaboos(rawAvoid) : [];
-  if (!recommended.length) recommended = DUTY_FALLBACK[dutyRaw] || ["việc thường ngày"];
-  if (!avoid.length) avoid = ["không có kiêng kỵ nổi bật trong lớp quy tắc đang bật"];
+  let recommendationOrigin = aligned ? "tyme4ts-crosscheck" : "duty-fallback";
+
+  if (!recommended.length) {
+    recommended = DUTY_FALLBACK[dutyRaw] || ["việc thường ngày"];
+    recommendationOrigin = "duty-fallback";
+  }
+  if (!avoid.length) {
+    avoid = ["không có kiêng kỵ nổi bật trong lớp quy tắc đang bật"];
+  }
 
   const bazi = getBaZi(isoDate, "12:00");
   const personal = personalizeDay(profile, bazi);
@@ -81,6 +96,20 @@ export function buildDayInfo(isoDate, profile = null) {
   if (personal) score += personal.delta;
 
   const ruleIds = [...dutyEval.ruleIds, ...(personal?.ruleIds || [])];
+  const rules = ruleSummary(ruleIds);
+  const crossChecks = crossCheckDay({
+    date:isoDate,
+    time:"12:00",
+    vietnameseLunar:vnLunar,
+    bazi,
+    tymeAligned:aligned
+  });
+  const evidence = rules.map(r => r.evidence).filter(Boolean);
+  const evidenceConfidence = assessEvidence({
+    evidence,
+    crossChecks,
+    experimental:Boolean(personal)
+  });
 
   return {
     date:isoDate,
@@ -93,22 +122,33 @@ export function buildDayInfo(isoDate, profile = null) {
     verdict:verdict(score),
     recommended,
     avoid,
+    recommendationOrigin,
     goodHours:goodHours(y,m,d),
     personal,
     provenance:{
       ruleIds,
-      rules:ruleSummary(ruleIds),
-      implementation:"Tyme4TS 1.5.3 được dùng để cross-check nghi/kỵ và thần trực nhật."
+      rules,
+      crossChecks,
+      implementationNotes:[
+        "Tyme4TS cung cấp nghi/kỵ, 12 Trực, thần trực nhật và giờ hoàng/hắc đạo.",
+        "lunar-javascript dùng để cross-check Can Chi và lịch âm.",
+        "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập."
+      ]
     },
     confidence:{
-      calendar:"cao",
-      traditionalRules:aligned ? "tham khảo có provenance" : "cần rà soát",
-      personalization:personal ? "theo mô hình Bát Tự V2" : "chưa bật",
-      note:aligned
-        ? "Âm lịch Việt UTC+7 và lịch nội bộ engine trùng ngày/tháng ở ngày này."
-        : "Âm lịch Việt UTC+7 khác lịch nội bộ engine; app tự hạ mức tin cậy nghi/kỵ."
+      overall:evidenceConfidence,
+      calendar:crossChecks.some(x => x.scope === "lunar-calendar" && x.status === "disputed")
+        ? "cần rà soát"
+        : "cao cho engine Việt UTC+7",
+      traditionalRules:evidenceConfidence.code,
+      personalization:personal ? "experimental-heuristic" : "chưa bật",
+      note:evidenceConfidence.code === "disputed"
+        ? "Có bất đồng kỹ thuật trong cross-check; AI phải trình bày thận trọng."
+        : aligned
+          ? "Engine Việt và implementation cross-check trùng ngày âm ở ngày này."
+          : "Có khác biệt với implementation lịch Trung Quốc; giữ kết quả UTC+7 và hạ mức tin cậy phần nghi/kỵ."
     },
-    evidence:["vn-lunar-hnd","vn-archives-hiep-ky","xieji","tyme4ts"],
+    evidence:["vn-lunar-hnd","vn-archives-hiep-ky","xieji","tyme4ts","lunar-javascript"],
     disclaimer:"Cát/hung là diễn giải theo hệ truyền thống, không phải dự đoán khoa học hay bảo đảm kết quả.",
     _ranking:score,
     _rawRecommended:rawRecommended,
