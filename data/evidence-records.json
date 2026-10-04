@@ -359,5 +359,43 @@
     },
     "reviewStatus": "reviewed",
     "note": "Chỉ xác nhận thành phần tàng can; không xác nhận tỷ trọng 0.6/0.3/0.1."
+  },
+  {
+    "id": "SFTK-TEN-GODS",
+    "sourceId": "shenfeng-tongkao",
+    "claimType": "ten-gods-relations",
+    "locator": "天干五阳通变/天干五阴通变/阴阳通变妙诀・CTP chapter 472359 lines 447-472",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-ten-god-labels",
+    "normalized": {
+      "basis": "same/generates/controls/generated-by/controlled-by + yin-yang polarity",
+      "labels": [
+        "比肩",
+        "劫财",
+        "食神",
+        "伤官",
+        "偏财",
+        "正财",
+        "七杀",
+        "正官",
+        "偏印",
+        "正印"
+      ]
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "SFTK-STRENGTH-QUALITATIVE",
+    "sourceId": "shenfeng-tongkao",
+    "claimType": "seasonal-strength-qualitative",
+    "locator": "五行生克制化 lines 171-175; 节气歌断 lines 670-678",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-strength-qualitative-only",
+    "normalized": {
+      "numericFormula": false,
+      "seasonalContext": true,
+      "note": "Không xác nhận các trọng số số học của ứng dụng."
+    },
+    "reviewStatus": "reviewed"
   }
 ]
