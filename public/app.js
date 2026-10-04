@@ -1,4 +1,4 @@
-import { $, $, api, setMeta, state, todayVN } from "./core.js";
+import { $, $$, api, setMeta, state, todayVN } from "./core.js";
 import { askGemini } from "./ai-ui.js";
 import { addPlan, refreshBrief, renderPlans } from "./assistant-ui.js";
 import { findDays } from "./planner-ui.js";
