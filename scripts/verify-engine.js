@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { buildDayInfo, publicDay } from "../src/traditional.js";
+import { engineManifest } from "../src/version.js";
 import {
   solarToVietnameseLunar,
   vietnameseLunarToSolar
@@ -35,6 +36,7 @@ function parseArgs() {
 }
 
 const { from, days, step, strict, out } = parseArgs();
+const manifest = engineManifest();
 const rows = [];
 const invariantCases = [];
 const summary = {
@@ -116,6 +118,13 @@ for (let i = 0; i < days; i += step) {
   if (day.confidence?.ranking?.code !== "experimental") {
     violations.push("ranking-not-marked-experimental");
   }
+  if (day.ranking?.role !== "tie-break-only" ||
+      day.ranking?.policy?.id !== manifest.rankingPolicy) {
+    violations.push("ranking-not-tie-break-only");
+  }
+  if (day.verdict?.policy?.id !== manifest.generalVerdictPolicy) {
+    violations.push("general-verdict-not-composition-v1");
+  }
   if (!Array.isArray(day.provenance?.rules) ||
       !Array.isArray(day.provenance?.crossChecks)) {
     violations.push("missing-provenance");
@@ -138,7 +147,7 @@ for (let i = 0; i < days; i += step) {
 
 const report = {
   generatedAt:new Date().toISOString(),
-  engine:"verified-engine-v5",
+  engine:manifest.engine,
   strict,
   summary,
   noteworthyCases:rows,
