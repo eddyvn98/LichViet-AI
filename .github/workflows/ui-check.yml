@@ -33,7 +33,7 @@ jobs:
         run: npm test
 
       - name: Verified engine audit smoke
-        run: npm run verify:engine -- --from=2026-10-01 --days=31 > engine-audit.txt
+        run: npm run verify:engine -- --from=2026-01-01 --days=366 --strict=true --out=artifacts/engine-audit.json > engine-audit.txt
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
