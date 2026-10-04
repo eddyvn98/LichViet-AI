@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { birthProfile } from "../src/bazi.js";
+import { analyzeBirthProfile } from "../src/bazi-profile.js";
 import { rankDays, rangeDays } from "../src/planner.js";
 import { buildDayInfo, publicDay } from "../src/traditional.js";
 
@@ -113,4 +114,37 @@ test("ecliptic component is labeled as engine rule normalization", async () => {
   const component = result.components.find(x => x.id === "ECLIPTIC_DAY");
   assert.ok(component);
   assert.equal(component.origin, "traditional-rule-normalization");
+});
+
+
+test("birth profile with missing time on Jie date withholds deep analysis", () => {
+  const p = analyzeBirthProfile("2026-02-04", "");
+  assert.equal(p.advancedAnalysisAvailable, false);
+  assert.equal(p.completeness, "three-pillars-boundary-ambiguous");
+  assert.ok(p.pillarUncertainty.ambiguousFields.includes("year"));
+  assert.ok(p.pillarUncertainty.ambiguousFields.includes("month"));
+  assert.equal(p.yearBranch, null);
+  assert.equal(p.elements, null);
+  assert.equal(p.strength, null);
+  assert.deepEqual(p.tenGods, []);
+  assert.match(p.note, /giữ cả khả năng|tạm ẩn/i);
+});
+
+test("explicit birth time resolves Jie-date profile", () => {
+  const before = analyzeBirthProfile("2026-02-04", "00:30");
+  const after = analyzeBirthProfile("2026-02-04", "23:30");
+  assert.equal(before.advancedAnalysisAvailable, true);
+  assert.equal(after.advancedAnalysisAvailable, true);
+  assert.notEqual(before.rawPillars[0], after.rawPillars[0]);
+  assert.notEqual(before.rawPillars[1], after.rawPillars[1]);
+});
+
+test("day confidence is split by domain and aggregate is conservative", () => {
+  const d = publicDay(buildDayInfo("2026-10-04"));
+  assert.ok(d.confidence.domains.calendar?.code);
+  assert.ok(d.confidence.domains.bazi?.code);
+  assert.ok(d.confidence.domains.traditional?.code);
+  assert.equal(d.confidence.calendar, "khá cho engine Việt UTC+7");
+  assert.equal(d.confidence.facts.code, "medium");
+  assert.equal(d.confidence.facts.weakestDomain, "calendar");
 });
