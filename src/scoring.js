@@ -4,7 +4,7 @@ export const SCORE_POLICY = {
   note:"Điểm số là chính sách xếp hạng của ứng dụng, không phải thang điểm cổ điển.",
   baseline:50,
   ecliptic:{ good:4, bad:-3 },
-  activityDirect:{ recommended:20, avoid:-32 }
+  implementationAdvisory:"display-only"
 };
 
 function clamp(value) {
@@ -16,9 +16,9 @@ export function scoreDayBase({ dutyBase = 0, eclipticGood = false, personalDelta
     { id:"BASELINE", value:SCORE_POLICY.baseline, origin:"product-policy" },
     { id:"DUTY_BASE", value:Number(dutyBase) || 0, origin:"traditional-rule-normalization" },
     {
-      id:"ECLIPTIC_IMPLEMENTATION",
+      id:"ECLIPTIC_DAY",
       value:eclipticGood ? SCORE_POLICY.ecliptic.good : SCORE_POLICY.ecliptic.bad,
-      origin:"implementation-crosscheck"
+      origin:"traditional-rule-normalization"
     }
   ];
   if (personalDelta) {
@@ -37,9 +37,7 @@ export function scoreDayBase({ dutyBase = 0, eclipticGood = false, personalDelta
 
 export function scoreActivity({
   baseScore,
-  activityDelta = 0,
-  recommendedHit = false,
-  avoidHit = false
+  activityDelta = 0
 } = {}) {
   const components = [
     { id:"DAY_BASE", value:Number(baseScore) || 0, origin:"day-score" }
@@ -49,20 +47,6 @@ export function scoreActivity({
       id:"DUTY_ACTIVITY",
       value:Number(activityDelta) || 0,
       origin:"traditional-rule-normalization"
-    });
-  }
-  if (recommendedHit) {
-    components.push({
-      id:"DIRECT_RECOMMENDATION",
-      value:SCORE_POLICY.activityDirect.recommended,
-      origin:"implementation-crosscheck"
-    });
-  }
-  if (avoidHit) {
-    components.push({
-      id:"DIRECT_AVOID",
-      value:SCORE_POLICY.activityDirect.avoid,
-      origin:"implementation-crosscheck"
     });
   }
   return {
