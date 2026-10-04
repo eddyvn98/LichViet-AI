@@ -252,5 +252,35 @@
       "bazi-hidden-stems-supplement"
     ],
     "usedFor": "Đối chiếu tàng can 12 Địa Chi; không dùng làm căn cứ cho trọng số số học."
+  },
+  {
+    "id": "xieji-huanghei",
+    "name": "欽定協紀辨方書 卷七・黃道黑道",
+    "publisher": "中華文庫 / 四庫全書本 transcription",
+    "url": "https://www.zhonghuashu.com/wiki/%E6%AC%BD%E5%AE%9A%E5%8D%94%E7%B4%80%E8%BE%A8%E6%96%B9%E6%9B%B8_%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%85%A8%E8%A6%BD1",
+    "type": "bản chép số hóa nguyên điển",
+    "strength": "cao trong hệ truyền thống, cần đối chiếu scan khi nâng critical edition",
+    "role": "primary-text-transcription",
+    "family": "xieji-bianfangshu",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "authorityRank": 4,
+    "canonicalFor": [
+      "yellow-black-path"
+    ],
+    "usedFor": "Công thức 12 thần Hoàng/Hắc đạo cho ngày và giờ."
+  },
+  {
+    "id": "qimen-huanghei",
+    "name": "奇門遁甲秘笈大全 卷二十・黃黑道日時",
+    "publisher": "Chinese Text Project",
+    "url": "https://ctext.org/wiki.pl?chapter=703617&if=gb&remap=gb",
+    "type": "cổ thư đối chiếu",
+    "strength": "bổ trợ",
+    "role": "supplemental-classic",
+    "family": "qimen-miji",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "authorityRank": 3,
+    "canonicalFor": [],
+    "usedFor": "Đối chiếu độc lập công thức khởi Thanh Long và sáu thần Hoàng đạo."
   }
 ]
