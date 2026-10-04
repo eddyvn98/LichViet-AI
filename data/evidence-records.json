@@ -463,5 +463,18 @@
       ]
     },
     "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XLKY-DUTY-TRANSITION",
+    "sourceId": "xingli-kaoyuan-yuejian",
+    "claimType": "twelve-duty-transition-day",
+    "locator": "卷五・月建十二神・CTP chapter 656830 lines 4-6",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "twelve-duty-day-transition",
+    "normalized": {
+      "rule": "每月交節則疊兩值日",
+      "interpretation": "Ngày chứa thời điểm giao tiết có hai Trực: trước và sau giao tiết."
+    },
+    "reviewStatus": "reviewed"
   }
 ]
