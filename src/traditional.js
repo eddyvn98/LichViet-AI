@@ -347,6 +347,8 @@ export function buildDayInfo(isoDate, profile = null) {
       x.evaluation.evidence?.flatMap(e => e.evidenceRefs || []) || []
     ),
     ...eclipticState.evidenceRefs,
+    "XLKY-12-DUTY-CLASSIFICATION",
+    "XLKY-SELECTION-MULTIFACTOR",
     ...(dutyState.transition?.evidenceRefs || []),
     ...(personal?.evidence?.flatMap(x => x.evidence?.evidenceRefs || []) || [])
   ]);
@@ -420,6 +422,7 @@ export function buildDayInfo(isoDate, profile = null) {
         canMakeStrongClaim:false,
         policy:ranking.policy.id
       },
+      calendarScope:vnLunar.calculation?.scope || "unknown",
       calendar:calendarConfidence.code === "disputed"
         ? "cần rà soát"
         : calendarConfidence.code === "high"
@@ -470,7 +473,8 @@ export function buildDayInfo(isoDate, profile = null) {
     _rawAvoid:rawAvoid,
     _implementationAdviceUsable:aligned,
     _dutyRaw:dutyState.primary.raw,
-    _dutyRaws:dutyState.dutyRaws
+    _dutyRaws:dutyState.dutyRaws,
+    _eclipticGoods:eclipticState.candidates.map(x => x.good)
   };
 }
 
@@ -482,6 +486,7 @@ export function publicDay(info) {
     _implementationAdviceUsable,
     _dutyRaw,
     _dutyRaws,
+    _eclipticGoods,
     ...publicInfo
   } = info;
   return publicInfo;
