@@ -9,6 +9,7 @@ import { buildBrief } from "./src/brief.js";
 import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
 import { allRules } from "./src/rule-engine.js";
 import { verificationCases, verificationSummary } from "./src/verification.js";
+import { allEvidenceRecords } from "./src/evidence.js";
 import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src/push.js";
 import { buildDayInfo, publicDay } from "./src/traditional.js";
 import { vietnameseLunarToSolar, vietnameseLunarYearStructure } from "./src/vietnamese-lunar.js";
@@ -114,6 +115,17 @@ async function api(req,url,res) {
   }
   if (req.method === "GET" && url.pathname === "/api/rules") {
     return json(res,200,{ rules:allRules() },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/evidence") {
+    const id = url.searchParams.get("id");
+    const claimType = url.searchParams.get("claimType");
+    let records = allEvidenceRecords();
+    if (id) records = records.filter(x => x.id === id);
+    if (claimType) records = records.filter(x => x.claimType === claimType);
+    return json(res,200,{ records },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/sources") {
+    return json(res,200,{ sources },"public, max-age=3600");
   }
   if (req.method === "GET" && url.pathname === "/api/verification") {
     return json(res,200,verificationSummary(),"public, max-age=3600");
