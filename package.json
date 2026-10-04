@@ -9,7 +9,8 @@
     "test:e2e": "playwright test",
     "verify:engine": "node scripts/verify-engine.js",
     "validate:knowledge": "node scripts/validate-knowledge.js",
-    "verify:properties": "node scripts/verify-properties.js"
+    "verify:properties": "node scripts/verify-properties.js",
+    "check:frontend": "node scripts/check-frontend.js"
   },
   "dependencies": {
     "lunar-javascript": "1.7.7",
