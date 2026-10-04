@@ -7,6 +7,7 @@ import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-se
 import { buildBrief } from "./src/brief.js";
 import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
 import { allRules } from "./src/rule-engine.js";
+import { verificationCases, verificationSummary } from "./src/verification.js";
 import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src/push.js";
 import { buildDayInfo, publicDay } from "./src/traditional.js";
 import { telegramStatus } from "./src/telegram.js";
@@ -62,7 +63,7 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:"2.2.0", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+    return json(res,200,{ ok:true, version:"3.0.0", engine:"verified-engine", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -89,11 +90,17 @@ async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/meta") {
     return json(res,200,{
       activities:Object.entries(ACTIVITIES).map(([id,x]) => ({ id,label:x.label })),
-      glossary,sources,ruleCount:allRules().length,push:pushStatus()
+      glossary,sources,ruleCount:allRules().length,verification:verificationSummary(),push:pushStatus()
     },"public, max-age=3600");
   }
   if (req.method === "GET" && url.pathname === "/api/rules") {
     return json(res,200,{ rules:allRules() },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/verification") {
+    return json(res,200,verificationSummary(),"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/verification/cases") {
+    return json(res,200,{ cases:verificationCases() },"public, max-age=3600");
   }
   if (req.method === "POST" && url.pathname === "/api/brief") {
     const payload = await bodyJson(req);
@@ -197,6 +204,6 @@ http.createServer(async(req,res) => {
     json(res,error.code === "ENOENT" ? 404 : 400,{ error:error.message || "Có lỗi xảy ra" });
   }
 }).listen(port,() => {
-  console.log(`LichViet AI v2.2 listening on ${port}`);
+  console.log(`LichViet AI v3 verified engine listening on ${port}`);
   startLocalNotificationScheduler();
 });

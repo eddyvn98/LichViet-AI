@@ -1,14 +1,16 @@
 {
   "name": "lichviet-ai",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.js",
     "test": "node --test test/*.test.js",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify:engine": "node scripts/verify-engine.js"
   },
   "dependencies": {
+    "lunar-javascript": "1.7.7",
     "tyme4ts": "1.5.3",
     "web-push": "^3.6.7"
   },

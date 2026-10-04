@@ -6,7 +6,10 @@
     "url":"https://www.archives.org.vn/gioi-thieu-tai-lieu-nghiep-vu/quy-trinh-bien-soan-lich-hiep-ky-duoi-trieu-nguyen.htm",
     "type":"nguồn Việt Nam chính thức về lịch sử",
     "strength":"cao",
-    "usedFor":"Chứng cứ Khâm Thiên Giám biên soạn Lịch Hiệp Kỷ và ngự lịch thời Minh Mệnh dựa trên sách Hiệp Kỷ Biện Phương."
+    "role":"official-secondary",
+    "family":"vietnam-national-archives",
+    "evidenceLevel":"OFFICIAL_SECONDARY",
+    "usedFor":"Chứng cứ lịch sử rằng triều Nguyễn dùng lịch Hiệp Kỷ và Khâm Thiên Giám dựa trên Hiệp Kỷ Biện Phương khi biên soạn ngự lịch."
   },
   {
     "id":"vn-archives-kham-thien",
@@ -15,6 +18,9 @@
     "url":"https://www.archives.org.vn/kham-thien-giam-trieu-nguyen.htm",
     "type":"nguồn Việt Nam chính thức về lịch sử",
     "strength":"cao",
+    "role":"official-secondary",
+    "family":"vietnam-national-archives",
+    "evidenceLevel":"OFFICIAL_SECONDARY",
     "usedFor":"Chứng cứ cơ quan chính thức làm lịch và lựa ngày giờ phục vụ triều đình."
   },
   {
@@ -24,7 +30,10 @@
     "url":"https://honguyenviet.com/amlich/calrules.html",
     "type":"thuật toán lịch thiên văn Việt Nam",
     "strength":"cao cho lịch hiện đại",
-    "usedFor":"Chuyển dương lịch sang âm lịch theo UTC+7; app triển khai lại công thức."
+    "role":"algorithm-reference",
+    "family":"ho-ngoc-duc-vn-lunar",
+    "evidenceLevel":"PRIMARY_FAMILY",
+    "usedFor":"Chuyển dương lịch sang âm lịch theo UTC+7; app triển khai lại công thức và khóa bằng regression cases."
   },
   {
     "id":"hko-calendar",
@@ -33,7 +42,10 @@
     "url":"https://www.hko.gov.hk/en/gts/time/conversion.htm",
     "type":"nguồn đối chiếu lịch và tiết khí",
     "strength":"cao nhưng UTC+8",
-    "usedFor":"Đối chiếu chéo ngày không nhạy múi giờ và mốc tiết khí; không dùng làm chuẩn âm lịch Việt Nam."
+    "role":"official-crosscheck",
+    "family":"hong-kong-observatory",
+    "evidenceLevel":"ASTRONOMY_OFFICIAL",
+    "usedFor":"Đối chiếu chéo các mốc không nhạy múi giờ và 24 tiết khí; không dùng làm chuẩn âm lịch Việt Nam vì UTC+8."
   },
   {
     "id":"gbt33661",
@@ -42,7 +54,10 @@
     "url":"https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=E107EA4DE9725EDF819F33C60A44B296&refer=outter",
     "type":"tiêu chuẩn lịch Trung Quốc",
     "strength":"cao trong phạm vi Trung Quốc",
-    "usedFor":"Tham khảo định nghĩa lịch thiên văn; không coi là tiêu chuẩn lịch Việt Nam."
+    "role":"standard-reference",
+    "family":"china-national-standard",
+    "evidenceLevel":"ASTRONOMY_OFFICIAL",
+    "usedFor":"Tham khảo định nghĩa lịch thiên văn Trung Quốc; không coi là tiêu chuẩn lịch Việt Nam."
   },
   {
     "id":"xieji",
@@ -51,7 +66,10 @@
     "url":"https://ctext.org/wiki.pl?chapter=855889&if=gb",
     "type":"nguồn cổ điển chọn ngày",
     "strength":"nguồn truyền thống chính",
-    "usedFor":"Source family chính của rule V2; các mục 建日/除日/... và 宜/忌 được dùng để gắn provenance."
+    "role":"primary-text",
+    "family":"xieji-bianfangshu",
+    "evidenceLevel":"PRIMARY_FAMILY",
+    "usedFor":"Nguyên điển chính của rule chọn ngày. Chỉ nâng rule lên PRIMARY_EXACT sau khi locator được xác minh đến đoạn/trang/bản scan."
   },
   {
     "id":"xieji-liuhe",
@@ -60,7 +78,10 @@
     "url":"https://ctext.org/wiki.pl?chapter=584487&if=gb&remap=gb",
     "type":"nguồn cổ điển quan hệ Địa Chi",
     "strength":"nguồn truyền thống",
-    "usedFor":"Provenance cho lục hợp và quan hệ Địa Chi được V2 dùng như tín hiệu phụ."
+    "role":"primary-text",
+    "family":"xieji-bianfangshu",
+    "evidenceLevel":"PRIMARY_FAMILY",
+    "usedFor":"Provenance cho lục hợp và quan hệ Địa Chi."
   },
   {
     "id":"tyme4ts",
@@ -69,6 +90,21 @@
     "url":"https://github.com/6tail/tyme4ts",
     "type":"implementation",
     "strength":"cross-check kỹ thuật",
+    "role":"implementation-crosscheck",
+    "family":"6tail",
+    "evidenceLevel":"IMPLEMENTATION_CROSSCHECK",
     "usedFor":"Nghi/kỵ chi tiết, 12 Trực, thần trực nhật và giờ Hoàng/Hắc đạo; không dùng làm chuẩn âm lịch Việt Nam."
+  },
+  {
+    "id":"lunar-javascript",
+    "name":"lunar-javascript",
+    "publisher":"6tail",
+    "url":"https://github.com/6tail/lunar-javascript",
+    "type":"implementation",
+    "strength":"cross-check kỹ thuật phổ biến",
+    "role":"implementation-crosscheck",
+    "family":"6tail",
+    "evidenceLevel":"IMPLEMENTATION_CROSSCHECK",
+    "usedFor":"Cross-check Can Chi năm/tháng/ngày và lịch âm. Cùng family 6tail với Tyme4TS nên không được tính như một nguồn độc lập thứ hai."
   }
 ]

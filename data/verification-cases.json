@@ -1,0 +1,45 @@
+[
+  {
+    "id": "VN-LUNAR-2026-03-01",
+    "date": "2026-03-01",
+    "kind": "vietnamese-lunar",
+    "expected": { "year": 2026, "month": 1, "day": 13, "leap": false },
+    "status": "REGRESSION_LOCKED",
+    "note": "Ca vang noi bo; khong dung de tu tuyen bo la primary-source verified."
+  },
+  {
+    "id": "VN-LUNAR-2026-03-19",
+    "date": "2026-03-19",
+    "kind": "vietnamese-lunar",
+    "expected": { "year": 2026, "month": 2, "day": 1, "leap": false },
+    "status": "REGRESSION_LOCKED"
+  },
+  {
+    "id": "VN-LUNAR-2026-07-14",
+    "date": "2026-07-14",
+    "kind": "vietnamese-lunar",
+    "expected": { "year": 2026, "month": 6, "day": 1, "leap": false },
+    "status": "REGRESSION_LOCKED"
+  },
+  {
+    "id": "VN-LUNAR-2026-10-04",
+    "date": "2026-10-04",
+    "kind": "vietnamese-lunar",
+    "expected": { "year": 2026, "month": 8, "day": 24, "leap": false },
+    "status": "REGRESSION_LOCKED"
+  },
+  {
+    "id": "BAZI-2026-10-04-NOON",
+    "date": "2026-10-04",
+    "time": "12:00",
+    "kind": "bazi",
+    "expected": {
+      "year": "丙午",
+      "month": "丁酉",
+      "day": "辛亥",
+      "solarTerm": "Thu phân"
+    },
+    "status": "REGRESSION_LOCKED",
+    "crossCheck": ["lunar-javascript", "tyme4ts"]
+  }
+]

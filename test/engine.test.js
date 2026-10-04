@@ -12,6 +12,9 @@ test("day API model uses Vietnamese lunar date", () => {
   assert.ok(d.recommended.length > 0);
   assert.ok(d.goodHours.length > 0);
   assert.ok(["Hoàng đạo","Hắc đạo"].includes(d.ecliptic));
+  assert.ok(Array.isArray(d.provenance.crossChecks));
+  assert.ok(d.provenance.crossChecks.some(x => x.provider === "lunar-javascript"));
+  assert.ok(d.confidence.overall?.code);
 });
 
 test("birth profile does not invent missing hour", () => {
