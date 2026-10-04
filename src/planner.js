@@ -21,9 +21,23 @@ function addDays(iso, n) {
 
 function activityScore(day, activity) {
   const cfg = ACTIVITIES[activity];
-  const dutyEval = evaluateDuty(day._dutyRaw, activity);
+  const dutyRaws = Array.isArray(day._dutyRaws) && day._dutyRaws.length
+    ? day._dutyRaws
+    : [day._dutyRaw];
+  const dutyEvaluations = dutyRaws.map(raw => evaluateDuty(raw, activity));
+  const dutyEval = {
+    activityDelta:Math.min(...dutyEvaluations.map(x => x.activityDelta)),
+    reasons:[...new Set(dutyEvaluations.flatMap(x => x.reasons))],
+    ruleIds:[...new Set(dutyEvaluations.flatMap(x => x.ruleIds))]
+  };
   const reasons = [...dutyEval.reasons];
   const ruleIds = [...dutyEval.ruleIds];
+
+  if (dutyRaws.length > 1) {
+    reasons.unshift(
+      "Ngày giao tiết có hai Trực; planner dùng mức điểm bảo thủ hơn giữa trạng thái trước và sau giao tiết."
+    );
+  }
 
   const advisoryAllowed = day._implementationAdviceUsable === true;
   const recommendedHit = advisoryAllowed
