@@ -6,7 +6,7 @@ import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
 import { loadDay } from "./today.js";
 
 function elementBars(elements) {
-  return Object.values(elements).map(x =>
+  return Object.values(elements || {}).map(x =>
     '<div class="element-row"><span>' + escapeHtml(x.label) + '</span>' +
       '<div class="bar"><i style="width:' + x.pct + '%"></i></div>' +
       '<small>' + x.pct + '%</small></div>'
@@ -15,38 +15,35 @@ function elementBars(elements) {
 
 export async function renderProfile() {
   if (!state.profile?.birthDate) {
-    $("#profileResult").innerHTML =
-      '<p class="note">Chưa có hồ sơ. App vẫn dùng được; hồ sơ chỉ thêm lớp Bát Tự cá nhân hóa.</p>';
-    return;
-  }
-
-  $("#profileName").value = state.profile.name || "";
-  $("#birthDate").value = state.profile.birthDate;
-  $("#birthTime").value = state.profile.birthTime || "";
-
-  const p = new URLSearchParams({ birth: state.profile.birthDate });
-  if (state.profile.birthTime) p.set("birthTime", state.profile.birthTime);
-  const d = await api("/api/profile?" + p.toString());
+    const dayMasterText = d.dayMaster
+    ? 'Nhật chủ <strong>' + escapeHtml(d.dayMaster.name) + ' ' +
+      escapeHtml(d.dayMaster.element) + '</strong>'
+    : 'Nhật chủ chưa thể chốt';
+  const strengthText = d.strength?.label
+    ? ' · ' + escapeHtml(d.strength.label)
+    : '';
+  const deepAnalysis = d.advancedAnalysisAvailable === false
+    ? '<div class="note"><b>Phân tích sâu tạm ẩn.</b> Cần giờ sinh để xác định chính xác trụ trước/sau ranh giới tiết khí.</div>'
+    : '<details class="deep-profile"><summary>Phân tích sâu</summary>' +
+        '<h3>Ngũ hành tương đối</h3>' + elementBars(d.elements) +
+        '<h3>Thập thần trên Thiên Can</h3>' +
+        '<div class="god-grid">' + (d.tenGods || []).map(x =>
+          '<span><b>' + escapeHtml(x.pillar) + '</b><small>' +
+          escapeHtml(x.stem) + ' · ' + escapeHtml(x.relation) + '</small></span>'
+        ).join("") + '</div>' +
+        '<p class="note">' + escapeHtml(d.strength?.warning || "") + '</p>' +
+      '</details>';
 
   $("#profileResult").innerHTML =
     '<div class="profile-summary">' +
-      '<p><b>' + escapeHtml(state.profile.name || "Hồ sơ") + '</b> · Nhật chủ <strong>' +
-      escapeHtml(d.dayMaster.name) + ' ' + escapeHtml(d.dayMaster.element) + '</strong> · ' +
-      escapeHtml(d.strength.label) + '</p>' +
+      '<p><b>' + escapeHtml(state.profile.name || "Hồ sơ") + '</b> · ' +
+      dayMasterText + strengthText + '</p>' +
       '<div class="pillars">' +
       d.pillars.map((x, i) =>
         '<span class="pillar">' + ["Năm","Tháng","Ngày","Giờ"][i] +
         ' · ' + escapeHtml(x) + '</span>'
       ).join("") + '</div>' +
-      '<details class="deep-profile"><summary>Phân tích sâu</summary>' +
-        '<h3>Ngũ hành tương đối</h3>' + elementBars(d.elements) +
-        '<h3>Thập thần trên Thiên Can</h3>' +
-        '<div class="god-grid">' + d.tenGods.map(x =>
-          '<span><b>' + escapeHtml(x.pillar) + '</b><small>' +
-          escapeHtml(x.stem) + ' · ' + escapeHtml(x.relation) + '</small></span>'
-        ).join("") + '</div>' +
-        '<p class="note">' + escapeHtml(d.strength.warning) + '</p>' +
-      '</details>' +
+      deepAnalysis +
       '<p class="note">' + escapeHtml(d.note) + '</p>' +
     '</div>';
 }
