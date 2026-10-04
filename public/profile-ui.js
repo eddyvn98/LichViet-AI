@@ -92,8 +92,32 @@ export function newFamilyMemberForm() {
   renderFamilyMembers();
 }
 
+export async function renderFeedbackHistory() {
+  const el = $("#feedbackHistory");
+  if (!el) return;
+  try {
+    const data = await api("/api/feedback?limit=10");
+    el.innerHTML = data.items?.length
+      ? data.items.map(item =>
+          '<article class="saved-plan">' +
+            '<div><b>' +
+              (item.feedback === "review" ? "⚑ Cần rà" : "✓ Hợp lý") +
+            '</b><small>' + escapeHtml(item.date) +
+              (item.activity ? ' · ' + escapeHtml(item.activity) : '') +
+              ' · ' + escapeHtml((item.traceHash || "").slice(0,12)) +
+            '</small></div>' +
+            '<span class="badge">' + escapeHtml(item.engine || "") + '</span>' +
+          '</article>'
+        ).join("")
+      : '<p class="note">Chưa có kết quả nào được đánh dấu.</p>';
+  } catch (e) {
+    el.innerHTML = '<p class="note">' + escapeHtml(e.message) + '</p>';
+  }
+}
+
 export async function renderProfile() {
   renderFamilyMembers();
+  renderFeedbackHistory();
   if (!state.profile?.birthDate) {
     $("#profileResult").innerHTML =
       '<p class="note">Chưa có hồ sơ. App vẫn dùng được; hồ sơ chỉ thêm lớp Bát Tự cá nhân hóa.</p>';
