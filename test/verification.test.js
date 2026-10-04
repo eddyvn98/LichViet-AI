@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { crossCheckDay, lunarJavascriptSnapshot } from "../src/crosscheck.js";
-import { assessEvidence, sourcePolicy } from "../src/evidence.js";
-import { getBaZi } from "../src/bazi.js";
+import { assessEvidence, combineConfidence, evidenceRecordById, sourcePolicy } from "../src/evidence.js";
+import { getBaZi, jieMonthTransitionForDate, solarTermMoment } from "../src/bazi.js";
 import { solarToVietnameseLunar } from "../src/vietnamese-lunar.js";
 import { verificationCases, verificationSummary } from "../src/verification.js";
 
@@ -177,4 +177,79 @@ test("yellow-black path engine yields exactly six good deities and hours", async
 
 test("BaZi rejects nonexistent Gregorian dates", () => {
   assert.throws(() => getBaZi("2026-02-31", "12:00"), /không tồn tại/i);
+});
+
+
+test("confidence applicability prevents unrelated official evidence from elevating a domain", () => {
+  const result = assessEvidence({
+    evidence:[
+      evidenceRecordById("VN-UTC7-OFFICIAL"),
+      evidenceRecordById("VN-LUNAR-HND-ALGORITHM")
+    ],
+    crossChecks:[],
+    strongClaimApplicabilities:["modern-vietnamese-lunar-calculation"]
+  });
+  assert.equal(result.code, "medium");
+  assert.equal(result.canMakeStrongClaim, false);
+});
+
+test("timezone-sensitive cross-check qualifies otherwise strong evidence", () => {
+  const result = assessEvidence({
+    evidence:[evidenceRecordById("XJ-HUANGHEI")],
+    crossChecks:[{
+      id:"tz",
+      family:"reference",
+      status:"timezone-sensitive"
+    }]
+  });
+  assert.equal(result.code, "medium");
+  assert.equal(result.canMakeStrongClaim, false);
+  assert.deepEqual(result.qualifiedBy, ["tz"]);
+});
+
+test("combined confidence uses the weakest evidence domain", () => {
+  const combined = combineConfidence({
+    calendar:{ code:"medium", label:"calendar", canMakeStrongClaim:false },
+    bazi:{ code:"high", label:"bazi", canMakeStrongClaim:true },
+    traditional:{ code:"high", label:"traditional", canMakeStrongClaim:true }
+  });
+  assert.equal(combined.code, "medium");
+  assert.equal(combined.weakestDomain, "calendar");
+  assert.equal(combined.canMakeStrongClaim, false);
+});
+
+function vnLocalParts(epochMs) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone:"Asia/Ho_Chi_Minh",
+    year:"numeric", month:"2-digit", day:"2-digit",
+    hour:"2-digit", minute:"2-digit",
+    hour12:false
+  }).formatToParts(new Date(epochMs));
+  const pick = type => parts.find(x => x.type === type)?.value;
+  return {
+    date:`${pick("year")}-${pick("month")}-${pick("day")}`,
+    time:`${pick("hour")}:${pick("minute")}`
+  };
+}
+
+test("all 12 Jie boundaries switch BaZi month pillar across the exact moment", () => {
+  const jieDegrees = [285,315,345,15,45,75,105,135,165,195,225,255];
+  for (const degree of jieDegrees) {
+    const moment = solarTermMoment(2015, degree);
+    const before = vnLocalParts(moment.epochMs - 60_000);
+    const after = vnLocalParts(moment.epochMs + 60_000);
+    const beforeBazi = getBaZi(before.date, before.time);
+    const afterBazi = getBaZi(after.date, after.time);
+    assert.notEqual(
+      beforeBazi.raw.month,
+      afterBazi.raw.month,
+      `${degree}° should switch month pillar at ${moment.iso}`
+    );
+
+    const transition = jieMonthTransitionForDate(moment.date);
+    assert.ok(transition, `missing transition for ${moment.iso}`);
+    assert.equal(transition.degree, degree);
+    assert.equal(beforeBazi.branches.month, transition.previousMonthBranch);
+    assert.equal(afterBazi.branches.month, transition.newMonthBranch);
+  }
 });
