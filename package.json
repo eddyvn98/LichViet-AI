@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --test test/*.test.js",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify:engine": "node scripts/verify-engine.js"
   },
   "dependencies": {
     "lunar-javascript": "1.7.7",
