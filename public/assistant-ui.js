@@ -1,6 +1,7 @@
 import {
   $, $$, api, escapeHtml, profilePayload, savePlans, state, todayVN, toast
 } from "./core.js";
+import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
 
 function planLabel(plan) {
   return state.meta.activities.find(x => x.id === plan.activity)?.label || plan.activity;
@@ -27,6 +28,7 @@ export function renderPlans() {
       savePlans(state.plans.filter(p => p.id !== b.dataset.remove));
       renderPlans();
       refreshBrief();
+      syncNotificationSettingsIfEnabled();
     };
   });
 }
@@ -52,6 +54,7 @@ export async function addPlan() {
   $("#intentTitle").value = "";
   renderPlans();
   await refreshBrief();
+  await syncNotificationSettingsIfEnabled();
   toast("Đã thêm kế hoạch.");
 }
 

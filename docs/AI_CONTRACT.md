@@ -54,3 +54,29 @@ apiKeysAllowed = false
 Không được cài fallback sang OpenAI, Claude, OpenRouter, Vertex API hoặc bất kỳ API AI khác.
 
 Gemini CLI chỉ nhận context do server dựng lại từ deterministic engine. Browser không được gửi một kết quả lịch tùy ý rồi yêu cầu AI coi đó là ground truth.
+
+
+## Style policy V2.2
+
+Mọi phản hồi Gemini phải:
+- kết luận trước,
+- câu ngắn,
+- từ phổ thông,
+- tối đa 80 từ cho web,
+- tối đa 60 từ cho Telegram,
+- tránh ngôn ngữ mơ hồ/cao siêu,
+- không dùng các từ kiểu “năng lượng”, “vận khí”, “cát khí”, “thiên thời”, “vũ trụ”, “khai mở” nếu engine không có dữ liệu tương ứng.
+
+## Telegram policy
+
+Telegram chỉ dành cho **thông báo chủ động theo lựa chọn của user**.
+
+Không gửi bản sao của mọi câu hỏi/đáp trên web.
+
+User có thể chọn:
+- overview,
+- plans,
+- upcoming,
+- personal.
+
+Thông báo Telegram được dựng từ deterministic context trước, sau đó Gemini chỉ rút gọn câu chữ.

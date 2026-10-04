@@ -9,6 +9,15 @@ import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
 import { allRules } from "./src/rule-engine.js";
 import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src/push.js";
 import { buildDayInfo, publicDay } from "./src/traditional.js";
+import { telegramStatus } from "./src/telegram.js";
+import {
+  getNotificationSettings,
+  saveNotificationSettings
+} from "./src/notification-store.js";
+import {
+  sendDueTelegramNotification,
+  startLocalNotificationScheduler
+} from "./src/notification-service.js";
 
 const publicRoot = fileURLToPath(new URL("./public/", import.meta.url));
 const sources = JSON.parse(await readFile(new URL("./data/sources.json", import.meta.url),"utf8"));
@@ -53,7 +62,7 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:"2.1.0", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus() });
+    return json(res,200,{ ok:true, version:"2.2.0", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -114,6 +123,23 @@ async function api(req,url,res) {
     });
     return json(res,200,await rewriteBriefWithGemini(brief));
   }
+  if (req.method === "GET" && url.pathname === "/api/telegram/status") {
+    return json(res,200,telegramStatus(),"public, max-age=60");
+  }
+  if (req.method === "GET" && url.pathname === "/api/notifications/settings") {
+    return json(res,200,await getNotificationSettings());
+  }
+  if (req.method === "POST" && url.pathname === "/api/notifications/settings") {
+    const payload = await bodyJson(req);
+    return json(res,200,await saveNotificationSettings(payload));
+  }
+  if (req.method === "POST" && url.pathname === "/api/notifications/run-now") {
+    const secret = req.headers["x-cron-secret"] || "";
+    if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+      return json(res,401,{ error:"Unauthorized" });
+    }
+    return json(res,200,await sendDueTelegramNotification(new Date()));
+  }
   if (req.method === "GET" && url.pathname === "/api/push/config") {
     return json(res,200,pushStatus(),"public, max-age=300");
   }
@@ -170,4 +196,7 @@ http.createServer(async(req,res) => {
   } catch(error) {
     json(res,error.code === "ENOENT" ? 404 : 400,{ error:error.message || "Có lỗi xảy ra" });
   }
-}).listen(port,() => console.log(`LichViet AI v2.1 listening on ${port}`));
+}).listen(port,() => {
+  console.log(`LichViet AI v2.2 listening on ${port}`);
+  startLocalNotificationScheduler();
+});

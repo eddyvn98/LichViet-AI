@@ -1,7 +1,7 @@
-const CACHE = "lichviet-v2-1";
+const CACHE = "lichviet-v2-2";
 const ASSETS = [
   "/", "/styles.css", "/app.js", "/core.js", "/today.js",
-  "/planner-ui.js", "/assistant-ui.js", "/profile-ui.js",
+  "/planner-ui.js", "/assistant-ui.js", "/profile-ui.js", "/notification-ui.js",
   "/manifest.webmanifest", "/icon.svg", "/sources.html"
 ];
 

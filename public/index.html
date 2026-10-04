@@ -203,17 +203,40 @@
       <hr>
 
       <div class="section-title">
-        <h2>Nhắc hằng ngày</h2>
-        <span>server push khi đã deploy</span>
+        <h2>Telegram chủ động</h2>
+        <span>chỉ gửi nội dung bạn chọn</span>
       </div>
+
+      <p class="note" id="telegramStatus"></p>
+
       <div class="reminder-row">
-        <label>Giờ nhắc
+        <label>Giờ gửi mỗi ngày
           <input id="reminderTime" type="time" value="07:30">
         </label>
-        <button id="enableReminder" class="ghost">Bật thông báo</button>
       </div>
+
+      <div class="topic-grid" aria-label="Nội dung muốn nhận">
+        <label class="topic-option">
+          <input id="notifyOverview" type="checkbox" checked>
+          <span><b>Tổng quan hôm nay</b><small>Nên làm, nên tránh, giờ đáng chú ý.</small></span>
+        </label>
+        <label class="topic-option">
+          <input id="notifyPlans" type="checkbox" checked>
+          <span><b>Kế hoạch đã lưu</b><small>Nhắc khi có ngày phù hợp sắp tới.</small></span>
+        </label>
+        <label class="topic-option">
+          <input id="notifyUpcoming" type="checkbox" checked>
+          <span><b>Ngày tốt sắp tới</b><small>Chỉ báo các ngày đáng xem trong 7 ngày.</small></span>
+        </label>
+        <label class="topic-option">
+          <input id="notifyPersonal" type="checkbox" checked>
+          <span><b>Cảnh báo cá nhân</b><small>Xung/hợp đáng chú ý theo hồ sơ đã lưu.</small></span>
+        </label>
+      </div>
+
+      <button id="enableReminder" class="ghost">Lưu thông báo</button>
       <p class="note" id="reminderNote">
-        Nếu server chưa cấu hình VAPID, app tự fallback về khả năng PWA của trình duyệt.
+        Telegram chỉ dùng cho thông báo chủ động hằng ngày, không mirror mọi câu hỏi trên web.
       </p>
 
       <hr>

@@ -56,3 +56,28 @@ Windows 11 Pro
 ```
 
 AI adapter chạy Gemini CLI trong thư mục runtime rỗng, dùng `--approval-mode plan` và loại các biến API key khỏi child process. Không có provider fallback.
+
+
+## Proactive Telegram V2.2
+
+```
+notification settings
+  ├─ reminder time
+  ├─ selected topics
+  ├─ local profile
+  └─ saved plans
+        |
+        v
+local scheduler (1 minute)
+        |
+        v
+deterministic notification context
+        |
+        v
+Gemini 3.8 Flash short rewriter
+        |
+        v
+Telegram Bot API
+```
+
+Telegram delivery is independent from interactive web AI. Interactive `/api/ai/explain` returns only to the web.

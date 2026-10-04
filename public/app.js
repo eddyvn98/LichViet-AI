@@ -1,9 +1,10 @@
 import { $, $$, api, setMeta, state, todayVN } from "./core.js";
 import { askGemini } from "./ai-ui.js";
+import { loadNotificationSettings, saveNotificationPreferences } from "./notification-ui.js";
 import { addPlan, refreshBrief, renderPlans } from "./assistant-ui.js";
 import { findDays } from "./planner-ui.js";
 import {
-  enableNotifications, renderProfile, saveProfileForm
+  renderProfile, saveProfileForm
 } from "./profile-ui.js";
 import { loadDay } from "./today.js";
 
@@ -53,7 +54,7 @@ async function init() {
   $("#addPlan").onclick = addPlan;
   $("#refreshBrief").onclick = refreshBrief;
   $("#saveProfile").onclick = saveProfileForm;
-  $("#enableReminder").onclick = enableNotifications;
+  $("#enableReminder").onclick = saveNotificationPreferences;
   $("#askGemini").onclick = askGemini;
 
   if (state.reminder?.time) {
@@ -68,7 +69,8 @@ async function init() {
   await Promise.all([
     renderProfile(),
     loadDay(),
-    refreshBrief()
+    refreshBrief(),
+    loadNotificationSettings()
   ]);
 }
 

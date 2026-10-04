@@ -68,3 +68,34 @@ If Windows Firewall blocks it, allow inbound TCP port 3000. For internet access,
 - Gemini CLI runs headlessly in an isolated empty runtime directory.
 - AI receives engine JSON only and is instructed not to recalculate calendar facts.
 - There is no provider fallback.
+
+## Telegram chủ động
+
+Telegram không nhận bản sao mọi câu hỏi trên web.
+
+Nó chỉ nhận bản tin hằng ngày theo các mục đã tích trong tab **Hồ sơ**.
+
+Biến môi trường:
+
+```powershell
+setx TELEGRAM_BOT_TOKEN "<bot-token>"
+setx TELEGRAM_CHAT_ID "<chat-id>"
+```
+
+Nếu chat ID đã được cấu hình trước thì giữ nguyên giá trị hiện tại. Mở PowerShell mới sau khi dùng `setx`.
+
+Node server tự kiểm tra mỗi phút:
+1. thông báo có đang bật không,
+2. đã đến giờ chưa,
+3. hôm nay đã gửi chưa,
+4. user đã chọn chủ đề nào.
+
+Nếu máy khởi động sau giờ gửi, app sẽ gửi bù một lần trong ngày.
+
+Các chủ đề hiện có:
+- Tổng quan hôm nay,
+- Kế hoạch đã lưu,
+- Ngày tốt sắp tới,
+- Cảnh báo cá nhân.
+
+Gemini chỉ rút gọn deterministic context thành tối đa khoảng 60 từ trước khi gửi Telegram.

@@ -84,3 +84,28 @@ gemini
 ```
 
 Xem `docs/WINDOWS_HOSTING.md`.
+
+
+## V2.2 — Telegram chủ động
+
+Telegram không mirror mọi câu hỏi trên web.
+
+- Web: Gemini trả lời khi người dùng hỏi.
+- Telegram: chỉ gửi bản tin chủ động hằng ngày.
+- Người dùng chọn nội dung muốn nhận:
+  - tổng quan hôm nay,
+  - kế hoạch đã lưu,
+  - ngày tốt sắp tới,
+  - cảnh báo cá nhân.
+- AI viết rất ngắn: tối đa khoảng 60 từ, từ phổ thông, không dùng ngôn ngữ mơ hồ/cao siêu.
+- Scheduler chạy trong Node server mỗi phút; mỗi ngày chỉ gửi một lần.
+- Nếu máy bật sau giờ đã đặt, app gửi bù một lần trong ngày.
+
+Telegram đọc từ biến môi trường Windows:
+
+```text
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
+```
+
+Token và chat ID không được trả ra browser.

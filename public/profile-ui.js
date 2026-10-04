@@ -2,6 +2,7 @@ import {
   $, api, escapeHtml, profilePayload, saveProfile, saveReminder, state, toast
 } from "./core.js";
 import { refreshBrief } from "./assistant-ui.js";
+import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
 import { loadDay } from "./today.js";
 
 function elementBars(elements) {
@@ -62,6 +63,7 @@ export async function saveProfileForm() {
 
   await renderProfile();
   await Promise.all([loadDay(), refreshBrief()]);
+  await syncNotificationSettingsIfEnabled();
   toast("Đã lưu hồ sơ trên thiết bị.");
 }
 

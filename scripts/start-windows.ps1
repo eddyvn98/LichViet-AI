@@ -12,6 +12,11 @@ Remove-Item Env:\GOOGLE_GENAI_USE_VERTEXAI -ErrorAction SilentlyContinue
 Write-Host "LichViet AI" -ForegroundColor Cyan
 Write-Host "Web: http://localhost:$env:PORT"
 Write-Host "AI: Gemini CLI / $env:GEMINI_MODEL / Google OAuth"
+if ($env:TELEGRAM_BOT_TOKEN -and $env:TELEGRAM_CHAT_ID) {
+  Write-Host "Telegram: connected" -ForegroundColor Green
+} else {
+  Write-Host "Telegram: not configured" -ForegroundColor Yellow
+}
 Write-Host "Press Ctrl+C to stop."
 Write-Host ""
 

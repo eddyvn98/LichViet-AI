@@ -86,7 +86,7 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("2.1.0");
+  expect(healthBody.version).toBe("2.2.0");
 
   const rules = await request.get("/api/rules");
   expect((await rules.json()).rules.length).toBeGreaterThanOrEqual(24);
@@ -114,4 +114,35 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   expect(aiBody.model).toBe("gemini-3.8-flash");
   expect(aiBody.auth).toBe("google-oauth");
   expect(aiBody.apiKeysAllowed).toBe(false);
+
+  const telegram = await request.get("/api/telegram/status");
+  expect(telegram.ok()).toBeTruthy();
+  const telegramBody = await telegram.json();
+  expect(typeof telegramBody.enabled).toBe("boolean");
+  expect("token" in telegramBody).toBe(false);
+  expect("chatId" in telegramBody).toBe(false);
+});
+
+
+test("notification topics can be selected and saved", async ({ page, request }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+
+  await page.locator("#notifyOverview").check();
+  await page.locator("#notifyPlans").check();
+  await page.locator("#notifyUpcoming").uncheck();
+  await page.locator("#notifyPersonal").check();
+  await page.locator("#reminderTime").fill("07:30");
+  await page.getByRole("button", { name:"Lưu thông báo" }).click();
+
+  await expect(page.getByText("Telegram sẽ chỉ gửi", { exact:false })).toBeVisible();
+
+  const settings = await request.get("/api/notifications/settings");
+  expect(settings.ok()).toBeTruthy();
+  const body = await settings.json();
+  expect(body.enabled).toBe(true);
+  expect(body.topics.overview).toBe(true);
+  expect(body.topics.plans).toBe(true);
+  expect(body.topics.upcoming).toBe(false);
+  expect(body.topics.personal).toBe(true);
 });
