@@ -8,6 +8,12 @@ import { crossCheckDay } from "./crosscheck.js";
 import { assessEvidence } from "./evidence.js";
 import { classifyScore, scoreDayBase } from "./scoring.js";
 import { calculateTwelveDuty } from "./twelve-duty.js";
+import {
+  calculateEclipticDay,
+  eclipticHoursForDay,
+  goodEclipticHours
+} from "./ecliptic.js";
+import { evidenceRecordById } from "./evidence.js";
 
 const DUTY_FALLBACK = {
   "建":["khởi động việc nhỏ","lập kế hoạch"],
@@ -28,29 +34,57 @@ function parseDate(iso) {
   return { y,m,d };
 }
 
-function hourRange(hour) {
-  if (hour === 0) return "23:00–00:59";
-  return `${String(hour - 1).padStart(2,"0")}:00–${String(hour).padStart(2,"0")}:59`;
+const HOUR_BRANCHES = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+
+function normalizeDeity(raw) {
+  return raw === "元武" ? "玄武" : raw;
 }
 
-function goodHours(y,m,d) {
-  const out = [];
+function verifiedGoodHours(dayBranch) {
+  return goodEclipticHours(dayBranch).map(x => ({
+    range:x.range,
+    branch:branchVi(x.branch),
+    star:translateStar(x.deity),
+    rawBranch:x.branch,
+    rawStar:x.deity,
+    source:"verified-engine",
+    evidenceLevel:"PRIMARY_EXACT",
+    evidenceRefs:x.evidenceRefs
+  }));
+}
+
+function crossCheckEclipticHours(y, m, d, dayBranch) {
+  const expected = new Map(
+    eclipticHoursForDay(dayBranch).map(x => [x.branch, x])
+  );
+  const differences = [];
+
   for (let hour = 0; hour < 24; hour += 2) {
     const lunarHour = SolarTime.fromYmdHms(y,m,d,hour,0,0).getLunarHour();
     const star = lunarHour.getTwelveStar();
-    if (star.getEcliptic().getLuck().getName() === "吉") {
-      const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-      const branchRaw = branches[Math.floor((hour + 1) / 2) % 12];
-      out.push({
-        range:hourRange(hour),
-        branch:branchVi(branchRaw),
-        star:translateStar(star.getName()),
-        source:"tyme4ts",
-        evidenceLevel:"IMPLEMENTATION_CROSSCHECK"
+    const branch = HOUR_BRANCHES[Math.floor((hour + 1) / 2) % 12];
+    const actualDeity = normalizeDeity(star.getName());
+    const actualGood = star.getEcliptic().getLuck().getName() === "吉";
+    const engine = expected.get(branch);
+
+    if (!engine || engine.deity !== actualDeity || engine.good !== actualGood) {
+      differences.push({
+        branch,
+        engine:engine ? { deity:engine.deity, good:engine.good } : null,
+        reference:{ deity:actualDeity, good:actualGood }
       });
     }
   }
-  return out.slice(0, 6);
+
+  return {
+    id:"XCHK-ECLIPTIC-HOURS-TYME4TS",
+    provider:"tyme4ts",
+    family:"6tail",
+    scope:"ecliptic-hours",
+    status:differences.length ? "disputed" : "agree",
+    differences,
+    note:"Giờ Hoàng/Hắc đạo do engine tự tính; Tyme4TS chỉ dùng để cross-check."
+  };
 }
 
 function alignedWithVietnameseLunar(engineLunar, vn) {
@@ -71,8 +105,13 @@ export function buildDayInfo(isoDate, profile = null) {
   const dutyCalc = calculateTwelveDuty(bazi.branches.month, bazi.branches.day);
   const dutyRaw = dutyCalc.raw;
   const dutyEval = evaluateDuty(dutyRaw);
-  const star = engineLunar.getTwelveStar();
-  const eclipticGood = star.getEcliptic().getLuck().getName() === "吉";
+  const tymeStar = engineLunar.getTwelveStar();
+  const tymeStarRaw = normalizeDeity(tymeStar.getName());
+  const eclipticCalc = calculateEclipticDay(
+    bazi.branches.month,
+    bazi.branches.day
+  );
+  const eclipticGood = eclipticCalc.good;
   const rawRecommended = engineLunar.getRecommends().map(x => x.getName());
   const rawAvoid = engineLunar.getAvoids().map(x => x.getName());
 
@@ -117,7 +156,24 @@ export function buildDayInfo(isoDate, profile = null) {
     }],
     note:"12 Trực do engine tự tính; Tyme4TS chỉ dùng để cross-check."
   });
-  const evidence = rules.map(r => r.evidence).filter(Boolean);
+  crossChecks.push({
+    id:"XCHK-ECLIPTIC-DAY-TYME4TS",
+    provider:"tyme4ts",
+    family:"6tail",
+    scope:"ecliptic-day",
+    status:tymeStarRaw === eclipticCalc.deity ? "agree" : "disputed",
+    differences:tymeStarRaw === eclipticCalc.deity ? [] : [{
+      field:"deity",
+      engine:eclipticCalc.deity,
+      reference:tymeStarRaw
+    }],
+    note:"Thần Hoàng/Hắc đạo ngày do engine tự tính; Tyme4TS chỉ dùng để cross-check."
+  });
+  crossChecks.push(crossCheckEclipticHours(y,m,d,bazi.branches.day));
+  const evidence = [
+    ...rules.map(r => r.evidence).filter(Boolean),
+    evidenceRecordById("XJ-HUANGHEI")
+  ].filter(Boolean);
   const factConfidence = assessEvidence({
     evidence,
     crossChecks,
@@ -131,14 +187,14 @@ export function buildDayInfo(isoDate, profile = null) {
     solarTerm:bazi.solarTerm,
     baziBoundary:bazi.boundary,
     duty:translateDuty(dutyRaw),
-    twelveStar:translateStar(star.getName()),
+    twelveStar:translateStar(eclipticCalc.deity),
     ecliptic:eclipticGood ? "Hoàng đạo" : "Hắc đạo",
     verdict:classifyScore(ranking.score),
     ranking,
     recommended,
     avoid,
     recommendationOrigin,
-    goodHours:goodHours(y,m,d),
+    goodHours:verifiedGoodHours(bazi.branches.day),
     personal,
     provenance:{
       ruleIds,
@@ -146,9 +202,11 @@ export function buildDayInfo(isoDate, profile = null) {
       crossChecks,
       baziCalculation:bazi.calculation,
       dutyCalculation:dutyCalc,
+      eclipticCalculation:eclipticCalc,
       implementationNotes:[
         "12 Trực do verified engine tự tính từ chi tháng tiết khí và chi ngày.",
-        "Tyme4TS cung cấp nghi/kỵ, thần trực nhật và giờ hoàng/hắc đạo để cross-check.",
+        "Hoàng/Hắc đạo ngày và giờ do verified engine tự tính theo Hiệp Kỷ Biện Phương Thư.",
+        "Tyme4TS cung cấp nghi/kỵ chi tiết và chỉ cross-check 12 Trực/Hoàng-Hắc đạo.",
         "lunar-javascript dùng để cross-check Can Chi và lịch âm.",
         "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập.",
         "Điểm ranking là heuristic của app, tách biệt với độ tin cậy của facts."
@@ -181,11 +239,15 @@ export function buildDayInfo(isoDate, profile = null) {
     _ranking:ranking.score,
     _rawRecommended:rawRecommended,
     _rawAvoid:rawAvoid,
+    _implementationAdviceUsable:aligned,
     _dutyRaw:dutyRaw
   };
 }
 
 export function publicDay(info) {
-  const { _ranking, _rawRecommended, _rawAvoid, _dutyRaw, ...publicInfo } = info;
+  const {
+    _ranking, _rawRecommended, _rawAvoid,
+    _implementationAdviceUsable, _dutyRaw, ...publicInfo
+  } = info;
   return publicInfo;
 }
