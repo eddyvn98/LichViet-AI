@@ -10,6 +10,7 @@ test("source policy defines strong and experimental levels", () => {
   const policy = sourcePolicy();
   assert.equal(policy.levels.PRIMARY_EXACT.strongClaim, true);
   assert.equal(policy.levels.EXPERIMENTAL.strongClaim, false);
+  assert.equal(policy.levels.PRODUCT_POLICY.strongClaim, false);
 });
 
 test("6tail reference snapshot exposes family identity", () => {
@@ -252,4 +253,33 @@ test("all 12 Jie boundaries switch BaZi month pillar across the exact moment", (
     assert.equal(beforeBazi.branches.month, transition.previousMonthBranch);
     assert.equal(afterBazi.branches.month, transition.newMonthBranch);
   }
+});
+
+
+test("all twelve duty classification primary goldens are registered", async () => {
+  const goldens = verificationCases().filter(x =>
+    x.kind === "twelve-duty-primary-golden"
+  );
+  assert.equal(goldens.length, 12);
+  const { allDutyClassifications } = await import("../src/rule-engine.js");
+  const byRaw = new Map(allDutyClassifications().map(x => [x.raw,x]));
+  for (const item of goldens) {
+    const actual = byRaw.get(item.raw);
+    assert.ok(actual, item.raw);
+    assert.equal(actual.traditionalClass, item.expected.traditionalClass);
+    assert.equal(actual.tier, item.expected.tier);
+    assert.equal(actual.evidenceRef, item.evidenceRef);
+  }
+});
+
+test("pre-2002 Vietnamese lunar result is explicitly proleptic historical reconstruction", () => {
+  const historical = solarToVietnameseLunar("1900-01-01");
+  const current = solarToVietnameseLunar("2026-10-04");
+  assert.equal(historical.calculation.scope, "historical-proleptic-utc7");
+  assert.equal(historical.calculation.historicalReconstruction, true);
+  assert.ok(historical.calculation.historicalContextEvidenceRefs.includes(
+    "VN-ARCHIVES-HIEPKY-XIEJI"
+  ));
+  assert.equal(current.calculation.scope, "official-current-utc7-reference");
+  assert.equal(current.calculation.historicalReconstruction, false);
 });
