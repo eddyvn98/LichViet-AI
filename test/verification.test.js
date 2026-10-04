@@ -138,3 +138,16 @@ test("solar-term solver stays close to HKO full-24 official times", async () => 
     );
   }
 });
+
+
+test("Twelve-Duty engine follows complete branch-offset cycle", async () => {
+  const { calculateTwelveDuty, TWELVE_DUTIES } = await import("../src/twelve-duty.js");
+  const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+  for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
+    for (let offset = 0; offset < 12; offset += 1) {
+      const dayIndex = (monthIndex + offset) % 12;
+      const result = calculateTwelveDuty(branches[monthIndex], branches[dayIndex]);
+      assert.equal(result.raw, TWELVE_DUTIES[offset]);
+    }
+  }
+});
