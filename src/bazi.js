@@ -5,6 +5,8 @@ const STEMS = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
 const BRANCHES = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
 const JIE_START = 315;
 const JIE_STEP = 30;
+const JIE_DEGREES = [285,315,345,15,45,75,105,135,165,195,225,255];
+const TERM_CACHE = new Map();
 
 function mod(n, m) { return ((n % m) + m) % m; }
 
@@ -81,6 +83,9 @@ export function solarTermMoment(year, targetDegree) {
     throw new Error("Kinh độ tiết khí phải là bội số 15° từ 0 đến 345");
   }
 
+  const cacheKey = `${y}:${target}`;
+  if (TERM_CACHE.has(cacheKey)) return structuredClone(TERM_CACHE.get(cacheKey));
+
   const start = Date.parse(`${y}-01-01T00:00:00+07:00`);
   const end = Date.parse(`${y + 1}-01-01T00:00:00+07:00`);
   const step = 6 * 60 * 60 * 1000;
@@ -99,7 +104,7 @@ export function solarTermMoment(year, targetDegree) {
       }
       const epochMs = Math.round((lo + hi) / 2);
       const parts = vnParts(epochMs);
-      return {
+      const result = {
         year:y,
         degree:target,
         term:SOLAR_TERMS[target] || "",
@@ -112,6 +117,8 @@ export function solarTermMoment(year, targetDegree) {
         evidenceRefs:["HKO-24-SOLAR-TERMS"],
         method:"solar-longitude-bisection"
       };
+      TERM_CACHE.set(cacheKey, result);
+      return structuredClone(result);
     }
     loMs = hiMs;
     loDeg = hiDeg;
@@ -126,6 +133,31 @@ export function solarTermsForYear(year) {
     105,120,135,150,165,180,195,210,225,240,255,270
   ];
   return order.map(degree => solarTermMoment(year, degree));
+}
+
+export function jieMonthTransitionForDate(isoDate) {
+  const { year } = validateIsoDate(isoDate);
+  for (const degree of JIE_DEGREES) {
+    const moment = solarTermMoment(year, degree);
+    if (moment.date !== isoDate) continue;
+
+    const shifted = mod(degree - JIE_START, 360);
+    const solarMonth = Math.floor(shifted / JIE_STEP) + 1;
+    const newMonthBranchIndex = mod(2 + solarMonth - 1, 12);
+    const previousMonthBranchIndex = mod(newMonthBranchIndex - 1, 12);
+
+    return {
+      date:isoDate,
+      degree,
+      term:moment.term,
+      moment,
+      previousMonthBranch:BRANCHES[previousMonthBranchIndex],
+      newMonthBranch:BRANCHES[newMonthBranchIndex],
+      method:"exact-jie-moment",
+      evidenceRefs:["HKO-24-SOLAR-TERMS"]
+    };
+  }
+  return null;
 }
 
 function cycleFromYear(year) {
