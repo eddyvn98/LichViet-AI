@@ -4,10 +4,17 @@ import { analyzeBirthProfile } from "../src/bazi-profile.js";
 import { buildBrief } from "../src/brief.js";
 import { evaluateDuty, allRules, relationRule } from "../src/rule-engine.js";
 
-test("V2 rule catalog has provenance", () => {
+test("rule catalog keeps canonical source separate from product-policy provenance", () => {
   const rules = allRules();
   assert.ok(rules.length >= 24);
-  assert.ok(rules.every(r => r.id && r.source && r.locator && r.verification));
+  assert.ok(rules.every(r => r.id && r.locator && r.verification));
+  const duties = rules.filter(r => r.kind === "duty");
+  const canonical = rules.filter(r => r.kind !== "duty");
+  assert.ok(canonical.every(r => r.source));
+  assert.ok(duties.every(r => r.evidence?.level === "PRODUCT_POLICY"));
+  assert.ok(duties.every(r =>
+    r.evidence?.records?.some(x => x.id === "XLKY-12-DUTY-CLASSIFICATION")
+  ));
 });
 
 test("Thành duty is preferred for contract in V2 normalized rules", () => {
@@ -51,15 +58,21 @@ test("daily brief proactively scans saved plans", () => {
       to: "2026-10-11"
     }]
   });
-  assert.equal(brief.generatedBy, "deterministic-brief-v2");
+  assert.equal(brief.generatedBy, "deterministic-brief-v3");
   assert.ok(brief.headline);
   assert.ok(Array.isArray(brief.alerts));
   assert.ok(brief.alerts.length >= 1);
   assert.equal(brief.alerts[0].title, "Ký hợp đồng");
 });
 
-test("V3 rules expose normalized evidence metadata", () => {
+test("V6 rules expose policy-locked evidence metadata", () => {
   const rules = allRules();
   assert.ok(rules.every(r => r.evidence?.level && Number.isFinite(r.evidence?.rank)));
-  assert.equal(rules.find(r => r.id === "DUTY-CHENG")?.evidence?.family, "xieji-bianfangshu");
+  const duty = rules.find(r => r.id === "DUTY-CHENG");
+  assert.equal(duty?.evidence?.level, "PRODUCT_POLICY");
+  assert.equal(duty?.evidence?.strongClaim, false);
+  assert.equal(duty?.evidence?.supportingEvidenceLevel, "PRIMARY_EXACT");
+  assert.ok(duty?.evidence?.records?.some(x =>
+    x.family === "xingli-kaoyuan"
+  ));
 });
