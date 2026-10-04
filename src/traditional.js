@@ -7,6 +7,7 @@ import { solarToVietnameseLunar } from "./vietnamese-lunar.js";
 import { crossCheckDay } from "./crosscheck.js";
 import { assessEvidence } from "./evidence.js";
 import { classifyScore, scoreDayBase } from "./scoring.js";
+import { calculateTwelveDuty } from "./twelve-duty.js";
 
 const DUTY_FALLBACK = {
   "建":["khởi động việc nhỏ","lập kế hoạch"],
@@ -65,7 +66,10 @@ export function buildDayInfo(isoDate, profile = null) {
   const vnLunar = solarToVietnameseLunar(isoDate);
   const aligned = alignedWithVietnameseLunar(engineLunar, vnLunar);
 
-  const dutyRaw = engineLunar.getDuty().getName();
+  const bazi = getBaZi(isoDate, "12:00");
+  const tymeDutyRaw = engineLunar.getDuty().getName();
+  const dutyCalc = calculateTwelveDuty(bazi.branches.month, bazi.branches.day);
+  const dutyRaw = dutyCalc.raw;
   const dutyEval = evaluateDuty(dutyRaw);
   const star = engineLunar.getTwelveStar();
   const eclipticGood = star.getEcliptic().getLuck().getName() === "吉";
@@ -84,7 +88,6 @@ export function buildDayInfo(isoDate, profile = null) {
     avoid = ["không có kiêng kỵ nổi bật trong lớp quy tắc đang bật"];
   }
 
-  const bazi = getBaZi(isoDate, "12:00");
   const personal = personalizeDay(profile, bazi);
   const ranking = scoreDayBase({
     dutyBase:dutyEval.baseScore,
@@ -100,6 +103,19 @@ export function buildDayInfo(isoDate, profile = null) {
     vietnameseLunar:vnLunar,
     bazi,
     tymeAligned:aligned
+  });
+  crossChecks.push({
+    id:"XCHK-DUTY-TYME4TS",
+    provider:"tyme4ts",
+    family:"6tail",
+    scope:"twelve-duty",
+    status:tymeDutyRaw === dutyRaw ? "agree" : "disputed",
+    differences:tymeDutyRaw === dutyRaw ? [] : [{
+      field:"duty",
+      engine:dutyRaw,
+      reference:tymeDutyRaw
+    }],
+    note:"12 Trực do engine tự tính; Tyme4TS chỉ dùng để cross-check."
   });
   const evidence = rules.map(r => r.evidence).filter(Boolean);
   const factConfidence = assessEvidence({
@@ -129,8 +145,10 @@ export function buildDayInfo(isoDate, profile = null) {
       rules,
       crossChecks,
       baziCalculation:bazi.calculation,
+      dutyCalculation:dutyCalc,
       implementationNotes:[
-        "Tyme4TS cung cấp nghi/kỵ, 12 Trực, thần trực nhật và giờ hoàng/hắc đạo.",
+        "12 Trực do verified engine tự tính từ chi tháng tiết khí và chi ngày.",
+        "Tyme4TS cung cấp nghi/kỵ, thần trực nhật và giờ hoàng/hắc đạo để cross-check.",
         "lunar-javascript dùng để cross-check Can Chi và lịch âm.",
         "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập.",
         "Điểm ranking là heuristic của app, tách biệt với độ tin cậy của facts."
