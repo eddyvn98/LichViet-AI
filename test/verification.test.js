@@ -120,3 +120,21 @@ test("Ten-Gods mapping regression matches classical Yang/Jia row", async () => {
     assert.equal(tenGodForStem("甲", stem), label);
   }
 });
+
+
+test("solar-term solver stays close to HKO full-24 official times", async () => {
+  const { solarTermMoment } = await import("../src/bazi.js");
+  const cases = verificationCases().filter(x =>
+    x.evidenceRef === "HKO-2015-ALL-24-TERMS"
+  );
+  assert.equal(cases.length, 24);
+  for (const c of cases) {
+    const actual = solarTermMoment(2015, c.expectedDegrees);
+    const expectedMs = Date.parse(`${c.date}T${c.time}:00+07:00`);
+    const diffMinutes = Math.abs(actual.epochMs - expectedMs) / 60000;
+    assert.ok(
+      diffMinutes <= 30,
+      `${c.id}: solver differs from HKO by ${diffMinutes.toFixed(1)} minutes`
+    );
+  }
+});
