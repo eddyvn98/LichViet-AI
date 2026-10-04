@@ -2,6 +2,7 @@ import { buildDayInfo, publicDay } from "./traditional.js";
 import { evaluateDuty, ruleSummary } from "./rule-engine.js";
 import { scoreActivity } from "./scoring.js";
 import { composeActivityDecision } from "./recommendation-engine.js";
+import { reproducibilityTrace } from "./trace.js";
 
 export const ACTIVITIES = {
   contract:{ label:"Ký hợp đồng / giao dịch", positive:["交易","立券","纳财","开市"] },
@@ -94,11 +95,22 @@ export function rankDays({ from, days = 14, activity = "contract", profile = nul
     const {
       score, ranking, decision, reasons, ruleIds, advisoryAllowed
     } = activityScore(day, activity);
+    const recommendationTrace = reproducibilityTrace({
+      type:"activity-recommendation",
+      date,
+      activity,
+      decision:decision.code,
+      stateCodes:decision.states.map(x => x.code),
+      dutyRaws:decision.states.map(x => x.raw),
+      evidenceRefs:decision.evidenceRefs,
+      ruleIds,
+      tieBreakScore:score
+    });
     ranked.push({
       ...publicDay(day),
       match:decision.label,
       reasons,
-      recommendationDecision:decision,
+      recommendationDecision:{ ...decision, trace:recommendationTrace },
       activityRanking:{
         ...ranking,
         role:"tie-break-only"
