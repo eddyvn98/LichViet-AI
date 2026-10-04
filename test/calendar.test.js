@@ -38,3 +38,18 @@ test("basic branch clash and harmony", () => {
   assert.equal(branchRelationship("子","丑").type, "harmony");
   assert.equal(branchRelationship("子","寅").type, "neutral");
 });
+
+test("BaZi supports explicit 23:00 day-boundary school without changing default", () => {
+  const civil = getBaZi("2026-10-04", "23:30");
+  const zi = getBaZi("2026-10-04", "23:30", { dayBoundary:"zi-hour" });
+  assert.notEqual(civil.raw.day, zi.raw.day);
+  assert.match(civil.calculation.dayBoundary, /00:00/);
+  assert.match(zi.calculation.dayBoundary, /23:00/);
+});
+
+test("BaZi carries primary evidence refs and solar-term boundary metadata", () => {
+  const x = getBaZi("2026-10-04", "12:00");
+  assert.ok(x.calculation.evidenceRefs.includes("XJ-WUHU"));
+  assert.ok(x.calculation.evidenceRefs.includes("XJ-WUSHU"));
+  assert.equal(typeof x.boundary.distanceDegrees, "number");
+});
