@@ -4,12 +4,42 @@ import {
 } from "./core.js";
 import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
 
+function splitList(value) {
+  return String(value || "")
+    .split(/[,\n]+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function constraintLabel(plan) {
+  const c = plan.constraints || {};
+  const parts = [];
+  if (c.dayType === "weekend") parts.push("chỉ cuối tuần");
+  if (c.dayType === "weekday") parts.push("chỉ ngày thường");
+  if (c.avoidJieTransition) parts.push("tránh giao tiết");
+  if (Array.isArray(c.avoidLunarDays) && c.avoidLunarDays.length) {
+    parts.push("tránh âm " + c.avoidLunarDays.join(","));
+  }
+  if (Array.isArray(c.excludeDates) && c.excludeDates.length) {
+    parts.push("loại " + c.excludeDates.length + " ngày");
+  }
+  return parts.join(" · ");
+}
+
 function planLabel(plan) {
   return state.meta.activities.find(x => x.id === plan.activity)?.label || plan.activity;
 }
 
 export function renderPlans() {
   const el = $("#savedPlans");
+  const selectedNames = state.selectedFamilyIds
+    .map(id => state.family.find(x => x.id === id)?.name)
+    .filter(Boolean);
+  if ($("#intentFamilyNote")) {
+    $("#intentFamilyNote").textContent = selectedNames.length
+      ? "Kế hoạch mới sẽ xét: " + selectedNames.join(", ")
+      : "Kế hoạch mới chưa gắn thành viên; sẽ dùng rule chung.";
+  }
   if (!state.plans.length) {
     el.innerHTML =
       '<p class="note">Chưa có kế hoạch. Thêm một việc để trợ lý tự theo dõi ngày phù hợp.</p>';
@@ -23,7 +53,9 @@ export function renderPlans() {
     return '<article class="saved-plan">' +
       '<div><b>' + escapeHtml(p.title || planLabel(p)) + '</b>' +
       '<small>' + escapeHtml(planLabel(p)) + ' · ' + p.from + ' → ' + p.to +
-      (names.length ? ' · ' + escapeHtml(names.join(", ")) : '') + '</small></div>' +
+      (names.length ? ' · ' + escapeHtml(names.join(", ")) : '') +
+      (constraintLabel(p) ? ' · ' + escapeHtml(constraintLabel(p)) : '') +
+      '</small></div>' +
       '<button class="icon-btn" data-remove="' + p.id + '" aria-label="Xóa kế hoạch">×</button>' +
     '</article>';
   }).join("");
@@ -53,11 +85,20 @@ export async function addPlan() {
     from,
     to,
     participantIds:state.selectedFamilyIds.slice(0,8),
+    constraints:{
+      dayType:$("#intentDayType").value || "any",
+      avoidLunarDays:splitList($("#intentAvoidLunarDays").value)
+        .map(Number).filter(x => Number.isInteger(x)),
+      excludeDates:splitList($("#intentExcludeDates").value),
+      avoidJieTransition:$("#intentAvoidJieTransition").checked
+    },
     createdAt: new Date().toISOString()
   };
 
   savePlans([...state.plans, plan]);
   $("#intentTitle").value = "";
+  $("#intentAvoidLunarDays").value = "";
+  $("#intentExcludeDates").value = "";
   renderPlans();
   await refreshBrief();
   await syncNotificationSettingsIfEnabled();
