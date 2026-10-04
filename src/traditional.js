@@ -7,6 +7,7 @@ import { solarToVietnameseLunar } from "./vietnamese-lunar.js";
 import { crossCheckDay } from "./crosscheck.js";
 import {
   assessEvidence,
+  combineConfidence,
   evidenceRecordById,
   resolveEvidenceRecords
 } from "./evidence.js";
@@ -278,18 +279,65 @@ export function buildDayInfo(isoDate, profile = null) {
     crossCheckEclipticHours(y,m,d,bazi.branches.day)
   );
 
-  const evidence = [
-    ...rules.map(r => r.evidence).filter(Boolean),
+  const calendarChecks = crossChecks.filter(x =>
+    x.scope === "lunar-calendar"
+  );
+  const baziChecks = crossChecks.filter(x =>
+    x.scope === "bazi-year-month-day"
+  );
+  const traditionalChecks = crossChecks.filter(x =>
+    ["twelve-duty","ecliptic-day","ecliptic-hours"].includes(x.scope)
+  );
+
+  const calendarEvidence = resolveEvidenceRecords(
+    vnLunar.calculation?.evidenceRefs || []
+  );
+  const baziEvidence = resolveEvidenceRecords(
+    bazi.calculation?.evidenceRefs || []
+  );
+  const traditionalEvidence = [
+    ...ruleSummary(dutyState.ruleIds).map(r => r.evidence).filter(Boolean),
     evidenceRecordById("XJ-HUANGHEI"),
     ...(dutyState.transition
       ? [evidenceRecordById("XLKY-DUTY-TRANSITION")]
       : [])
   ].filter(Boolean);
 
-  const factConfidence = assessEvidence({
-    evidence,
-    crossChecks,
+  const calendarConfidence = assessEvidence({
+    evidence:calendarEvidence,
+    crossChecks:calendarChecks,
+    experimental:false,
+    strongClaimApplicabilities:["modern-vietnamese-lunar-calculation"]
+  });
+  const baziConfidence = assessEvidence({
+    evidence:baziEvidence,
+    crossChecks:baziChecks,
+    experimental:false,
+    strongClaimApplicabilities:[
+      "solar-longitude",
+      "bazi-month-stem",
+      "bazi-hour-stem"
+    ]
+  });
+  const traditionalConfidence = assessEvidence({
+    evidence:traditionalEvidence,
+    crossChecks:traditionalChecks,
     experimental:false
+  });
+  const personalEvidence = (personal?.evidence || [])
+    .map(item => item?.evidence)
+    .filter(Boolean);
+  const personalConfidence = personal
+    ? assessEvidence({
+        evidence:personalEvidence,
+        crossChecks:[],
+        experimental:false
+      })
+    : null;
+  const factConfidence = combineConfidence({
+    calendar:calendarConfidence,
+    bazi:baziConfidence,
+    traditional:traditionalConfidence
   });
 
   const evidenceRecordIds = unique([
@@ -361,29 +409,46 @@ export function buildDayInfo(isoDate, profile = null) {
     },
     confidence:{
       facts:factConfidence,
+      domains:{
+        calendar:calendarConfidence,
+        bazi:baziConfidence,
+        traditional:traditionalConfidence
+      },
       ranking:{
         code:"experimental",
         label:"Điểm xếp hạng là heuristic",
         canMakeStrongClaim:false,
         policy:ranking.policy.id
       },
-      calendar:crossChecks.some(x =>
-        x.scope === "lunar-calendar" && x.status === "disputed"
-      ) ? "cần rà soát" : "cao cho engine Việt UTC+7",
-      traditionalRules:factConfidence.code,
+      calendar:calendarConfidence.code === "disputed"
+        ? "cần rà soát"
+        : calendarConfidence.code === "high"
+          ? "cao cho engine Việt UTC+7"
+          : calendarConfidence.code === "medium"
+            ? "khá cho engine Việt UTC+7"
+            : "cần thêm bằng chứng",
+      bazi:baziConfidence.code,
+      traditionalRules:traditionalConfidence.code,
       advisoryRecommendations:aligned
         ? "implementation-advisory"
         : "disabled-because-calendar-not-aligned",
       personalization:personal
-        ? "mixed-provenance-plus-heuristic-score"
-        : "chưa bật",
+        ? {
+            facts:personalConfidence,
+            ranking:{
+              code:"experimental",
+              canMakeStrongClaim:false,
+              policy:"ranking-heuristic-v1"
+            }
+          }
+        : null,
       boundary:dutyState.transition
         ? "jie-transition-day"
         : bazi.boundary.nearBoundary
           ? "near-solar-term-boundary"
           : "normal",
       note:factConfidence.code === "disputed"
-        ? "Có bất đồng kỹ thuật trong cross-check; AI phải trình bày thận trọng."
+        ? "Có bất đồng kỹ thuật trong ít nhất một miền; AI phải chỉ rõ miền nào đang bất đồng."
         : dutyState.transition
           ? `Ngày giao ${dutyState.transition.term}; Trực và Hoàng/Hắc đạo ngày có trạng thái trước/sau tại ${dutyState.transition.moment.time}.`
           : bazi.boundary.nearBoundary
