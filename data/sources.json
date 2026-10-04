@@ -236,5 +236,21 @@
       "solar-term-regression"
     ],
     "usedFor": "Golden cases đủ 24 tiết khí, bao gồm toàn bộ 12 ranh giới tháng tiết khí của Bát Tự."
+  },
+  {
+    "id": "shenfeng-tongkao",
+    "name": "神峰通考 – Thần Phong Thông Khảo",
+    "publisher": "Chinese Text Project",
+    "url": "https://ctext.org/wiki.pl?chapter=472359&if=en&remap=gb",
+    "type": "cổ thư Bát Tự bổ trợ",
+    "strength": "bổ trợ cho cấu trúc Bát Tự",
+    "role": "supplemental-classic",
+    "family": "shenfeng-tongkao",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "authorityRank": 3,
+    "canonicalFor": [
+      "bazi-hidden-stems-supplement"
+    ],
+    "usedFor": "Đối chiếu tàng can 12 Địa Chi; không dùng làm căn cứ cho trọng số số học."
   }
 ]
