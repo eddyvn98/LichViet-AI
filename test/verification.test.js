@@ -151,3 +151,30 @@ test("Twelve-Duty engine follows complete branch-offset cycle", async () => {
     }
   }
 });
+
+
+test("yellow-black path engine yields exactly six good deities and hours", async () => {
+  const {
+    calculateEclipticDay,
+    eclipticHoursForDay,
+    ECLIPTIC_DEITIES
+  } = await import("../src/ecliptic.js");
+  const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+
+  for (const anchor of branches) {
+    const dayResults = branches.map(day => calculateEclipticDay(anchor, day));
+    assert.deepEqual(
+      dayResults.map(x => x.deity).sort(),
+      [...ECLIPTIC_DEITIES].sort()
+    );
+    assert.equal(dayResults.filter(x => x.good).length, 6);
+
+    const hours = eclipticHoursForDay(anchor);
+    assert.equal(hours.length, 12);
+    assert.equal(hours.filter(x => x.good).length, 6);
+  }
+});
+
+test("BaZi rejects nonexistent Gregorian dates", () => {
+  assert.throws(() => getBaZi("2026-02-31", "12:00"), /không tồn tại/i);
+});
