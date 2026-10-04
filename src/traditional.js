@@ -48,8 +48,8 @@ function hourRange(hour) {
 function goodHours(y,m,d) {
   const out = [];
   for (let hour = 0; hour < 24; hour += 2) {
-    const h = SolarTime.fromYmdHms(y,m,d,h,0,0).getLunarHour();
-    const star = h.getTwelveStar();
+    const lunarHour = SolarTime.fromYmdHms(y,m,d,hour,0,0).getLunarHour();
+    const star = lunarHour.getTwelveStar();
     if (star.getEcliptic().getLuck().getName() === "吉") {
       const branchRaw = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"][Math.floor((hour + 1) / 2) % 12];
       out.push({
