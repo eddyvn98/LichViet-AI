@@ -56,7 +56,7 @@ test("profile supports birth time but never requires it", async ({ page }) => {
 test("sources page exposes method and limits", async ({ page }) => {
   await page.goto("/sources.html");
   await expect(page.getByRole("heading", { name:"App biết gì, và chưa biết gì?" })).toBeVisible();
-  await expect(page.getByText("Hồ Ngọc Đức", { exact:false })).toBeVisible();
+  await expect(page.getByText("Hồ Ngọc Đức", { exact:false }).first()).toBeVisible();
   await expect(page.getByText("Khâm Thiên Giám", { exact:false }).first()).toBeVisible();
   await expect(page.getByRole("heading", { name:"Giới hạn hiện tại" })).toBeVisible();
 });
