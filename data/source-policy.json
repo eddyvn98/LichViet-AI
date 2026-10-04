@@ -1,0 +1,53 @@
+{
+  "version": "3.0",
+  "principles": [
+    "Nguon goc va nguon chinh thuc co quyen cao hon implementation.",
+    "Thu vien pho bien chi dung de cross-check, khong tu tao chan ly.",
+    "Hai implementation cung tac gia/he sinh thai khong duoc tinh la hai nguon doc lap.",
+    "Bat dong phai duoc ghi nhan, khong am tham chon mot ket qua.",
+    "Heuristic phai gan nhan EXPERIMENTAL va AI khong duoc trinh bay nhu quy tac co dien da xac minh."
+  ],
+  "levels": {
+    "ASTRONOMY_OFFICIAL": {
+      "rank": 5,
+      "label": "Thien van chinh thuc",
+      "strongClaim": true
+    },
+    "PRIMARY_EXACT": {
+      "rank": 5,
+      "label": "Nguyen dien + locator chinh xac",
+      "strongClaim": true
+    },
+    "PRIMARY_FAMILY": {
+      "rank": 4,
+      "label": "Dung nguyen dien, locator moi o cap quyen/muc",
+      "strongClaim": false
+    },
+    "OFFICIAL_SECONDARY": {
+      "rank": 4,
+      "label": "Nguon co quan chinh thuc / luu tru",
+      "strongClaim": true
+    },
+    "IMPLEMENTATION_CROSSCHECK": {
+      "rank": 2,
+      "label": "Implementation cross-check",
+      "strongClaim": false
+    },
+    "COMMUNITY_REFERENCE": {
+      "rank": 1,
+      "label": "Nguon tham khao cong dong",
+      "strongClaim": false
+    },
+    "EXPERIMENTAL": {
+      "rank": 0,
+      "label": "Heuristic / thu nghiem",
+      "strongClaim": false
+    }
+  },
+  "confidencePolicy": {
+    "high": "Nguon thien van chinh thuc; hoac PRIMARY_EXACT/OFFICIAL_SECONDARY kem cross-check khong co dispute.",
+    "medium": "PRIMARY_FAMILY hoac nhieu implementation dong thuan nhung chua co locator nguyen dien chinh xac.",
+    "low": "Chi co implementation, heuristic, hoac co bat dong chua giai quyet.",
+    "disputed": "Bat ky cross-check quan trong nao mau thuan voi engine; AI phai noi ro chua du can cu."
+  }
+}
