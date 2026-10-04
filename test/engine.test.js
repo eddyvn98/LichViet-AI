@@ -10,10 +10,23 @@ test("day API model uses Vietnamese lunar date", () => {
   assert.equal(d.lunar.month, 8);
   assert.equal(d.canChi.day, "Tân Hợi");
   assert.ok(d.recommended.length > 0);
-  assert.ok(d.goodHours.length > 0);
+  assert.equal(d.goodHours.length, 6);
+  assert.ok(d.goodHours.every(x => x.source === "verified-engine"));
   assert.ok(["Hoàng đạo","Hắc đạo"].includes(d.ecliptic));
   assert.ok(Array.isArray(d.provenance.crossChecks));
   assert.ok(d.provenance.crossChecks.some(x => x.provider === "lunar-javascript"));
+  assert.equal(
+    d.provenance.crossChecks.find(x => x.scope === "twelve-duty")?.status,
+    "agree"
+  );
+  assert.equal(
+    d.provenance.crossChecks.find(x => x.scope === "ecliptic-day")?.status,
+    "agree"
+  );
+  assert.equal(
+    d.provenance.crossChecks.find(x => x.scope === "ecliptic-hours")?.status,
+    "agree"
+  );
   assert.ok(d.confidence.facts?.code);
   assert.equal(d.confidence.ranking.code, "experimental");
   assert.equal(d.ranking.policy.id, "ranking-heuristic-v1");
