@@ -165,7 +165,7 @@ export function solarToVietnameseLunar(isoDate, timezone = TZ_VIETNAM) {
     calculation:{
       mode:"astronomical-UTC+7",
       historicalReconstruction:false,
-      evidenceRefs:["VN-UTC7-OFFICIAL","vn-lunar-hnd"]
+      evidenceRefs:["VN-UTC7-OFFICIAL","VN-LUNAR-HND-ALGORITHM"]
     }
   };
 }
@@ -235,7 +235,7 @@ export function vietnameseLunarToSolar(input, timezone = TZ_VIETNAM) {
     calculation:{
       mode:"astronomical-UTC+7",
       historicalReconstruction:false,
-      evidenceRefs:["VN-UTC7-OFFICIAL","vn-lunar-hnd"]
+      evidenceRefs:["VN-UTC7-OFFICIAL","VN-LUNAR-HND-ALGORITHM"]
     }
   };
 }
