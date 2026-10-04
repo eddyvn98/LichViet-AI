@@ -4,7 +4,7 @@ import {
 
 function splitList(value) {
   return String(value || "")
-    .split(/[,\\n]+/)
+    .split(/[,\n]+/)
     .map(x => x.trim())
     .filter(Boolean);
 }
