@@ -10,28 +10,41 @@ const HARMONY = {
   "辰":"酉","酉":"辰","巳":"申","申":"巳","午":"未","未":"午"
 };
 
-export function branchRelationship(birthYearBranch, dayBranch) {
-  if (!birthYearBranch || !dayBranch) return null;
-  if (CLASH[birthYearBranch] === dayBranch) {
+const HARM = {
+  "子":"未","未":"子","丑":"午","午":"丑","寅":"巳","巳":"寅",
+  "卯":"辰","辰":"卯","申":"亥","亥":"申","酉":"戌","戌":"酉"
+};
+
+export function branchRelationship(referenceBranch, dayBranch) {
+  if (!referenceBranch || !dayBranch) return null;
+  if (CLASH[referenceBranch] === dayBranch) {
     return {
-      type: "clash",
-      delta: -12,
-      label: "Xung tuổi",
-      detail: `Chi ngày ${branchVi(dayBranch)} xung với chi năm sinh ${branchVi(birthYearBranch)}.`
+      type:"clash",
+      suggestedDelta:-12,
+      label:"Lục xung",
+      detail:`Chi ngày ${branchVi(dayBranch)} lục xung với chi tham chiếu ${branchVi(referenceBranch)}.`
     };
   }
-  if (HARMONY[birthYearBranch] === dayBranch) {
+  if (HARMONY[referenceBranch] === dayBranch) {
     return {
-      type: "harmony",
-      delta: 6,
-      label: "Hợp tuổi",
-      detail: `Chi ngày ${branchVi(dayBranch)} lục hợp với chi năm sinh ${branchVi(birthYearBranch)}.`
+      type:"harmony",
+      suggestedDelta:6,
+      label:"Lục hợp",
+      detail:`Chi ngày ${branchVi(dayBranch)} lục hợp với chi tham chiếu ${branchVi(referenceBranch)}.`
+    };
+  }
+  if (HARM[referenceBranch] === dayBranch) {
+    return {
+      type:"harm",
+      suggestedDelta:0,
+      label:"Lục hại",
+      detail:`Chi ngày ${branchVi(dayBranch)} thuộc cặp lục hại với chi tham chiếu ${branchVi(referenceBranch)}; hiện chỉ hiển thị tham khảo, không cộng/trừ điểm.`
     };
   }
   return {
-    type: "neutral",
-    delta: 0,
-    label: "Không xung trực tiếp",
-    detail: "Không rơi vào cặp lục xung hoặc lục hợp cơ bản đang dùng trong MVP."
+    type:"neutral",
+    suggestedDelta:0,
+    label:"Không có quan hệ trực tiếp",
+    detail:"Không rơi vào Lục xung, Lục hợp hoặc Lục hại trong corpus đang bật."
   };
 }
