@@ -1,0 +1,11 @@
+{
+  "version": "6.0.0",
+  "verificationVersion": "6.0",
+  "engine": "verified-engine-v6",
+  "knowledgeBase": "evidence-corpus-v6",
+  "decisionPolicy": "activity-composition-v2",
+  "generalVerdictPolicy": "general-day-composition-v1",
+  "rankingPolicy": "ranking-tiebreak-v2",
+  "calendar": "Vietnam UTC+7",
+  "releaseFocus": "source-backed duty corpus, multi-signal recommendation composition, property testing and AI guardrails"
+}
