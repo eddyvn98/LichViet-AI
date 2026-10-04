@@ -30,7 +30,7 @@ test("day API model uses Vietnamese lunar date", () => {
   );
   assert.ok(d.confidence.facts?.code);
   assert.equal(d.confidence.ranking.code, "experimental");
-  assert.equal(d.ranking.policy.id, "ranking-heuristic-v1");
+  assert.equal(d.ranking.policy.id, "ranking-tiebreak-v2");
 });
 
 test("birth profile does not invent missing hour", () => {
@@ -59,7 +59,7 @@ test("planner exposes one heuristic score pipeline without hidden double count",
   assert.equal(r.length, 1);
   const ids = r[0].activityRanking.components.map(x => x.id);
   assert.equal(ids.filter(x => x === "DUTY_ACTIVITY").length <= 1, true);
-  assert.equal(r[0].activityRanking.policy.id, "ranking-heuristic-v1");
+  assert.equal(r[0].activityRanking.policy.id, "ranking-tiebreak-v2");
 });
 
 
@@ -113,7 +113,7 @@ test("ecliptic component is labeled as engine rule normalization", async () => {
   const result = scoreDayBase({ dutyBase:0, eclipticGood:true, personalDelta:0 });
   const component = result.components.find(x => x.id === "ECLIPTIC_DAY");
   assert.ok(component);
-  assert.equal(component.origin, "traditional-rule-normalization");
+  assert.equal(component.origin, "product-policy-derived-from-traditional-signal");
 });
 
 
@@ -147,4 +147,34 @@ test("day confidence is split by domain and aggregate is conservative", () => {
   assert.equal(d.confidence.calendar, "khá cho engine Việt UTC+7");
   assert.equal(d.confidence.facts.code, "medium");
   assert.equal(d.confidence.facts.weakestDomain, "calendar");
+});
+
+
+test("general day verdict is composition-based, not score-based", () => {
+  const d = publicDay(buildDayInfo("2026-10-04"));
+  assert.equal(d.verdict.policy.id, "general-day-composition-v1");
+  assert.equal(d.ranking.role, "tie-break-only");
+  assert.equal(d.ranking.policy.id, "ranking-tiebreak-v2");
+});
+
+
+test("reproducibility fingerprint is stable for identical deterministic input", () => {
+  const a = publicDay(buildDayInfo("2026-10-04"));
+  const b = publicDay(buildDayInfo("2026-10-04"));
+  const c = publicDay(buildDayInfo("2026-10-05"));
+  assert.equal(a.provenance.trace.algorithm, "sha256");
+  assert.equal(a.provenance.trace.engine, "verified-engine-v6");
+  assert.equal(a.provenance.trace.hash, b.provenance.trace.hash);
+  assert.notEqual(a.provenance.trace.hash, c.provenance.trace.hash);
+  assert.match(a.provenance.trace.hash, /^[0-9a-f]{64}$/);
+});
+
+test("planner recommendation includes its own reproducibility fingerprint", () => {
+  const first = rankDays({ from:"2026-10-04", days:1, activity:"contract" })[0];
+  const second = rankDays({ from:"2026-10-04", days:1, activity:"contract" })[0];
+  assert.equal(first.recommendationDecision.trace.algorithm, "sha256");
+  assert.equal(
+    first.recommendationDecision.trace.hash,
+    second.recommendationDecision.trace.hash
+  );
 });

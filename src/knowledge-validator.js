@@ -43,16 +43,22 @@ export function validateKnowledgeBase() {
   const rules = readJson("../data/rules.json");
   const sources = readJson("../data/sources.json");
   const evidence = readJson("../data/evidence-records.json");
+  const dutyClassification = readJson("../data/duty-classification.json");
+  const activityPolicies = readJson("../data/activity-policies.json");
   const policy = sourcePolicy();
   const errors = [];
   const warnings = [];
 
   const sourceIds = new Set(sources.map(x => x.id));
   const evidenceIds = new Set(evidence.map(x => x.id));
+  const dutyClassByRaw = new Map(dutyClassification.map(x => [x.raw, x]));
+  const activityPolicyById = new Map(activityPolicies.map(x => [x.activity, x]));
 
   for (const id of duplicateValues(sources.map(x => x.id))) errors.push(`Nguồn trùng ID: ${id}`);
   for (const id of duplicateValues(evidence.map(x => x.id))) errors.push(`Evidence trùng ID: ${id}`);
   for (const id of duplicateValues(rules.map(x => x.id))) errors.push(`Rule trùng ID: ${id}`);
+  for (const id of duplicateValues(dutyClassification.map(x => x.raw))) errors.push(`Duty classification trùng raw: ${id}`);
+  for (const id of duplicateValues(activityPolicies.map(x => x.activity))) errors.push(`Activity policy trùng activity: ${id}`);
 
   for (const source of sources) {
     if (!source.id || !source.url || !source.family || !source.role) {
@@ -91,6 +97,59 @@ export function validateKnowledgeBase() {
         Number(source?.authorityRank || 0) < 4) {
       warnings.push(`PRIMARY_EXACT nhưng source authority < 4, không được dùng cho strong claim: ${record.id}`);
     }
+  }
+
+  const DUTY_CLASSES = new Set(["good","bad"]);
+  const DUTY_TIERS = new Set(["top-good","second-good","good","bad","very-bad"]);
+
+  for (const item of dutyClassification) {
+    if (!DUTIES.has(item.raw)) errors.push(`Duty classification raw lạ: ${item.raw}`);
+    if (!DUTY_CLASSES.has(item.traditionalClass)) {
+      errors.push(`Duty classification class lạ: ${item.raw} = ${item.traditionalClass}`);
+    }
+    if (!DUTY_TIERS.has(item.tier)) {
+      errors.push(`Duty classification tier lạ: ${item.raw} = ${item.tier}`);
+    }
+    if (!evidenceIds.has(item.evidenceRef)) {
+      errors.push(`Duty classification thiếu evidenceRef: ${item.raw} -> ${item.evidenceRef}`);
+    }
+  }
+  if (dutyClassification.length !== 12 ||
+      new Set(dutyClassification.map(x => x.raw)).size !== 12 ||
+      [...DUTIES].some(x => !dutyClassByRaw.has(x))) {
+    errors.push("Duty classification phải có đúng 12 Trực duy nhất");
+  }
+
+  for (const item of activityPolicies) {
+    if (!item.id || !ACTIVITIES.has(item.activity)) {
+      errors.push(`Activity policy không hợp lệ: ${item.id || "(no id)"}`);
+    }
+    if (item.evidenceLevel !== "PRODUCT_POLICY") {
+      errors.push(`Activity policy phải là PRODUCT_POLICY: ${item.id}`);
+    }
+    if (item.policyVersion !== "activity-composition-v2") {
+      errors.push(`Activity policy sai version: ${item.id}`);
+    }
+    for (const key of ["preferredDuties","avoidDuties","cautionDuties"]) {
+      if (!Array.isArray(item[key]) || item[key].some(x => !DUTIES.has(x))) {
+        errors.push(`Activity policy ${item.id} có ${key} không hợp lệ`);
+      }
+    }
+    const overlap = [
+      ...(item.preferredDuties || []).filter(x => (item.avoidDuties || []).includes(x)),
+      ...(item.preferredDuties || []).filter(x => (item.cautionDuties || []).includes(x)),
+      ...(item.avoidDuties || []).filter(x => (item.cautionDuties || []).includes(x))
+    ];
+    if (overlap.length) {
+      errors.push(`Activity policy ${item.id} overlap duty: ${[...new Set(overlap)].join(",")}`);
+    }
+    for (const ref of item.evidenceRefs || []) {
+      if (!evidenceIds.has(ref)) errors.push(`Activity policy ${item.id} thiếu evidenceRef: ${ref}`);
+    }
+  }
+  if (activityPolicies.length !== ACTIVITIES.size ||
+      [...ACTIVITIES].some(x => !activityPolicyById.has(x))) {
+    errors.push("Activity policy phải phủ đủ 8 loại việc duy nhất");
   }
 
   for (const rule of rules) {
@@ -133,8 +192,30 @@ export function validateKnowledgeBase() {
 
     if (rule.kind === "duty") {
       if (!DUTIES.has(rule.raw)) errors.push(`Rule Trực có raw không hợp lệ: ${rule.id}`);
-      if (rule.scorePolicy !== "ranking-heuristic-v1") {
-        errors.push(`Rule Trực phải khai báo scorePolicy heuristic: ${rule.id}`);
+      if (rule.scorePolicy !== "ranking-tiebreak-v2") {
+        errors.push(`Rule Trực phải khai báo scorePolicy ranking-tiebreak-v2: ${rule.id}`);
+      }
+      if (rule.evidenceLevel !== "PRODUCT_POLICY" ||
+          rule.verification !== "product_policy") {
+        errors.push(`Rule Trực activity mapping phải khóa ở PRODUCT_POLICY: ${rule.id}`);
+      }
+      if (!dutyClassByRaw.has(rule.raw)) {
+        errors.push(`Rule Trực thiếu canonical classification: ${rule.id}`);
+      }
+
+      const expectedGood = activityPolicies
+        .filter(x => x.preferredDuties.includes(rule.raw))
+        .map(x => x.activity).sort();
+      const expectedAvoid = activityPolicies
+        .filter(x => x.avoidDuties.includes(rule.raw))
+        .map(x => x.activity).sort();
+      const actualGood = [...(rule.good || [])].sort();
+      const actualAvoid = [...(rule.avoid || [])].sort();
+      if (JSON.stringify(actualGood) !== JSON.stringify(expectedGood)) {
+        errors.push(`Rule ${rule.id} good[] drift khỏi activity-policies.json`);
+      }
+      if (JSON.stringify(actualAvoid) !== JSON.stringify(expectedAvoid)) {
+        errors.push(`Rule ${rule.id} avoid[] drift khỏi activity-policies.json`);
       }
     }
   }
@@ -153,7 +234,9 @@ export function validateKnowledgeBase() {
       sources:sources.length,
       evidenceRecords:evidence.length,
       rules:rules.length,
-      canonicalRules:rules.filter(x => x.verification === "canonical_verified").length
+      canonicalRules:rules.filter(x => x.verification === "canonical_verified").length,
+      dutyClassifications:dutyClassification.length,
+      activityPolicies:activityPolicies.length
     }
   };
 }

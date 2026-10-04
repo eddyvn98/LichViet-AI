@@ -79,6 +79,10 @@ export function evidenceForRule(rule) {
   const bestRecord = [...records].sort((a,b) =>
     (b.rank + b.authorityRank) - (a.rank + a.authorityRank)
   )[0] || null;
+  const explicitLevel = normalizeEvidenceLevel(
+    rule?.evidenceLevel || rule?.verification
+  );
+  const policyLocked = ["PRODUCT_POLICY","EXPERIMENTAL"].includes(explicitLevel);
 
   return {
     ruleId:rule?.id || null,
@@ -92,7 +96,9 @@ export function evidenceForRule(rule) {
     verification:rule?.verification || null,
     evidenceRefs:records.map(x => x.id),
     records,
-    ...(bestRecord ? evidenceLevelInfo(bestRecord.evidenceLevel) : levelInfo)
+    supportingEvidenceLevel:bestRecord?.level || null,
+    ...(policyLocked ? levelInfo :
+      bestRecord ? evidenceLevelInfo(bestRecord.evidenceLevel) : levelInfo)
   };
 }
 

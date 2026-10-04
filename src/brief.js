@@ -30,17 +30,24 @@ export function buildBrief({ date, profile = null, plans = [] }) {
     );
 
     if (distance <= 7) {
+      const preferred = best.recommendationDecision?.code === "preferred";
       alerts.push({
         planId:plan.id || null,
         title:plan.title || ACTIVITIES[plan.activity].label,
         activity:plan.activity,
         date:best.date,
-        urgency:distance <= 1 ? "high" : distance <= 3 ? "medium" : "normal",
-        message:distance === 0
-          ? "Hôm nay là lựa chọn ưu tiên trong khoảng bạn đã lưu."
-          : distance === 1
-            ? "Ngày mai là một lựa chọn ưu tiên trong kế hoạch của bạn."
-            : `${distance} ngày nữa có một ngày đáng ưu tiên cho kế hoạch này.`,
+        urgency:preferred && distance <= 1 ? "high" : distance <= 3 ? "medium" : "normal",
+        decision:best.recommendationDecision || null,
+        match:best.match,
+        message:preferred
+          ? distance === 0
+            ? "Hôm nay là lựa chọn ưu tiên trong khoảng bạn đã lưu."
+            : distance === 1
+              ? "Ngày mai là một lựa chọn ưu tiên trong kế hoạch của bạn."
+              : `${distance} ngày nữa có một ngày ở mức Ưu tiên cho kế hoạch này.`
+          : distance === 0
+            ? `Hôm nay là lựa chọn cao nhất trong khoảng, nhưng chỉ ở mức ${best.match}.`
+            : `${distance} ngày nữa là lựa chọn cao nhất trong khoảng, ở mức ${best.match}.`,
         reasons:best.reasons.slice(0,2)
       });
     }
@@ -61,10 +68,11 @@ export function buildBrief({ date, profile = null, plans = [] }) {
       recommended:today.recommended.slice(0,2),
       avoid:today.avoid.slice(0,1),
       goodHours:today.goodHours.slice(0,2),
-      personal:today.personal
+      personal:today.personal,
+      confidence:today.confidence
     },
     alerts:alerts.sort((a,b) => a.date.localeCompare(b.date)).slice(0,5),
-    generatedBy:"deterministic-brief-v2",
-    aiPolicy:"AI may rephrase this payload but must not invent calendar facts."
+    generatedBy:"deterministic-brief-v3",
+    aiPolicy:"AI may rephrase only; it must preserve decision, confidence, evidence scope and PRODUCT_POLICY labels."
   };
 }

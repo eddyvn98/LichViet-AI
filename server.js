@@ -7,13 +7,14 @@ import { solarTermsForYear } from "./src/bazi.js";
 import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-service.js";
 import { buildBrief } from "./src/brief.js";
 import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
-import { allRules } from "./src/rule-engine.js";
+import { allActivityPolicies, allDutyClassifications, allRules } from "./src/rule-engine.js";
 import { verificationCases, verificationSummary } from "./src/verification.js";
 import { allEvidenceRecords } from "./src/evidence.js";
 import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src/push.js";
 import { buildDayInfo, publicDay } from "./src/traditional.js";
 import { vietnameseLunarToSolar, vietnameseLunarYearStructure } from "./src/vietnamese-lunar.js";
 import { telegramStatus } from "./src/telegram.js";
+import { engineManifest } from "./src/version.js";
 import {
   getNotificationSettings,
   saveNotificationSettings
@@ -27,6 +28,7 @@ const publicRoot = fileURLToPath(new URL("./public/", import.meta.url));
 const sources = JSON.parse(await readFile(new URL("./data/sources.json", import.meta.url),"utf8"));
 const glossary = JSON.parse(await readFile(new URL("./data/glossary.json", import.meta.url),"utf8"));
 const port = Number(process.env.PORT || 3000);
+const manifest = engineManifest();
 
 function todayVN() {
   return new Intl.DateTimeFormat("en-CA",{ timeZone:"Asia/Ho_Chi_Minh" }).format(new Date());
@@ -66,7 +68,7 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:"5.0.0", engine:"verified-engine-v5", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+    return json(res,200,{ ok:true, version:manifest.version, engine:manifest.engine, calendar:manifest.calendar, decisionPolicy:manifest.decisionPolicy, rankingPolicy:manifest.rankingPolicy, push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -110,11 +112,20 @@ async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/meta") {
     return json(res,200,{
       activities:Object.entries(ACTIVITIES).map(([id,x]) => ({ id,label:x.label })),
-      glossary,sources,ruleCount:allRules().length,verification:verificationSummary(),push:pushStatus()
+      glossary,sources,ruleCount:allRules().length,
+      decisionPolicy:manifest.decisionPolicy,
+      rankingPolicy:manifest.rankingPolicy,
+      verification:verificationSummary(),push:pushStatus()
     },"public, max-age=3600");
   }
   if (req.method === "GET" && url.pathname === "/api/rules") {
     return json(res,200,{ rules:allRules() },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/duty-classification") {
+    return json(res,200,{ duties:allDutyClassifications() },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/activity-policies") {
+    return json(res,200,{ policies:allActivityPolicies() },"public, max-age=3600");
   }
   if (req.method === "GET" && url.pathname === "/api/evidence") {
     const id = url.searchParams.get("id");
@@ -235,6 +246,6 @@ http.createServer(async(req,res) => {
     json(res,error.code === "ENOENT" ? 404 : 400,{ error:error.message || "Có lỗi xảy ra" });
   }
 }).listen(port,() => {
-  console.log(`LichViet AI v5 verified engine listening on ${port}`);
+  console.log(`LichViet AI ${manifest.version} ${manifest.engine} listening on ${port}`);
   startLocalNotificationScheduler();
 });

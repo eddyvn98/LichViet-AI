@@ -1,7 +1,7 @@
 export const SCORE_POLICY = {
-  id:"ranking-heuristic-v1",
-  evidenceLevel:"EXPERIMENTAL",
-  note:"Điểm số là chính sách xếp hạng của ứng dụng, không phải thang điểm cổ điển.",
+  id:"ranking-tiebreak-v2",
+  evidenceLevel:"PRODUCT_POLICY",
+  note:"Điểm số chỉ dùng tie-break giữa các ngày cùng decision band; không quyết định verdict/match và không phải thang điểm cổ điển.",
   baseline:50,
   ecliptic:{ good:4, bad:-3 },
   implementationAdvisory:"display-only"
@@ -14,11 +14,11 @@ function clamp(value) {
 export function scoreDayBase({ dutyBase = 0, eclipticGood = false, personalDelta = 0 } = {}) {
   const components = [
     { id:"BASELINE", value:SCORE_POLICY.baseline, origin:"product-policy" },
-    { id:"DUTY_BASE", value:Number(dutyBase) || 0, origin:"traditional-rule-normalization" },
+    { id:"DUTY_BASE", value:Number(dutyBase) || 0, origin:"product-policy" },
     {
       id:"ECLIPTIC_DAY",
       value:eclipticGood ? SCORE_POLICY.ecliptic.good : SCORE_POLICY.ecliptic.bad,
-      origin:"traditional-rule-normalization"
+      origin:"product-policy-derived-from-traditional-signal"
     }
   ];
   if (personalDelta) {
@@ -46,7 +46,7 @@ export function scoreActivity({
     components.push({
       id:"DUTY_ACTIVITY",
       value:Number(activityDelta) || 0,
-      origin:"traditional-rule-normalization"
+      origin:"product-policy"
     });
   }
   return {

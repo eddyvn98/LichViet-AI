@@ -4,84 +4,96 @@
     "kind": "duty",
     "raw": "建",
     "vi": "Kiến",
-    "base": 2,
+    "base": -3,
     "good": [
       "meeting"
     ],
     "avoid": [
       "build"
     ],
-    "source": "xieji",
-    "locator": "卷二十至二十一・建日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-CHU",
     "kind": "duty",
     "raw": "除",
     "vi": "Trừ",
-    "base": 3,
+    "base": 5,
     "good": [
       "medical"
     ],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・除日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-MAN",
     "kind": "duty",
     "raw": "满",
     "vi": "Mãn",
-    "base": 4,
+    "base": -3,
     "good": [
-      "meeting",
-      "opening"
+      "opening",
+      "meeting"
     ],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・满日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-PING",
     "kind": "duty",
     "raw": "平",
     "vi": "Bình",
-    "base": 0,
+    "base": -3,
     "good": [],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・平日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-DING",
     "kind": "duty",
     "raw": "定",
     "vi": "Định",
-    "base": 6,
+    "base": 5,
     "good": [
       "contract",
       "wedding",
@@ -89,38 +101,44 @@
       "build"
     ],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・定日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-ZHI",
     "kind": "duty",
     "raw": "执",
     "vi": "Chấp",
-    "base": 2,
+    "base": 4,
     "good": [],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・执日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-PO",
     "kind": "duty",
     "raw": "破",
     "vi": "Phá",
-    "base": -8,
+    "base": -10,
     "good": [],
     "avoid": [
       "contract",
@@ -129,33 +147,39 @@
       "opening",
       "build"
     ],
-    "source": "xieji",
-    "locator": "卷二十至二十一・破日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-WEI",
     "kind": "duty",
     "raw": "危",
     "vi": "Nguy",
-    "base": -5,
+    "base": 8,
     "good": [],
     "avoid": [
       "build"
     ],
-    "source": "xieji",
-    "locator": "卷二十至二十一・危日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-CHENG",
@@ -173,38 +197,44 @@
       "meeting"
     ],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・成日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-SHOU",
     "kind": "duty",
     "raw": "收",
     "vi": "Thu",
-    "base": 3,
+    "base": -3,
     "good": [],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・收日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-KAI",
     "kind": "duty",
     "raw": "开",
     "vi": "Khai",
-    "base": 7,
+    "base": 8,
     "good": [
       "contract",
       "move",
@@ -214,34 +244,40 @@
       "meeting"
     ],
     "avoid": [],
-    "source": "xieji",
-    "locator": "卷二十至二十一・开日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "DUTY-BI",
     "kind": "duty",
     "raw": "闭",
     "vi": "Bế",
-    "base": -6,
+    "base": -3,
     "good": [],
     "avoid": [
       "opening",
       "travel"
     ],
-    "source": "xieji",
-    "locator": "卷二十至二十一・闭日条",
-    "verification": "primary_text_family",
+    "locator": "App activity policy; traditional class in data/duty-classification.json",
+    "verification": "product_policy",
     "evidenceRefs": [
+      "XLKY-12-DUTY-CLASSIFICATION",
+      "XLKY-SELECTION-MULTIFACTOR",
       "SHUIHUDI-12-DUTIES"
     ],
-    "scorePolicy": "ranking-heuristic-v1",
-    "normalizationNote": "Good/avoid và base score là normalization của app; evidence lịch sử không tự động xác nhận toàn bộ mapping hiện đại."
+    "scorePolicy": "ranking-tiebreak-v2",
+    "normalizationNote": "good/avoid và điểm số là PRODUCT_POLICY. Phân nhóm cát/hung tổng quát của Trực có provenance riêng; app không gọi mapping theo loại việc là nguyên điển.",
+    "evidenceLevel": "PRODUCT_POLICY",
+    "policyClass": "activity-normalization"
   },
   {
     "id": "REL-ZI-WU",

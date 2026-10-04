@@ -11,7 +11,9 @@ import {
   evidenceRecordById,
   resolveEvidenceRecords
 } from "./evidence.js";
-import { classifyScore, scoreDayBase } from "./scoring.js";
+import { scoreDayBase } from "./scoring.js";
+import { composeGeneralDayAssessment } from "./recommendation-engine.js";
+import { reproducibilityTrace } from "./trace.js";
 import { calculateTwelveDuty } from "./twelve-duty.js";
 import {
   calculateEclipticDay,
@@ -227,6 +229,11 @@ export function buildDayInfo(isoDate, profile = null) {
       : "single-state"
   };
 
+  const generalAssessment = composeGeneralDayAssessment({
+    dutyRaws:dutyState.dutyRaws,
+    eclipticGoods:eclipticState.candidates.map(x => x.good)
+  });
+
   const ruleIds = unique([
     ...dutyState.ruleIds,
     ...(personal?.ruleIds || [])
@@ -347,9 +354,24 @@ export function buildDayInfo(isoDate, profile = null) {
       x.evaluation.evidence?.flatMap(e => e.evidenceRefs || []) || []
     ),
     ...eclipticState.evidenceRefs,
+    "XLKY-12-DUTY-CLASSIFICATION",
+    "XLKY-SELECTION-MULTIFACTOR",
     ...(dutyState.transition?.evidenceRefs || []),
     ...(personal?.evidence?.flatMap(x => x.evidence?.evidenceRefs || []) || [])
   ]);
+
+  const trace = reproducibilityTrace({
+    type:"day",
+    date:isoDate,
+    lunar:{ year:vnLunar.year, month:vnLunar.month, day:vnLunar.day, leap:vnLunar.leap },
+    canChi:{ year:bazi.raw.year, month:bazi.raw.month, day:bazi.raw.day },
+    dutyRaws:dutyState.dutyRaws,
+    ecliptic:eclipticState.candidates.map(x => ({ deity:x.deity, good:x.good })),
+    ruleIds,
+    evidenceRecordIds,
+    verdict:generalAssessment.code,
+    confidence:factConfidence.code
+  });
 
   return {
     date:isoDate,
@@ -383,8 +405,8 @@ export function buildDayInfo(isoDate, profile = null) {
       },
       evidenceRefs:eclipticState.evidenceRefs
     } : null,
-    verdict:classifyScore(ranking.score),
-    ranking,
+    verdict:generalAssessment,
+    ranking:{ ...ranking, role:"tie-break-only" },
     recommended,
     avoid,
     recommendationOrigin,
@@ -398,13 +420,15 @@ export function buildDayInfo(isoDate, profile = null) {
       dutyCalculation:dutyState,
       eclipticCalculation:eclipticState,
       evidenceRecords:resolveEvidenceRecords(evidenceRecordIds),
+      trace,
       implementationNotes:[
         "12 Trực do verified engine tự tính; ngày giao tiết giữ cả trạng thái trước/sau theo nguyên điển.",
         "Hoàng/Hắc đạo ngày và giờ do verified engine tự tính theo Hiệp Kỷ Biện Phương Thư.",
         "Tyme4TS chỉ cung cấp nghi/kỵ chi tiết dạng advisory và cross-check các phép tính cốt lõi.",
         "lunar-javascript dùng để cross-check Can Chi và lịch âm.",
         "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập.",
-        "Điểm ranking là heuristic của app, tách biệt với độ tin cậy của facts."
+        "Verdict ngày dùng multi-signal composition; không lấy score làm kết luận.",
+        "Điểm ranking chỉ là tie-break PRODUCT_POLICY, tách biệt với độ tin cậy của facts."
       ]
     },
     confidence:{
@@ -420,6 +444,7 @@ export function buildDayInfo(isoDate, profile = null) {
         canMakeStrongClaim:false,
         policy:ranking.policy.id
       },
+      calendarScope:vnLunar.calculation?.scope || "unknown",
       calendar:calendarConfidence.code === "disputed"
         ? "cần rà soát"
         : calendarConfidence.code === "high"
@@ -470,7 +495,8 @@ export function buildDayInfo(isoDate, profile = null) {
     _rawAvoid:rawAvoid,
     _implementationAdviceUsable:aligned,
     _dutyRaw:dutyState.primary.raw,
-    _dutyRaws:dutyState.dutyRaws
+    _dutyRaws:dutyState.dutyRaws,
+    _eclipticGoods:eclipticState.candidates.map(x => x.good)
   };
 }
 
@@ -482,6 +508,7 @@ export function publicDay(info) {
     _implementationAdviceUsable,
     _dutyRaw,
     _dutyRaws,
+    _eclipticGoods,
     ...publicInfo
   } = info;
   return publicInfo;

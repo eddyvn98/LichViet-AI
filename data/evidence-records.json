@@ -476,5 +476,91 @@
       "interpretation": "Ngày chứa thời điểm giao tiết có hai Trực: trước và sau giao tiết."
     },
     "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XLKY-12-DUTY-CLASSIFICATION",
+    "sourceId": "xingli-kaoyuan-yuejian",
+    "claimType": "twelve-duty-general-classification",
+    "locator": "卷五・月建十二神・CTP chapter 656830 lines 5-6",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "twelve-duty-general-classification",
+    "normalized": {
+      "good": [
+        "除",
+        "危",
+        "定",
+        "执",
+        "成",
+        "开"
+      ],
+      "bad": [
+        "建",
+        "破",
+        "平",
+        "收",
+        "满",
+        "闭"
+      ],
+      "topGood": [
+        "成",
+        "开",
+        "危"
+      ],
+      "secondGood": [
+        "定",
+        "除"
+      ],
+      "veryBad": [
+        "破"
+      ],
+      "note": "执 được xếp trong nhóm cát nhưng đoạn này không đặt vào top/second tier."
+    },
+    "reviewStatus": "reviewed",
+    "note": "Phân loại tổng quát của 12 Trực; không tự suy ra một loại việc cụ thể."
+  },
+  {
+    "id": "XLKY-SELECTION-MULTIFACTOR",
+    "sourceId": "xingli-kaoyuan-yuejian",
+    "claimType": "selection-composition-principle",
+    "locator": "卷五・月建十二神・CTP chapter 656830 line 6",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "selection-composition-principle",
+    "normalized": {
+      "singleFactorSufficient": false,
+      "principle": "Xem số lượng cát/hung thần và nghi/kỵ của từng thần; không chấp một yếu tố duy nhất để luận.",
+      "engineRequirement": "multi-signal-composition"
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "VN-ARCHIVES-HIEPKY-XIEJI",
+    "sourceId": "vn-archives-hiep-ky",
+    "claimType": "vietnamese-historical-almanac-use",
+    "locator": "Bài 'Quy trình biên soạn lịch Hiệp kỷ dưới triều Nguyễn', đoạn về Ngự lịch Minh Mệnh 12 (1831)",
+    "evidenceLevel": "OFFICIAL_SECONDARY",
+    "applicability": "vietnamese-historical-context",
+    "normalized": {
+      "institution": "Khâm Thiên Giám triều Nguyễn",
+      "usedWork": "Hiệp kỷ biện phương",
+      "scope": "ngự lịch / chọn ngày theo bối cảnh lịch sử triều Nguyễn"
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "VN-ARCHIVES-KHAMTHIEN-DATE-SELECTION",
+    "sourceId": "vn-archives-kham-thien",
+    "claimType": "vietnamese-official-calendar-institution",
+    "locator": "Tài liệu giới thiệu Khâm Thiên Giám triều Nguyễn: chức năng làm lịch, coi ngày, báo giờ",
+    "evidenceLevel": "OFFICIAL_SECONDARY",
+    "applicability": "vietnamese-historical-context",
+    "normalized": {
+      "institution": "Khâm Thiên Giám",
+      "functions": [
+        "làm lịch",
+        "coi ngày",
+        "báo giờ"
+      ]
+    },
+    "reviewStatus": "reviewed"
   }
 ]

@@ -4,8 +4,20 @@ import { evidenceForRule } from "./evidence.js";
 const RULES = JSON.parse(
   readFileSync(new URL("../data/rules.json", import.meta.url), "utf8")
 );
+const DUTY_CLASSIFICATION = JSON.parse(
+  readFileSync(new URL("../data/duty-classification.json", import.meta.url), "utf8")
+);
+const ACTIVITY_POLICIES = JSON.parse(
+  readFileSync(new URL("../data/activity-policies.json", import.meta.url), "utf8")
+);
 const DUTY_RULES = new Map(
   RULES.filter(x => x.kind === "duty").map(x => [x.raw, x])
+);
+const DUTY_CLASS_MAP = new Map(
+  DUTY_CLASSIFICATION.map(x => [x.raw, x])
+);
+const ACTIVITY_POLICY_MAP = new Map(
+  ACTIVITY_POLICIES.map(x => [x.activity, x])
 );
 
 function enrich(rule) {
@@ -20,26 +32,56 @@ export function getDutyRule(raw) {
   return enrich(DUTY_RULES.get(raw) || null);
 }
 
+export function getDutyClassification(raw) {
+  const item = DUTY_CLASS_MAP.get(raw);
+  return item ? structuredClone(item) : null;
+}
+
+export function allDutyClassifications() {
+  return DUTY_CLASSIFICATION.map(item => structuredClone(item));
+}
+
+export function getActivityPolicy(activity) {
+  const item = ACTIVITY_POLICY_MAP.get(activity);
+  return item ? structuredClone(item) : null;
+}
+
+export function allActivityPolicies() {
+  return ACTIVITY_POLICIES.map(item => structuredClone(item));
+}
+
 export function evaluateDuty(raw, activity = null) {
   const rule = getDutyRule(raw);
-  if (!rule) {
+  const classification = getDutyClassification(raw);
+  if (!rule || !classification) {
     return {
       baseScore:0, activityDelta:0, score:0,
-      ruleIds:[], reasons:[], evidence:[]
+      ruleIds:[], reasons:[], evidence:[],
+      classification:null, activityPolicy:null
     };
   }
 
   const baseScore = Number(rule.base) || 0;
+  const activityPolicy = activity ? getActivityPolicy(activity) : null;
   let activityDelta = 0;
   const reasons = [];
 
-  if (activity && rule.good?.includes(activity)) {
+  if (activityPolicy?.preferredDuties?.includes(raw)) {
     activityDelta += 7;
-    reasons.push(`Trực ${rule.vi} thuộc nhóm ưu tiên cho loại việc này theo normalization của app.`);
+    reasons.push(
+      `Trực ${rule.vi} nằm trong nhóm ưu tiên của PRODUCT_POLICY cho loại việc này; đây không phải nghi/kỵ nguyên điển.`
+    );
   }
-  if (activity && rule.avoid?.includes(activity)) {
+  if (activityPolicy?.avoidDuties?.includes(raw)) {
     activityDelta -= 10;
-    reasons.push(`Trực ${rule.vi} không được ưu tiên cho loại việc này theo normalization của app.`);
+    reasons.push(
+      `Trực ${rule.vi} nằm trong nhóm tránh của PRODUCT_POLICY cho loại việc này; đây không phải thang điểm cổ điển.`
+    );
+  }
+  if (activityPolicy?.cautionDuties?.includes(raw)) {
+    reasons.push(
+      `Trực ${rule.vi} được PRODUCT_POLICY đánh dấu cần thận trọng cho loại việc này.`
+    );
   }
 
   return {
@@ -49,7 +91,9 @@ export function evaluateDuty(raw, activity = null) {
     ruleIds:[rule.id],
     reasons,
     evidence:[rule.evidence],
-    scoringPolicy:rule.scorePolicy || null
+    scoringPolicy:rule.scorePolicy || null,
+    classification,
+    activityPolicy
   };
 }
 

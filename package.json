@@ -1,6 +1,6 @@
 {
   "name": "lichviet-ai",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,8 @@
     "test": "node --test test/*.test.js",
     "test:e2e": "playwright test",
     "verify:engine": "node scripts/verify-engine.js",
-    "validate:knowledge": "node scripts/validate-knowledge.js"
+    "validate:knowledge": "node scripts/validate-knowledge.js",
+    "verify:properties": "node scripts/verify-properties.js"
   },
   "dependencies": {
     "lunar-javascript": "1.7.7",

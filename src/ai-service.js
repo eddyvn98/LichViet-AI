@@ -1,11 +1,12 @@
 import { runGemini, geminiConfig } from "./gemini-cli.js";
+import { engineManifest } from "./version.js";
 
 function compact(value, limit = 16000) {
   const text = JSON.stringify(value);
   return text.length <= limit ? text : text.slice(0, limit) + "...";
 }
 
-function basePolicy() {
+export function aiGuardrailPolicy() {
   return [
     "Bạn là lớp diễn giải của ứng dụng Lịch Việt AI Verified Engine.",
     "Chỉ dùng dữ liệu deterministic và evidence trong CONTEXT.",
@@ -21,6 +22,9 @@ function basePolicy() {
     "recommended/avoid có recommendationOrigin=tyme4ts-advisory chỉ là lớp tham khảo implementation, không được mô tả như fact canonical.",
     "Nguồn implementation không được mô tả như nguyên điển hay nguồn chính thức.",
     "Heuristic/EXPERIMENTAL không được diễn đạt như quy tắc cổ điển đã xác minh.",
+    "PRODUCT_POLICY là chính sách của ứng dụng, không được gọi là cổ thư, nguyên điển hoặc fact canonical.",
+    "recommendationDecision/verdict là kết quả composition; ranking.score chỉ tie-break và không được dùng để thay đổi nhãn decision.",
+    "Nếu confidence.calendarScope=historical-proleptic-utc7, phải nói đây là phép tính lùi hiện đại; không gọi là lịch chính thức lịch sử.",
     "Không nói các hệ cát/hung là sự thật khoa học.",
     "Viết ngắn, rõ, dùng từ phổ thông.",
     "Không nói mơ hồ hoặc cao siêu.",
@@ -32,9 +36,12 @@ function basePolicy() {
 }
 
 export function aiStatus() {
+  const manifest = engineManifest();
   return {
     ...geminiConfig(),
-    evidencePolicy:"verified-engine-v5"
+    evidencePolicy:manifest.engine,
+    decisionPolicy:manifest.decisionPolicy,
+    rankingPolicy:manifest.rankingPolicy
   };
 }
 
@@ -42,7 +49,7 @@ export async function explainWithGemini({ context, question = "" }) {
   if (!context) throw new Error("Thiếu context deterministic");
 
   const prompt = [
-    basePolicy(),
+    aiGuardrailPolicy(),
     "",
     "CONTEXT:",
     compact(context),
@@ -67,7 +74,7 @@ export async function explainWithGemini({ context, question = "" }) {
 
 export async function rewriteBriefWithGemini(brief) {
   const prompt = [
-    basePolicy(),
+    aiGuardrailPolicy(),
     "",
     "CONTEXT DAILY BRIEF:",
     compact(brief),

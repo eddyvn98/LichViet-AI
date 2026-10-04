@@ -1,11 +1,13 @@
 {
-  "version": "4.0",
+  "version": "6.0",
   "principles": [
     "Nguon goc va nguon chinh thuc co quyen cao hon implementation.",
     "Thu vien pho bien chi dung de cross-check, khong tu tao chan ly.",
     "Hai implementation cung tac gia/he sinh thai khong duoc tinh la hai nguon doc lap.",
     "Bat dong phai duoc ghi nhan, khong am tham chon mot ket qua.",
-    "Heuristic phai gan nhan EXPERIMENTAL va AI khong duoc trinh bay nhu quy tac co dien da xac minh."
+    "Heuristic phai gan nhan EXPERIMENTAL va AI khong duoc trinh bay nhu quy tac co dien da xac minh.",
+    "Product policy phai tach khoi fact nguyen dien; khong duoc dung PRODUCT_POLICY de tao strong claim.",
+    "Ket luan chon ngay phai composition nhieu tin hieu; khong cho mot implementation advisory hoac mot score heuristic tu quyet dinh."
   ],
   "levels": {
     "ASTRONOMY_OFFICIAL": {
@@ -42,6 +44,11 @@
       "rank": 0,
       "label": "Heuristic / thu nghiem",
       "strongClaim": false
+    },
+    "PRODUCT_POLICY": {
+      "rank": 0,
+      "label": "Chinh sach / normalization cua ung dung",
+      "strongClaim": false
     }
   },
   "confidencePolicy": {
@@ -65,6 +72,7 @@
     "không có dispute quan trọng",
     "không phải heuristic",
     "evidence đúng applicability",
-    "PRIMARY_EXACT cần authorityRank >= 4, hoặc ASTRONOMY_OFFICIAL"
+    "PRIMARY_EXACT cần authorityRank >= 4, hoặc ASTRONOMY_OFFICIAL",
+    "khong phai PRODUCT_POLICY"
   ]
 }

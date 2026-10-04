@@ -1,0 +1,86 @@
+[
+  {
+    "raw": "建",
+    "vi": "Kiến",
+    "traditionalClass": "bad",
+    "tier": "bad",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "除",
+    "vi": "Trừ",
+    "traditionalClass": "good",
+    "tier": "second-good",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "满",
+    "vi": "Mãn",
+    "traditionalClass": "bad",
+    "tier": "bad",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "平",
+    "vi": "Bình",
+    "traditionalClass": "bad",
+    "tier": "bad",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "定",
+    "vi": "Định",
+    "traditionalClass": "good",
+    "tier": "second-good",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "执",
+    "vi": "Chấp",
+    "traditionalClass": "good",
+    "tier": "good",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "破",
+    "vi": "Phá",
+    "traditionalClass": "bad",
+    "tier": "very-bad",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "危",
+    "vi": "Nguy",
+    "traditionalClass": "good",
+    "tier": "top-good",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "成",
+    "vi": "Thành",
+    "traditionalClass": "good",
+    "tier": "top-good",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "收",
+    "vi": "Thu",
+    "traditionalClass": "bad",
+    "tier": "bad",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "开",
+    "vi": "Khai",
+    "traditionalClass": "good",
+    "tier": "top-good",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  },
+  {
+    "raw": "闭",
+    "vi": "Bế",
+    "traditionalClass": "bad",
+    "tier": "bad",
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION"
+  }
+]

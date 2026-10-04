@@ -1,6 +1,8 @@
 import { buildDayInfo, publicDay } from "./traditional.js";
 import { evaluateDuty, ruleSummary } from "./rule-engine.js";
 import { scoreActivity } from "./scoring.js";
+import { composeActivityDecision } from "./recommendation-engine.js";
+import { reproducibilityTrace } from "./trace.js";
 
 export const ACTIVITIES = {
   contract:{ label:"Ký hợp đồng / giao dịch", positive:["交易","立券","纳财","开市"] },
@@ -30,12 +32,23 @@ function activityScore(day, activity) {
     reasons:[...new Set(dutyEvaluations.flatMap(x => x.reasons))],
     ruleIds:[...new Set(dutyEvaluations.flatMap(x => x.ruleIds))]
   };
-  const reasons = [...dutyEval.reasons];
+  const decision = composeActivityDecision({
+    activity,
+    dutyRaws,
+    eclipticGoods:day._eclipticGoods || [],
+    personal:day.personal
+  });
+  const reasons = [
+    ...decision.vetoes.map(x => x.detail),
+    ...decision.cautions.map(x => x.detail),
+    ...decision.supports.map(x => x.detail),
+    ...dutyEval.reasons
+  ];
   const ruleIds = [...dutyEval.ruleIds];
 
   if (dutyRaws.length > 1) {
     reasons.unshift(
-      "Ngày giao tiết có hai Trực; planner dùng mức điểm bảo thủ hơn giữa trạng thái trước và sau giao tiết."
+      "Ngày giao tiết có hai Trực; recommendation engine lấy trạng thái bảo thủ hơn."
     );
   }
 
@@ -52,26 +65,23 @@ function activityScore(day, activity) {
   });
 
   if (recommendedHit) {
-    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên làm; chỉ hiển thị tham khảo, không cộng điểm.");
+    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên làm; chỉ hiển thị tham khảo, không đổi decision.");
   }
   if (avoidHit) {
-    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên tránh; chỉ hiển thị tham khảo, không trừ điểm.");
+    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên tránh; chỉ hiển thị tham khảo, không đổi decision.");
   }
-  if (day.personal?.signals?.some(x => x.level === "caution")) {
-    reasons.push(day.personal.signals.find(x => x.level === "caution").detail);
-  }
-  if (day.personal?.signals?.some(x => x.level === "good")) {
-    reasons.push(day.personal.signals.find(x => x.level === "good").detail);
-  }
-  if (!reasons.length) {
-    reasons.push("Không có tín hiệu mạnh; xếp hạng theo chính sách heuristic công khai của app.");
-  }
-
   if (!advisoryAllowed) {
-    reasons.push("Nghi/kỵ chi tiết từ implementation bị loại khỏi điểm vì lịch UTC+7 không khớp reference ngày này.");
+    reasons.push("Nghi/kỵ chi tiết từ implementation bị loại khỏi decision/ranking vì lịch UTC+7 không khớp reference ngày này.");
   }
 
-  return { score:ranking.score, ranking, reasons, ruleIds, advisoryAllowed };
+  return {
+    score:ranking.score,
+    ranking,
+    decision,
+    reasons:[...new Set(reasons)],
+    ruleIds,
+    advisoryAllowed
+  };
 }
 
 export function rankDays({ from, days = 14, activity = "contract", profile = null }) {
@@ -83,24 +93,44 @@ export function rankDays({ from, days = 14, activity = "contract", profile = nul
     const date = addDays(from, i);
     const day = buildDayInfo(date, profile);
     const {
-      score, ranking, reasons, ruleIds, advisoryAllowed
+      score, ranking, decision, reasons, ruleIds, advisoryAllowed
     } = activityScore(day, activity);
+    const recommendationTrace = reproducibilityTrace({
+      type:"activity-recommendation",
+      date,
+      activity,
+      decision:decision.code,
+      stateCodes:decision.states.map(x => x.code),
+      dutyRaws:decision.states.map(x => x.raw),
+      evidenceRefs:decision.evidenceRefs,
+      ruleIds,
+      tieBreakScore:score
+    });
     ranked.push({
       ...publicDay(day),
-      match:score >= 72 ? "Ưu tiên" : score >= 52 ? "Có thể cân nhắc" : "Không ưu tiên",
+      match:decision.label,
       reasons,
-      activityRanking:ranking,
+      recommendationDecision:{ ...decision, trace:recommendationTrace },
+      activityRanking:{
+        ...ranking,
+        role:"tie-break-only"
+      },
       advisoryImplementationUsed:false,
       advisoryImplementationVisible:advisoryAllowed,
       rankingProvenance:ruleSummary(ruleIds),
+      _decisionRank:decision.rank,
       _score:score
     });
   }
 
   return ranked
-    .sort((a,b) => b._score - a._score || a.date.localeCompare(b.date))
+    .sort((a,b) =>
+      b._decisionRank - a._decisionRank ||
+      b._score - a._score ||
+      a.date.localeCompare(b.date)
+    )
     .slice(0,5)
-    .map(({ _score, ...x }) => x);
+    .map(({ _decisionRank, _score, ...x }) => x);
 }
 
 export function rangeDays({ from, days = 7, profile = null }) {
