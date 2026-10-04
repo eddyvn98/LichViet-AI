@@ -37,6 +37,10 @@ export function getDutyClassification(raw) {
   return item ? structuredClone(item) : null;
 }
 
+export function allDutyClassifications() {
+  return DUTY_CLASSIFICATION.map(item => structuredClone(item));
+}
+
 export function getActivityPolicy(activity) {
   const item = ACTIVITY_POLICY_MAP.get(activity);
   return item ? structuredClone(item) : null;
