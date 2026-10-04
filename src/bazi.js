@@ -17,12 +17,97 @@ function validateTime(time) {
   return { hour, minute };
 }
 
+function solarLongitudeAtMs(ms) {
+  const jd = ms / 86400000 + 2440587.5;
+  return sunLongitudeRadians(jd) * 180 / Math.PI;
+}
+
 export function solarLongitudeDegrees(isoDate, time = "12:00") {
   const safeTime = /^\d{2}:\d{2}$/.test(time) ? time : "12:00";
   const ms = Date.parse(`${isoDate}T${safeTime}:00+07:00`);
   if (!Number.isFinite(ms)) throw new Error("Ngày hoặc giờ không hợp lệ");
-  const jd = ms / 86400000 + 2440587.5;
-  return sunLongitudeRadians(jd) * 180 / Math.PI;
+  return solarLongitudeAtMs(ms);
+}
+
+function vnParts(ms) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone:"Asia/Ho_Chi_Minh",
+    year:"numeric", month:"2-digit", day:"2-digit",
+    hour:"2-digit", minute:"2-digit", second:"2-digit",
+    hour12:false
+  }).formatToParts(new Date(ms));
+  const pick = type => parts.find(x => x.type === type)?.value;
+  return {
+    date:`${pick("year")}-${pick("month")}-${pick("day")}`,
+    time:`${pick("hour")}:${pick("minute")}:${pick("second")}`
+  };
+}
+
+function arcContainsTarget(fromDeg, toDeg, targetDeg) {
+  const forward = mod(toDeg - fromDeg, 360);
+  const targetDistance = mod(targetDeg - fromDeg, 360);
+  return forward <= 2 && targetDistance <= forward + 1e-9;
+}
+
+function signedAngle(angle, target) {
+  return mod(angle - target + 180, 360) - 180;
+}
+
+export function solarTermMoment(year, targetDegree) {
+  const y = Number(year);
+  const target = Number(targetDegree);
+  if (!Number.isInteger(y) || y < 1800 || y > 2199) {
+    throw new Error("Năm tiết khí ngoài phạm vi 1800–2199");
+  }
+  if (!Number.isInteger(target) || target < 0 || target >= 360 || target % 15 !== 0) {
+    throw new Error("Kinh độ tiết khí phải là bội số 15° từ 0 đến 345");
+  }
+
+  const start = Date.parse(`${y}-01-01T00:00:00+07:00`);
+  const end = Date.parse(`${y + 1}-01-01T00:00:00+07:00`);
+  const step = 6 * 60 * 60 * 1000;
+  let loMs = start;
+  let loDeg = solarLongitudeAtMs(loMs);
+
+  for (let hiMs = start + step; hiMs <= end; hiMs += step) {
+    const hiDeg = solarLongitudeAtMs(hiMs);
+    if (arcContainsTarget(loDeg, hiDeg, target)) {
+      let lo = loMs;
+      let hi = hiMs;
+      for (let i = 0; i < 48; i += 1) {
+        const mid = (lo + hi) / 2;
+        if (signedAngle(solarLongitudeAtMs(mid), target) < 0) lo = mid;
+        else hi = mid;
+      }
+      const epochMs = Math.round((lo + hi) / 2);
+      const parts = vnParts(epochMs);
+      return {
+        year:y,
+        degree:target,
+        term:SOLAR_TERMS[target] || "",
+        epochMs,
+        date:parts.date,
+        time:parts.time,
+        iso:`${parts.date}T${parts.time}+07:00`,
+        timezone:"Asia/Ho_Chi_Minh",
+        longitude:Number(solarLongitudeAtMs(epochMs).toFixed(6)),
+        evidenceRefs:["HKO-24-SOLAR-TERMS"],
+        method:"solar-longitude-bisection"
+      };
+    }
+    loMs = hiMs;
+    loDeg = hiDeg;
+  }
+
+  throw new Error(`Không tìm thấy tiết khí ${target}° trong năm ${y}`);
+}
+
+export function solarTermsForYear(year) {
+  const order = [
+    285,300,315,330,345,0,15,30,45,60,75,90,
+    105,120,135,150,165,180,195,210,225,240,255,270
+  ];
+  return order.map(degree => solarTermMoment(year, degree));
 }
 
 function cycleFromYear(year) {
