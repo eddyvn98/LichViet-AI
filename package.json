@@ -1,0 +1,14 @@
+{
+  "name": "lichviet-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "tyme4ts": "1.5.3"
+  },
+  "engines": { "node": ">=20" }
+}
