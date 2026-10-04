@@ -60,3 +60,29 @@ test("planner exposes one heuristic score pipeline without hidden double count",
   assert.equal(ids.filter(x => x === "DUTY_ACTIVITY").length <= 1, true);
   assert.equal(r[0].activityRanking.policy.id, "ranking-heuristic-v1");
 });
+
+
+test("Jie transition day keeps both Duties and both day-deity states", () => {
+  const d = publicDay(buildDayInfo("2026-01-05"));
+  assert.ok(d.dutyTransition);
+  assert.equal(d.dutyTransition.before, "Bình");
+  assert.equal(d.dutyTransition.after, "Mãn");
+  assert.match(d.duty, /Bình.*Mãn/);
+  assert.ok(d.eclipticTransition);
+  assert.equal(
+    d.provenance.crossChecks.find(x => x.scope === "twelve-duty")?.status,
+    "agree"
+  );
+  assert.equal(
+    d.provenance.crossChecks.find(x => x.scope === "ecliptic-day")?.status,
+    "agree"
+  );
+  assert.equal(d.ranking.transitionPolicy, "conservative-minimum-across-jie-transition");
+});
+
+test("planner marks Jie transition scoring as conservative", () => {
+  const r = rankDays({ from:"2026-01-05", days:1, activity:"contract" });
+  assert.equal(r.length, 1);
+  assert.equal(r[0].ranking.transitionPolicy, "conservative-minimum-across-jie-transition");
+  assert.match(r[0].reasons.join(" "), /hai Trực|giao tiết/i);
+});
