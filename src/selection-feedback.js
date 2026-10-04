@@ -46,7 +46,10 @@ export async function saveSelectionFeedback(input = {}) {
     traceHash,
     engine:manifest.engine,
     decisionPolicy:manifest.decisionPolicy,
-    rankingPolicy:manifest.rankingPolicy
+    rankingPolicy:manifest.rankingPolicy,
+    familyPolicy:manifest.familyPolicy,
+    constraintPolicy:manifest.constraintPolicy,
+    comparisonPolicy:manifest.comparisonPolicy
   };
 
   const items = await readAll();
