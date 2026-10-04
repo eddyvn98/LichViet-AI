@@ -29,6 +29,9 @@ jobs:
       - name: Unit smoke tests
         run: npm test
 
+      - name: Verified engine audit smoke
+        run: npm run verify:engine -- --from=2026-10-01 --days=31 > engine-audit.txt
+
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
@@ -42,6 +45,7 @@ jobs:
           name: playwright-ui-artifacts
           path: |
             artifacts/
+            engine-audit.txt
             playwright-report/
             test-results/
           if-no-files-found: ignore
