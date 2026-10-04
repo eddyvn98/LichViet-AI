@@ -101,6 +101,7 @@ function strengthHeuristic(dayStem, monthBranch, balance) {
     ratio:Number(ratio.toFixed(2)),
     method:"experimental-strength-v1",
     evidenceLevel:"EXPERIMENTAL",
+    informedBy:["SFTK-STRENGTH-QUALITATIVE"],
     affectsRanking:false,
     warning:"Đây là heuristic định lượng của ứng dụng. Không phải kết luận Dụng thần, vượng suy canonical hay quy tắc đã được nguyên điển xác minh."
   };
@@ -158,7 +159,8 @@ export function analyzeBirthProfile(birthDate, birthTime = "", options = {}) {
     tenGods:stemGods,
     tenGodMethod:{
       id:"five-elements-polarity-derivation",
-      evidenceLevel:"TRADITIONAL_DERIVED",
+      evidenceLevel:"PRIMARY_EXACT_STRUCTURE",
+      evidenceRefs:["SFTK-TEN-GODS"],
       affectsRanking:false
     },
     completeness:hasTime ? "four-pillars" : "three-pillars",
