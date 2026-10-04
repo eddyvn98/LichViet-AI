@@ -7,6 +7,12 @@ import { getBaZi } from "./bazi.js";
 import { personalizeFamily } from "./family-selection.js";
 import { evaluateSelectionConstraints, normalizeSelectionConstraints } from "./selection-constraints.js";
 
+export const COMPARISON_POLICY = {
+  id:"deterministic-date-comparison-v1",
+  evidenceLevel:"PRODUCT_POLICY",
+  note:"So sánh ưu tiên decision band trước; numeric score chỉ tie-break trong cùng band."
+};
+
 export const ACTIVITIES = {
   contract:{ label:"Ký hợp đồng / giao dịch", positive:["交易","立券","纳财","开市"] },
   wedding:{ label:"Cưới hỏi / đính hôn", positive:["嫁娶","订婚","纳采","订盟"] },
@@ -244,6 +250,7 @@ export function compareDays({
           : `Các tín hiệu chính ngang nhau; dùng thứ tự ngày làm tie-break cuối.`;
 
   return {
+    policy:COMPARISON_POLICY,
     activity:{
       id:activity,
       label:ACTIVITIES[activity].label
