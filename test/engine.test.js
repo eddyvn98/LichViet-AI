@@ -156,3 +156,25 @@ test("general day verdict is composition-based, not score-based", () => {
   assert.equal(d.ranking.role, "tie-break-only");
   assert.equal(d.ranking.policy.id, "ranking-tiebreak-v2");
 });
+
+
+test("reproducibility fingerprint is stable for identical deterministic input", () => {
+  const a = publicDay(buildDayInfo("2026-10-04"));
+  const b = publicDay(buildDayInfo("2026-10-04"));
+  const c = publicDay(buildDayInfo("2026-10-05"));
+  assert.equal(a.provenance.trace.algorithm, "sha256");
+  assert.equal(a.provenance.trace.engine, "verified-engine-v6");
+  assert.equal(a.provenance.trace.hash, b.provenance.trace.hash);
+  assert.notEqual(a.provenance.trace.hash, c.provenance.trace.hash);
+  assert.match(a.provenance.trace.hash, /^[0-9a-f]{64}$/);
+});
+
+test("planner recommendation includes its own reproducibility fingerprint", () => {
+  const first = rankDays({ from:"2026-10-04", days:1, activity:"contract" })[0];
+  const second = rankDays({ from:"2026-10-04", days:1, activity:"contract" })[0];
+  assert.equal(first.recommendationDecision.trace.algorithm, "sha256");
+  assert.equal(
+    first.recommendationDecision.trace.hash,
+    second.recommendationDecision.trace.hash
+  );
+});
