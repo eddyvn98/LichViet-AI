@@ -1,20 +1,45 @@
-# Lịch Việt AI V2
+# Lịch Việt AI — Verified Engine V3
 
-Trợ lý lịch Việt chủ động: xem hôm nay, chọn ngày, lưu kế hoạch để app tự nhắc và cá nhân hóa bằng Bát Tự có provenance.
+Trợ lý lịch Việt cá nhân: lịch Việt UTC+7, chọn ngày, Bát Tự, kế hoạch chủ động, Gemini CLI và Telegram.
 
-## V2 có gì
+## Trọng tâm V3
 
-- Âm lịch Việt UTC+7 độc lập với lịch UTC+8.
-- Can Chi / tiết khí / Bát Tự deterministic.
-- Rule catalog riêng có ID + source + locator + verification.
-- Nhật chủ, cân bằng Ngũ hành tương đối, Thập thần.
-- Cá nhân hóa theo cả chi năm và chi ngày sinh.
-- Chọn ngày theo 8 loại việc.
-- Lưu tối đa 20 kế hoạch và sinh daily brief chủ động.
-- PWA + fallback Periodic Background Sync.
-- True Web Push backend bằng VAPID + cron endpoint khi deploy.
-- GitHub Actions + Playwright desktop/mobile.
-- AI contract: AI chỉ diễn giải output engine.
+V3 không ưu tiên thêm nhiều tính năng bề mặt. Trọng tâm là **độ tin cậy của engine**:
+
+- Kết quả lịch/Can Chi được tính deterministic, AI không tự tính.
+- Rule có ID, source, locator và evidence level.
+- Nguồn gốc/chính thức có quyền cao hơn implementation.
+- Tyme4TS và lunar-javascript chỉ là cross-check.
+- Hai thư viện cùng family 6tail không được tính là hai nguồn độc lập.
+- Bất đồng cross-check được giữ trong provenance thay vì âm thầm chọn một kết quả.
+- Heuristic phải gắn nhãn EXPERIMENTAL.
+- Gemini phải hạ giọng khẳng định khi confidence thấp/disputed.
+
+## Evidence levels
+
+- `ASTRONOMY_OFFICIAL` — nguồn thiên văn/tiêu chuẩn chính thức.
+- `PRIMARY_EXACT` — nguyên điển với locator chính xác.
+- `PRIMARY_FAMILY` — đã xác định đúng nguyên điển/quyển/mục nhưng chưa đủ locator để tuyên bố canonical.
+- `OFFICIAL_SECONDARY` — tài liệu cơ quan/lưu trữ chính thức.
+- `IMPLEMENTATION_CROSSCHECK` — thư viện kỹ thuật dùng để đối chiếu.
+- `EXPERIMENTAL` — heuristic của app.
+
+Xem `data/source-policy.json`.
+
+## Nguồn cốt lõi
+
+- Âm lịch Việt UTC+7: thuật toán Hồ Ngọc Đức, khóa bằng regression cases.
+- Lịch sử Việt Nam: tài liệu Trung tâm Lưu trữ Quốc gia về Lịch Hiệp Kỷ và Khâm Thiên Giám.
+- Chọn ngày truyền thống: `欽定協紀辨方書` (Hiệp Kỷ Biện Phương Thư), truy qua Chinese Text Project/bản scan.
+- Đối chiếu thiên văn: Hong Kong Observatory (lưu ý UTC+8).
+- Cross-check implementation: Tyme4TS + lunar-javascript.
+
+## API kiểm chứng
+
+- `GET /api/verification` — policy, số rule/source/case, phân bố evidence.
+- `GET /api/verification/cases` — regression/golden cases.
+- `GET /api/rules` — rule cùng evidence metadata.
+- `GET /api/day` — provenance, crossChecks và confidence ngay trong kết quả.
 
 ## Chạy
 
@@ -31,81 +56,25 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-## Web Push khi deploy
+## Runtime cá nhân
 
-Cấu hình:
+- Windows 11 Pro.
+- Node.js trực tiếp, không Docker.
+- AI duy nhất: Gemini CLI.
+- Model mặc định: `gemini-3.8-flash`.
+- Auth AI: Sign in with Google (OAuth).
+- Telegram dùng Bot API.
+- Security/auth của module có thể đặt sau lớp bảo mật chung của web chính.
 
-```text
-VAPID_PUBLIC_KEY=...
-VAPID_PRIVATE_KEY=...
-VAPID_SUBJECT=mailto:you@example.com
-CRON_SECRET=...
-PUSH_STORE_PATH=/data/push-subscriptions.json
-```
-
-Scheduler gọi `POST /api/tasks/daily-push` với header `x-cron-secret`.
-
-## Tài liệu
-
-- `docs/V2.md`
-- `docs/ARCHITECTURE.md`
-- `docs/VERIFICATION.md`
-- `docs/AI_CONTRACT.md`
+Xem `docs/WINDOWS_HOSTING.md`.
 
 ## Nguyên tắc
 
 1. Lịch trước, AI sau.
 2. Việt Nam trước.
-3. Rule có provenance.
-4. Không giả khoa học.
-5. Không đoán dữ liệu thiếu.
-6. Cái gì còn phụ thuộc trường phái phải ghi rõ.
-
-
-## Personal Windows runtime (V2.1)
-
-Môi trường chính thức trước mắt:
-
-- Windows 11 Pro.
-- Chạy trực tiếp bằng PowerShell/terminal, không Docker.
-- AI duy nhất: Gemini CLI.
-- Model cố định mặc định: `gemini-3.8-flash`.
-- Xác thực: **Sign in with Google (OAuth)**.
-- Không dùng OpenAI, Claude, OpenRouter hay AI provider khác.
-- Không dùng `GEMINI_API_KEY` hoặc `GOOGLE_API_KEY`.
-
-Thiết lập:
-
-```powershell
-.\scripts\setup-windows.ps1
-gemini
-# Chọn Sign in with Google
-.\scripts\start-windows.ps1
-```
-
-Xem `docs/WINDOWS_HOSTING.md`.
-
-
-## V2.2 — Telegram chủ động
-
-Telegram không mirror mọi câu hỏi trên web.
-
-- Web: Gemini trả lời khi người dùng hỏi.
-- Telegram: chỉ gửi bản tin chủ động hằng ngày.
-- Người dùng chọn nội dung muốn nhận:
-  - tổng quan hôm nay,
-  - kế hoạch đã lưu,
-  - ngày tốt sắp tới,
-  - cảnh báo cá nhân.
-- AI viết rất ngắn: tối đa khoảng 60 từ, từ phổ thông, không dùng ngôn ngữ mơ hồ/cao siêu.
-- Scheduler chạy trong Node server mỗi phút; mỗi ngày chỉ gửi một lần.
-- Nếu máy bật sau giờ đã đặt, app gửi bù một lần trong ngày.
-
-Telegram đọc từ biến môi trường Windows:
-
-```text
-TELEGRAM_BOT_TOKEN
-TELEGRAM_CHAT_ID
-```
-
-Token và chat ID không được trả ra browser.
+3. Evidence trước lời giải thích.
+4. Không biến độ phổ biến của thư viện thành bằng chứng đúng.
+5. Không giả khoa học.
+6. Không đoán dữ liệu thiếu.
+7. Bất đồng phải nhìn thấy được.
+8. Chỉ nâng rule lên canonical khi có locator và regression test đủ mạnh.
