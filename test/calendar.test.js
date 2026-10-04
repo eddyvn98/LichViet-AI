@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { solarToVietnameseLunar, vietnameseLunarToSolar } from "../src/vietnamese-lunar.js";
+import { solarToVietnameseLunar, vietnameseLunarToSolar, vietnameseLunarYearStructure } from "../src/vietnamese-lunar.js";
 import { getBaZi } from "../src/bazi.js";
 import { branchRelationship } from "../src/personal.js";
 
@@ -69,4 +69,22 @@ test("Vietnam lunar reverse conversion rejects impossible leap flag", () => {
     () => vietnameseLunarToSolar({ ...normal, leap:true }),
     /nhuận|không tồn tại/i
   );
+});
+
+test("Vietnam lunar year structure has 12/13 valid months", () => {
+  for (const year of [2024,2025,2026,2027]) {
+    const structure = vietnameseLunarYearStructure(year);
+    assert.ok([12,13].includes(structure.monthCount));
+    assert.ok(structure.months.every(x => x.days === 29 || x.days === 30));
+    assert.equal(structure.months.filter(x => x.leap).length <= 1, true);
+    assert.deepEqual(
+      [...new Set(structure.months.filter(x => !x.leap).map(x => x.month))].sort((a,b)=>a-b),
+      [1,2,3,4,5,6,7,8,9,10,11,12]
+    );
+  }
+});
+
+test("Vietnam lunar core rejects nonexistent Gregorian dates", () => {
+  assert.throws(() => solarToVietnameseLunar("2026-02-31"), /không tồn tại/i);
+  assert.throws(() => solarToVietnameseLunar("2026-13-01"), /không hợp lệ|phạm vi/i);
 });
