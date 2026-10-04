@@ -175,6 +175,7 @@ for (let date = from; date <= to; date = nextDay(date), index += 1) {
     });
     summary.compareSamples += 1;
     if (comparison.familyMemberCount !== 2 ||
+        comparison.policy?.id !== manifest.comparisonPolicy ||
         !comparison.explanation ||
         comparison.candidates.length !== 2) {
       summary.familyFailures += 1;
