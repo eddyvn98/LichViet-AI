@@ -20,7 +20,7 @@
   <main class="panel">
     <div class="section-head">
       <div>
-        <p class="eyebrow">Minh bạch V2</p>
+        <p class="eyebrow">Verified Engine V3</p>
         <h1>App biết gì, và chưa biết gì?</h1>
       </div>
       <p>Không nguồn nào được dùng để biến niềm tin truyền thống thành sự thật khoa học.</p>
@@ -53,8 +53,9 @@
       <span id="ruleCount"></span>
     </div>
     <p class="meta">
-      V2 đã tách rule khỏi UI. Mỗi rule có ID, loại, nguồn, locator và trạng thái xác minh.
-      Việc có provenance không đồng nghĩa mọi diễn giải đã được xác minh tuyệt đối từng trang.
+      V3 gắn evidence level cho từng rule. Nguồn gốc/chính thức được ưu tiên hơn implementation.
+      Hai thư viện cùng một family không được tính như hai bằng chứng độc lập. Rule chưa có locator chính xác
+      không được hiển thị như đã canonical verified.
     </p>
     <div id="ruleList" class="plan-results"></div>
 
@@ -63,12 +64,12 @@
     <h2>Giới hạn hiện tại</h2>
     <p class="meta">
       Âm lịch hiện đại dùng thuật toán thiên văn UTC+7. Với lịch sử xa, lịch thực dùng có thể khác
-      do thay đổi múi giờ và lịch pháp. Nghi/kỵ của Tyme4TS hiện vẫn đóng vai trò implementation
-      cross-check, còn rule V2 dùng để kiểm soát scoring và provenance.
+      do thay đổi múi giờ và lịch pháp. Nghi/kỵ của Tyme4TS vẫn là implementation cross-check. lunar-javascript được thêm để kiểm tra Can Chi/lịch âm,
+      nhưng cả hai cùng family 6tail nên chỉ tạo một cụm implementation evidence. Bất đồng được giữ trong provenance.
     </p>
     <p class="meta">
       Bát Tự dùng Lập Xuân để đổi năm và 12 tiết để đổi tháng. Mốc đổi ngày mặc định là 00:00 dân dụng.
-      Mô hình “thiên mạnh / thiên yếu” ở V2 là heuristic minh bạch; app không tự tuyên bố Dụng thần chuẩn
+      Mô hình “thiên mạnh / thiên yếu” là EXPERIMENTAL; app không tự tuyên bố Dụng thần chuẩn
       của một trường phái cụ thể.
     </p>
   </main>
@@ -102,8 +103,10 @@ document.querySelector("#ruleList").innerHTML = ruleData.rules.map(r =>
     '<div class="plan-date"><b>' + escapeHtml(r.id) + '</b><small>' + escapeHtml(r.kind) + '</small></div>' +
     '<div><h3>' + escapeHtml(r.vi || (r.a + "–" + r.b)) + '</h3>' +
     '<p>Nguồn: ' + escapeHtml(r.source) + '</p>' +
-    '<p>' + escapeHtml(r.locator || "—") + '</p></div>' +
-    '<span class="badge">' + escapeHtml(r.verification) + '</span>' +
+    '<p>' + escapeHtml(r.locator || "—") + '</p>' +
+    '<small>Evidence: ' + escapeHtml(r.evidence?.level || r.verification) +
+    ' · ' + escapeHtml(r.evidence?.label || "") + '</small></div>' +
+    '<span class="badge">' + escapeHtml(r.evidence?.level || r.verification) + '</span>' +
   '</article>'
 ).join("");
 </script>
