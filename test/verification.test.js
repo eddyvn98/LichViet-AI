@@ -92,3 +92,31 @@ test("verified relation corpus includes harm, trine and stem combination", async
   assert.equal(rulesByKind("trine").length, 4);
   assert.equal(stemCombinationRule("甲", "己")?.id, "STEM-COMB-JIA-JI");
 });
+
+
+test("hidden stems match the reviewed classical membership corpus", async () => {
+  const { hiddenStemsForBranch } = await import("../src/bazi-profile.js");
+  const expected = {
+    "子":["癸"],"丑":["己","辛","癸"],"寅":["甲","丙","戊"],
+    "卯":["乙"],"辰":["戊","乙","癸"],"巳":["丙","戊","庚"],
+    "午":["丁","己"],"未":["丁","乙","己"],"申":["庚","壬","戊"],
+    "酉":["辛"],"戌":["丁","辛","戊"],"亥":["壬","甲"]
+  };
+  for (const [branch, stems] of Object.entries(expected)) {
+    const actual = hiddenStemsForBranch(branch);
+    assert.deepEqual(actual.map(x => x.raw), stems);
+    assert.ok(actual.every(x => x.weightStatus === "EXPERIMENTAL"));
+  }
+});
+
+test("Ten-Gods mapping regression matches classical Yang/Jia row", async () => {
+  const { tenGodForStem } = await import("../src/bazi-profile.js");
+  const expected = {
+    "甲":"Tỷ Kiên","乙":"Kiếp Tài","丙":"Thực Thần","丁":"Thương Quan",
+    "戊":"Thiên Tài","己":"Chính Tài","庚":"Thất Sát","辛":"Chính Quan",
+    "壬":"Thiên Ấn","癸":"Chính Ấn"
+  };
+  for (const [stem, label] of Object.entries(expected)) {
+    assert.equal(tenGodForStem("甲", stem), label);
+  }
+});
