@@ -232,6 +232,16 @@ export function compareDays({
       a.date.localeCompare(b.date)
     );
   const winner = sortedEligible[0] || null;
+  const runnerUp = sortedEligible[1] || null;
+  const explanation = !winner
+    ? "Không có ngày nào vượt qua ràng buộc."
+    : !runnerUp
+      ? "Chỉ có một ngày vượt qua ràng buộc."
+      : winner._decisionRank > runnerUp._decisionRank
+        ? `${winner.date} có decision band cao hơn ${runnerUp.date}; score không cần quyết định.`
+        : winner._score > runnerUp._score
+          ? `${winner.date} và ${runnerUp.date} cùng decision band; ${winner.date} đứng trước nhờ tie-break score.`
+          : `Các tín hiệu chính ngang nhau; dùng thứ tự ngày làm tie-break cuối.`;
 
   return {
     activity:{
@@ -248,6 +258,7 @@ export function compareDays({
       decision:winner.recommendationDecision.code,
       traceHash:winner.recommendationDecision.trace.hash
     } : null,
+    explanation,
     candidates:candidates.map(({ _decisionRank, _score, ...item }) => ({
       ...item,
       comparison:{
