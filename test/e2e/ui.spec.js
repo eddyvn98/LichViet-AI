@@ -86,8 +86,14 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("3.0.0");
-  expect(healthBody.engine).toBe("verified-engine");
+  expect(healthBody.version).toBe("4.0.0");
+  expect(healthBody.engine).toBe("verified-engine-v4");
+
+  const conversion = await request.post("/api/convert/lunar-to-solar", {
+    data: { day:24, month:8, year:2026, leap:false }
+  });
+  expect(conversion.ok()).toBeTruthy();
+  expect((await conversion.json()).iso).toBe("2026-10-04");
 
   const verification = await request.get("/api/verification");
   expect(verification.ok()).toBeTruthy();
