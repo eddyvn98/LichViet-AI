@@ -8,6 +8,23 @@ const JIE_STEP = 30;
 
 function mod(n, m) { return ((n % m) + m) % m; }
 
+function validateIsoDate(isoDate) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(isoDate || ""))) {
+    throw new Error("Ngày không hợp lệ");
+  }
+  const [year, month, day] = isoDate.split("-").map(Number);
+  if (year < 1800 || year > 2199 || month < 1 || month > 12 || day < 1 || day > 31) {
+    throw new Error("Ngày ngoài phạm vi 1800–2199");
+  }
+  const ms = Date.parse(`${isoDate}T12:00:00+07:00`);
+  if (!Number.isFinite(ms)) throw new Error("Ngày không hợp lệ");
+  const normalized = new Intl.DateTimeFormat("en-CA", {
+    timeZone:"Asia/Ho_Chi_Minh"
+  }).format(new Date(ms));
+  if (normalized !== isoDate) throw new Error("Ngày dương không tồn tại");
+  return { year, month, day };
+}
+
 function validateTime(time) {
   if (!/^\d{2}:\d{2}$/.test(time)) throw new Error("Giờ không hợp lệ");
   const [hour, minute] = time.split(":").map(Number);
@@ -23,6 +40,7 @@ function solarLongitudeAtMs(ms) {
 }
 
 export function solarLongitudeDegrees(isoDate, time = "12:00") {
+  validateIsoDate(isoDate);
   const safeTime = /^\d{2}:\d{2}$/.test(time) ? time : "12:00";
   const ms = Date.parse(`${isoDate}T${safeTime}:00+07:00`);
   if (!Number.isFinite(ms)) throw new Error("Ngày hoặc giờ không hợp lệ");
@@ -141,8 +159,7 @@ function civilDayJdn(day, month, year, hour, dayBoundary) {
 }
 
 export function getBaZi(isoDate, time = "12:00", options = {}) {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  if (!year || !month || !day) throw new Error("Ngày không hợp lệ");
+  const { year, month, day } = validateIsoDate(isoDate);
   const { hour } = validateTime(time);
   const dayBoundary = options.dayBoundary || "civil-midnight";
   if (!["civil-midnight","zi-hour"].includes(dayBoundary)) {
