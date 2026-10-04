@@ -58,3 +58,37 @@ test("verification registry is exposed", () => {
   assert.ok(summary.ruleCount >= 24);
   assert.ok(verificationCases().length >= 5);
 });
+
+
+test("knowledge base integrity passes", async () => {
+  const { validateKnowledgeBase } = await import("../src/knowledge-validator.js");
+  const result = validateKnowledgeBase();
+  assert.equal(result.ok, true, result.errors.join("\n"));
+  assert.ok(result.counts.evidenceRecords >= 10);
+  assert.ok(result.counts.rules >= 35);
+});
+
+test("HKO official solar-term cases fit longitude tolerance", () => {
+  const official = verificationCases().filter(x => x.kind === "solar-longitude-official");
+  assert.ok(official.length >= 3);
+  return import("../src/bazi.js").then(({ solarLongitudeDegrees }) => {
+    for (const c of official) {
+      const actual = solarLongitudeDegrees(c.date, c.time);
+      const diff = Math.min(
+        Math.abs(actual - c.expectedDegrees),
+        360 - Math.abs(actual - c.expectedDegrees)
+      );
+      assert.ok(
+        diff <= c.toleranceDegrees,
+        `${c.id}: expected ${c.expectedDegrees}°, got ${actual}° (diff ${diff}°)`
+      );
+    }
+  });
+});
+
+test("verified relation corpus includes harm, trine and stem combination", async () => {
+  const { relationRule, rulesByKind, stemCombinationRule } = await import("../src/rule-engine.js");
+  assert.equal(relationRule("harm", "子", "未")?.id, "HARMFUL-ZI-WEI");
+  assert.equal(rulesByKind("trine").length, 4);
+  assert.equal(stemCombinationRule("甲", "己")?.id, "STEM-COMB-JIA-JI");
+});
