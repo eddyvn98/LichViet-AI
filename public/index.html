@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#f4f1e9">
-  <meta name="description" content="Trợ lý lịch Việt: hôm nay nên làm gì, chọn ngày và giải thích nguồn.">
+  <meta name="description" content="Trợ lý lịch Việt chủ động: hôm nay, chọn ngày, kế hoạch và Bát Tự có nguồn.">
   <title>Lịch Việt AI</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -15,7 +15,7 @@
   <header class="topbar">
     <div>
       <a class="brand" href="/" aria-label="Lịch Việt AI">Lịch Việt <b>AI</b></a>
-      <p class="tagline">Mở ra là biết hôm nay nên làm gì.</p>
+      <p class="tagline">Không chỉ xem ngày — tự nhắc khi có thời điểm đáng chú ý.</p>
     </div>
     <button class="ghost compact" id="todayBtn">Hôm nay</button>
   </header>
@@ -23,6 +23,7 @@
   <nav class="tabs" aria-label="Chức năng">
     <button class="tab active" data-tab="today">Hôm nay</button>
     <button class="tab" data-tab="planner">Chọn ngày</button>
+    <button class="tab" data-tab="assistant">Trợ lý</button>
     <button class="tab" data-tab="profile">Hồ sơ</button>
   </nav>
 
@@ -57,7 +58,10 @@
         </div>
 
         <article class="hours-card">
-          <div class="section-title"><h2>Giờ thuận</h2><span>theo Hoàng/Hắc đạo giờ</span></div>
+          <div class="section-title">
+            <h2>Giờ thuận</h2>
+            <span>theo Hoàng/Hắc đạo giờ</span>
+          </div>
           <div id="goodHours" class="hour-chips"></div>
         </article>
 
@@ -84,9 +88,13 @@
 
     <section id="planner" class="panel tabpanel" hidden>
       <div class="section-head">
-        <div><p class="eyebrow">Kế hoạch</p><h1>Chọn ngày phù hợp</h1></div>
-        <p>App chỉ đưa vài lựa chọn tốt nhất, không dội cả lịch lên màn hình.</p>
+        <div>
+          <p class="eyebrow">Kế hoạch tức thời</p>
+          <h1>Chọn ngày phù hợp</h1>
+        </div>
+        <p>So sánh tối đa 60 ngày nhưng chỉ trả 5 lựa chọn đáng xem nhất.</p>
       </div>
+
       <div class="form-grid">
         <label>Việc cần làm
           <select id="activity"></select>
@@ -102,16 +110,70 @@
           </select>
         </label>
       </div>
+
       <button id="findDays" class="primary">Tìm ngày</button>
       <div id="planLoading" class="loading" hidden>Đang so sánh các ngày…</div>
       <div id="planResults" class="plan-results"></div>
     </section>
 
+    <section id="assistant" class="panel tabpanel" hidden>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Chủ động</p>
+          <h1>Trợ lý của bạn</h1>
+        </div>
+        <button id="refreshBrief" class="ghost compact">Cập nhật</button>
+      </div>
+
+      <article class="brief-card">
+        <p class="eyebrow">Bản tin hôm nay</p>
+        <h2 id="briefHeadline">Đang chuẩn bị…</h2>
+        <div id="briefToday" class="brief-today"></div>
+        <div id="briefLoading" class="loading" hidden>Đang rà kế hoạch…</div>
+      </article>
+
+      <div id="briefAlerts" class="alerts"></div>
+
+      <hr>
+
+      <div class="section-title">
+        <h2>Kế hoạch đang theo dõi</h2>
+        <span>tối đa 20</span>
+      </div>
+
+      <div id="savedPlans" class="saved-plans"></div>
+
+      <div class="intent-form">
+        <label>Tên kế hoạch
+          <input id="intentTitle" type="text" maxlength="80" placeholder="Ví dụ: ký hợp đồng căn hộ">
+        </label>
+        <label>Loại việc
+          <select id="intentActivity"></select>
+        </label>
+        <label>Từ
+          <input id="intentFrom" type="date">
+        </label>
+        <label>Đến
+          <input id="intentTo" type="date">
+        </label>
+      </div>
+      <button id="addPlan" class="primary">Theo dõi kế hoạch</button>
+
+      <p class="note">
+        Daily brief được tạo từ engine deterministic. Sau này AI chỉ được phép viết lại câu chữ,
+        không được tự thay ngày, Can Chi hay kết luận rule.
+      </p>
+    </section>
+
     <section id="profile" class="panel tabpanel" hidden>
       <div class="section-head">
-        <div><p class="eyebrow">Cá nhân hóa</p><h1>Hồ sơ của bạn</h1></div>
-        <p>Dữ liệu được lưu trong trình duyệt. Server không lưu hồ sơ ở V1.</p>
+        <div>
+          <p class="eyebrow">Cá nhân hóa</p>
+          <h1>Hồ sơ Bát Tự</h1>
+        </div>
+        <p>Dữ liệu vẫn lưu ở trình duyệt, trừ khi bạn chủ động bật server push.</p>
       </div>
+
       <div class="form-grid">
         <label>Tên hiển thị
           <input id="profileName" type="text" maxlength="40" placeholder="Không bắt buộc">
@@ -124,19 +186,28 @@
           <small>Không biết thì để trống; app không tự đoán.</small>
         </label>
       </div>
+
       <button id="saveProfile" class="primary">Lưu hồ sơ</button>
       <div id="profileResult" class="profile-result"></div>
 
       <hr>
-      <div class="section-title"><h2>Nhắc hằng ngày</h2><span>không cần tự vào tra</span></div>
+
+      <div class="section-title">
+        <h2>Nhắc hằng ngày</h2>
+        <span>server push khi đã deploy</span>
+      </div>
       <div class="reminder-row">
-        <label>Giờ nhắc <input id="reminderTime" type="time" value="07:30"></label>
+        <label>Giờ nhắc
+          <input id="reminderTime" type="time" value="07:30">
+        </label>
         <button id="enableReminder" class="ghost">Bật thông báo</button>
       </div>
-      <p class="note" id="reminderNote">V1 nhắc khi web/PWA đang chạy hoặc ngay lần mở tiếp theo sau giờ nhắc. Trình duyệt hỗ trợ Periodic Background Sync có thể đánh thức PWA định kỳ.</p>
+      <p class="note" id="reminderNote">
+        Nếu server chưa cấu hình VAPID, app tự fallback về khả năng PWA của trình duyệt.
+      </p>
 
       <hr>
-      <a class="source-link" href="/sources.html">Nguồn, phương pháp & giới hạn →</a>
+      <a class="source-link" href="/sources.html">Nguồn, rule, phương pháp & giới hạn →</a>
     </section>
   </main>
 </div>

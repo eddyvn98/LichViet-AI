@@ -6,7 +6,7 @@
     "url":"https://www.archives.org.vn/gioi-thieu-tai-lieu-nghiep-vu/quy-trinh-bien-soan-lich-hiep-ky-duoi-trieu-nguyen.htm",
     "type":"nguồn Việt Nam chính thức về lịch sử",
     "strength":"cao",
-    "usedFor":"Chứng cứ lịch Hiệp Kỷ do Khâm Thiên Giám biên soạn và triều Nguyễn dùng Hiệp Kỷ Biện Phương làm căn cứ cho ngự lịch."
+    "usedFor":"Chứng cứ Khâm Thiên Giám biên soạn Lịch Hiệp Kỷ và ngự lịch thời Minh Mệnh dựa trên sách Hiệp Kỷ Biện Phương."
   },
   {
     "id":"vn-archives-kham-thien",
@@ -15,7 +15,7 @@
     "url":"https://www.archives.org.vn/kham-thien-giam-trieu-nguyen.htm",
     "type":"nguồn Việt Nam chính thức về lịch sử",
     "strength":"cao",
-    "usedFor":"Chứng cứ Khâm Thiên Giám làm lịch và xem ngày giờ tốt/xấu phục vụ triều đình."
+    "usedFor":"Chứng cứ cơ quan chính thức làm lịch và lựa ngày giờ phục vụ triều đình."
   },
   {
     "id":"vn-lunar-hnd",
@@ -24,16 +24,16 @@
     "url":"https://honguyenviet.com/amlich/calrules.html",
     "type":"thuật toán lịch thiên văn Việt Nam",
     "strength":"cao cho lịch hiện đại",
-    "usedFor":"Chuyển dương lịch sang âm lịch theo múi giờ Việt Nam UTC+7. App triển khai lại công thức, không sao chép mã nguồn."
+    "usedFor":"Chuyển dương lịch sang âm lịch theo UTC+7; app triển khai lại công thức."
   },
   {
     "id":"hko-calendar",
-    "name":"Gregorian–Lunar Calendar Conversion Table",
+    "name":"Gregorian–Lunar Calendar Conversion Table / 24 Solar Terms",
     "publisher":"Hong Kong Observatory",
     "url":"https://www.hko.gov.hk/en/gts/time/conversion.htm",
-    "type":"nguồn đối chiếu lịch",
+    "type":"nguồn đối chiếu lịch và tiết khí",
     "strength":"cao nhưng UTC+8",
-    "usedFor":"Đối chiếu chéo các ngày không nhạy múi giờ; không dùng làm chuẩn Việt Nam."
+    "usedFor":"Đối chiếu chéo ngày không nhạy múi giờ và mốc tiết khí; không dùng làm chuẩn âm lịch Việt Nam."
   },
   {
     "id":"gbt33661",
@@ -47,11 +47,20 @@
   {
     "id":"xieji",
     "name":"欽定協紀辨方書 – Khâm định Hiệp Kỷ Biện Phương Thư",
-    "publisher":"Chinese Text Project (bản số hóa)",
-    "url":"https://ctext.org/wiki.pl?chapter=530461&if=en&remap=gb",
+    "publisher":"Chinese Text Project",
+    "url":"https://ctext.org/wiki.pl?chapter=855889&if=gb",
     "type":"nguồn cổ điển chọn ngày",
+    "strength":"nguồn truyền thống chính",
+    "usedFor":"Source family chính của rule V2; các mục 建日/除日/... và 宜/忌 được dùng để gắn provenance."
+  },
+  {
+    "id":"xieji-liuhe",
+    "name":"欽定協紀辨方書 卷六 – 六合等关系",
+    "publisher":"Chinese Text Project",
+    "url":"https://ctext.org/wiki.pl?chapter=584487&if=gb&remap=gb",
+    "type":"nguồn cổ điển quan hệ Địa Chi",
     "strength":"nguồn truyền thống",
-    "usedFor":"Nguồn gốc học thuật/truyền thống của lớp chọn ngày; từng quy tắc cần tiếp tục gắn provenance chi tiết."
+    "usedFor":"Provenance cho lục hợp và quan hệ Địa Chi được V2 dùng như tín hiệu phụ."
   },
   {
     "id":"tyme4ts",
@@ -59,7 +68,7 @@
     "publisher":"6tail",
     "url":"https://github.com/6tail/tyme4ts",
     "type":"implementation",
-    "strength":"tham khảo kỹ thuật",
-    "usedFor":"12 Trực, thần trực nhật, nghi/kỵ và giờ hoàng đạo. Không dùng làm chuẩn âm lịch Việt Nam."
+    "strength":"cross-check kỹ thuật",
+    "usedFor":"Nghi/kỵ chi tiết, 12 Trực, thần trực nhật và giờ Hoàng/Hắc đạo; không dùng làm chuẩn âm lịch Việt Nam."
   }
 ]

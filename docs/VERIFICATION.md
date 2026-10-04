@@ -1,43 +1,67 @@
-# Verification
+# Verification V2
 
-## Golden cases âm lịch Việt
+## Lịch Việt
 
-Các ca sau được khóa bằng unit test và đối chiếu với lịch công khai dựa trên thuật toán Hồ Ngọc Đức:
+Golden cases đang khóa:
+- 2026-03-01 → 13/1/2026
+- 2026-03-19 → 1/2/2026
+- 2026-07-14 → 1/6/2026
+- 2026-10-04 → 24/8/2026
 
-| Dương lịch | Âm lịch |
-|---|---|
-| 2026-03-01 | 13/1/2026 |
-| 2026-03-19 | 1/2/2026 |
-| 2026-07-14 | 1/6/2026 |
-| 2026-10-04 | 24/8/2026 |
-
-Nguồn tham chiếu được ghi trong `data/sources.json`.
+Âm lịch hiện đại dùng công thức thiên văn UTC+7. HKO chỉ dùng để cross-check vì dùng UTC+8.
 
 ## Bát Tự
 
 Ca khóa:
 - 2026-10-04 12:00 UTC+7
-- Năm: Bính Ngọ
-- Tháng: Đinh Dậu
-- Ngày: Tân Hợi
+- Năm Bính Ngọ
+- Tháng Đinh Dậu
+- Ngày Tân Hợi
+- Nhật chủ Tân Kim
 - Tiết đang hiệu lực: Thu phân
 
-## Quy tắc chọn ngày
+V2 còn test:
+- không có giờ sinh → không tạo trụ giờ,
+- Nhật chủ/Ngũ hành/Thập thần có cấu trúc ổn định,
+- tổng tỷ lệ Ngũ hành xấp xỉ 100%.
 
-Phần nghi/kỵ hiện dùng Tyme4TS như implementation tham khảo, trong bối cảnh lịch Hiệp Kỷ triều Nguyễn có chứng cứ sử dụng Hiệp Kỷ Biện Phương Thư.
+## Rule engine
 
-Không gắn nhãn “verified canonical” cho từng nghi/kỵ cho tới khi từng rule có:
-1. rule id,
-2. điều kiện machine-readable,
-3. quyển/trang hoặc đoạn nguồn,
-4. golden cases,
-5. test phản ví dụ.
+`test/v2.test.js` kiểm tra:
+- catalog có provenance,
+- Trực Thành có rule ID riêng,
+- lục xung/lục hợp truy được rule,
+- planner trả provenance thay vì chỉ score ẩn.
 
-## CI
+## Proactive brief
 
-GitHub Actions phải pass:
-- unit calendar/BaZi/personal/planner,
-- API smoke,
-- Playwright desktop Chromium,
-- Playwright mobile Pixel 7,
+Daily brief là deterministic:
+- đọc ngày hôm nay,
+- đọc các kế hoạch đã lưu,
+- dùng planner chọn candidate tốt nhất,
+- chỉ cảnh báo khi candidate nằm trong 7 ngày tới.
+
+AI không được thay kết quả.
+
+## Playwright
+
+Mỗi push/PR chạy:
+- desktop Chromium,
+- mobile Pixel 7,
+- hôm nay,
+- planner,
+- trợ lý + saved plan,
+- hồ sơ Bát Tự sâu,
+- trang nguồn/rule catalog,
+- API rules/brief/push status,
 - screenshot artifact.
+
+## Chưa gọi là canonical verified
+
+Một rule chỉ được nâng lên mức page-level verified khi có:
+1. bản nguồn ổn định,
+2. locator chính xác đến đoạn/trang,
+3. bản dịch/normalization review,
+4. positive case,
+5. negative case,
+6. kiểm thử regression.

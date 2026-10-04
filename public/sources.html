@@ -1,33 +1,111 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f4f1e9">
   <title>Nguồn & phương pháp · Lịch Việt AI</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <div class="app">
-  <header class="topbar"><div><a class="brand" href="/">Lịch Việt <b>AI</b></a><p class="tagline">Nguồn & phương pháp</p></div><a class="source-link" href="/">← Quay lại</a></header>
+  <header class="topbar">
+    <div>
+      <a class="brand" href="/">Lịch Việt <b>AI</b></a>
+      <p class="tagline">Nguồn, rule & giới hạn</p>
+    </div>
+    <a class="source-link" href="/">← Quay lại</a>
+  </header>
+
   <main class="panel">
-    <div class="section-head"><div><p class="eyebrow">Minh bạch</p><h1>App biết gì, và chưa biết gì?</h1></div><p>Không nguồn nào được dùng để biến niềm tin truyền thống thành sự thật khoa học.</p></div>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Minh bạch V2</p>
+        <h1>App biết gì, và chưa biết gì?</h1>
+      </div>
+      <p>Không nguồn nào được dùng để biến niềm tin truyền thống thành sự thật khoa học.</p>
+    </div>
+
     <div class="mini-card">
-      <h2>Thứ tự xử lý</h2>
-      <p class="meta"><b>1. Lịch Việt UTC+7</b> → <b>2. Can Chi / tiết khí</b> → <b>3. quy tắc chọn ngày truyền thống</b> → <b>4. cá nhân hóa xung/hợp cơ bản</b> → <b>5. AI chỉ diễn giải.</b></p>
+      <h2>Luồng quyết định</h2>
+      <p class="meta">
+        <b>1. Lịch Việt UTC+7</b> →
+        <b>2. Can Chi / tiết khí</b> →
+        <b>3. rule có ID + provenance</b> →
+        <b>4. Bát Tự cá nhân hóa</b> →
+        <b>5. planner / daily brief</b> →
+        <b>6. AI chỉ diễn giải.</b>
+      </p>
+    </div>
+
+    <hr>
+
+    <div class="section-title">
+      <h2>Nguồn</h2>
+      <span id="sourceCount"></span>
     </div>
     <div id="sourceList" class="plan-results"></div>
+
     <hr>
+
+    <div class="section-title">
+      <h2>Rule catalog</h2>
+      <span id="ruleCount"></span>
+    </div>
+    <p class="meta">
+      V2 đã tách rule khỏi UI. Mỗi rule có ID, loại, nguồn, locator và trạng thái xác minh.
+      Việc có provenance không đồng nghĩa mọi diễn giải đã được xác minh tuyệt đối từng trang.
+    </p>
+    <div id="ruleList" class="plan-results"></div>
+
+    <hr>
+
     <h2>Giới hạn hiện tại</h2>
-    <p class="meta">Âm lịch hiện đại dùng thuật toán thiên văn UTC+7. Với lịch sử xa, “lịch thực dùng” có thể khác do thay đổi múi giờ và lịch pháp. Quy tắc nghi/kỵ từ engine truyền thống chưa được gắn số trang nguyên điển cho từng mục; app vì vậy ghi mức “tham khảo”, không ghi “đã kiểm chứng tuyệt đối”.</p>
-    <p class="meta">Bát Tự dùng Lập Xuân để đổi năm và 12 tiết để đổi tháng. Mốc đổi ngày mặc định là 00:00 dân dụng; một số trường phái dùng 23:00, nên trường hợp sát giờ Tý cần được ghi rõ trường phái trước khi luận sâu.</p>
+    <p class="meta">
+      Âm lịch hiện đại dùng thuật toán thiên văn UTC+7. Với lịch sử xa, lịch thực dùng có thể khác
+      do thay đổi múi giờ và lịch pháp. Nghi/kỵ của Tyme4TS hiện vẫn đóng vai trò implementation
+      cross-check, còn rule V2 dùng để kiểm soát scoring và provenance.
+    </p>
+    <p class="meta">
+      Bát Tự dùng Lập Xuân để đổi năm và 12 tiết để đổi tháng. Mốc đổi ngày mặc định là 00:00 dân dụng.
+      Mô hình “thiên mạnh / thiên yếu” ở V2 là heuristic minh bạch; app không tự tuyên bố Dụng thần chuẩn
+      của một trường phái cụ thể.
+    </p>
   </main>
 </div>
+
 <script type="module">
-const list=document.querySelector("#sourceList");
-const data=await fetch("/api/meta").then(r=>r.json());
-list.innerHTML=data.sources.map(s=>`<article class="plan-card" style="grid-template-columns:1fr auto">
-<div><h3>${s.name}</h3><p>${s.publisher} · ${s.type}</p><p>${s.usedFor}</p>
-<a class="source-link" href="${s.url}" target="_blank" rel="noreferrer">Mở nguồn ↗</a></div>
-<span class="badge">${s.strength}</span></article>`).join("");
+const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+
+const [meta, ruleData] = await Promise.all([
+  fetch("/api/meta").then(r=>r.json()),
+  fetch("/api/rules").then(r=>r.json())
+]);
+
+document.querySelector("#sourceCount").textContent = meta.sources.length + " nguồn";
+document.querySelector("#ruleCount").textContent = ruleData.rules.length + " rule";
+
+document.querySelector("#sourceList").innerHTML = meta.sources.map(s =>
+  '<article class="plan-card" style="grid-template-columns:1fr auto">' +
+    '<div><h3>' + escapeHtml(s.name) + '</h3>' +
+    '<p>' + escapeHtml(s.publisher) + ' · ' + escapeHtml(s.type) + '</p>' +
+    '<p>' + escapeHtml(s.usedFor) + '</p>' +
+    '<a class="source-link" href="' + s.url + '" target="_blank" rel="noreferrer">Mở nguồn ↗</a></div>' +
+    '<span class="badge">' + escapeHtml(s.strength) + '</span>' +
+  '</article>'
+).join("");
+
+document.querySelector("#ruleList").innerHTML = ruleData.rules.map(r =>
+  '<article class="plan-card" style="grid-template-columns:120px 1fr auto">' +
+    '<div class="plan-date"><b>' + escapeHtml(r.id) + '</b><small>' + escapeHtml(r.kind) + '</small></div>' +
+    '<div><h3>' + escapeHtml(r.vi || (r.a + "–" + r.b)) + '</h3>' +
+    '<p>Nguồn: ' + escapeHtml(r.source) + '</p>' +
+    '<p>' + escapeHtml(r.locator || "—") + '</p></div>' +
+    '<span class="badge">' + escapeHtml(r.verification) + '</span>' +
+  '</article>'
+).join("");
 </script>
-</body></html>
+</body>
+</html>

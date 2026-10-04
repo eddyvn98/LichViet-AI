@@ -1,53 +1,62 @@
-# Lịch Việt AI
+# Lịch Việt AI V2
 
-Trợ lý lịch Việt tối giản: mở app là biết hôm nay nên làm gì, có thể chọn ngày cho một việc cụ thể và cá nhân hóa bằng ngày/giờ sinh.
+Trợ lý lịch Việt chủ động: xem hôm nay, chọn ngày, lưu kế hoạch để app tự nhắc và cá nhân hóa bằng Bát Tự có provenance.
 
-## Trạng thái
+## V2 có gì
 
-**V1 hoàn chỉnh ở mức ứng dụng web/PWA không cần tài khoản.**
+- Âm lịch Việt UTC+7 độc lập với lịch UTC+8.
+- Can Chi / tiết khí / Bát Tự deterministic.
+- Rule catalog riêng có ID + source + locator + verification.
+- Nhật chủ, cân bằng Ngũ hành tương đối, Thập thần.
+- Cá nhân hóa theo cả chi năm và chi ngày sinh.
+- Chọn ngày theo 8 loại việc.
+- Lưu tối đa 20 kế hoạch và sinh daily brief chủ động.
+- PWA + fallback Periodic Background Sync.
+- True Web Push backend bằng VAPID + cron endpoint khi deploy.
+- GitHub Actions + Playwright desktop/mobile.
+- AI contract: AI chỉ diễn giải output engine.
 
-- Âm lịch Việt Nam tính riêng theo UTC+7.
-- Can Chi và Bát Tự tính theo tiết khí; năm đổi tại Lập Xuân.
-- 12 Trực, Hoàng/Hắc đạo, nghi/kỵ lấy từ lớp engine truyền thống và luôn ghi mức tin cậy.
-- Hồ sơ lưu localStorage, server không lưu ngày sinh.
-- Chọn ngày trả tối đa 5 kết quả.
-- PWA + Notification API + Periodic Background Sync khi trình duyệt hỗ trợ.
-- GitHub Actions chạy unit tests và Playwright trên desktop/mobile.
-- AI không tham gia tính toán; API JSON được thiết kế để AI chỉ diễn giải.
-
-## Chạy local
+## Chạy
 
 ```bash
 npm install
 npm test
 npm start
-# http://localhost:3000
 ```
 
-Kiểm tra UI:
+UI test:
 
 ```bash
 npx playwright install chromium
 npm run test:e2e
 ```
 
-## API
+## Web Push khi deploy
 
-- `GET /api/day?date=2026-10-04`
-- `GET /api/range?from=2026-10-04&days=7`
-- `GET /api/plan?from=2026-10-04&days=30&activity=contract`
-- `GET /api/profile?birth=1995-04-14&birthTime=08:00`
-- `GET /api/meta`
-- `GET /api/health`
+Cấu hình:
 
-Thêm `birth` và `birthTime` vào day/range/plan để bật cá nhân hóa.
+```text
+VAPID_PUBLIC_KEY=...
+VAPID_PRIVATE_KEY=...
+VAPID_SUBJECT=mailto:you@example.com
+CRON_SECRET=...
+PUSH_STORE_PATH=/data/push-subscriptions.json
+```
+
+Scheduler gọi `POST /api/tasks/daily-push` với header `x-cron-secret`.
+
+## Tài liệu
+
+- `docs/V2.md`
+- `docs/ARCHITECTURE.md`
+- `docs/VERIFICATION.md`
+- `docs/AI_CONTRACT.md`
 
 ## Nguyên tắc
 
-1. **Lịch trước, AI sau.** LLM không được tự tính ngày tốt/xấu.
-2. **Việt Nam trước.** Không dùng âm lịch UTC+8 làm lịch Việt.
-3. **Nguồn có tầng.** Nguồn nhà nước/lịch sử, thuật toán thiên văn, cổ điển và implementation được phân loại riêng.
-4. **Không giả khoa học.** Cát/hung là hệ truyền thống.
-5. **Không đoán dữ liệu.** Không biết giờ sinh thì app chỉ hiển thị 3 trụ.
-
-Xem `docs/ARCHITECTURE.md`, `docs/VERIFICATION.md`, `docs/AI_CONTRACT.md`.
+1. Lịch trước, AI sau.
+2. Việt Nam trước.
+3. Rule có provenance.
+4. Không giả khoa học.
+5. Không đoán dữ liệu thiếu.
+6. Cái gì còn phụ thuộc trường phái phải ghi rõ.

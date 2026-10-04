@@ -1,0 +1,28 @@
+[
+  {"id":"DUTY-JIAN","kind":"duty","raw":"建","vi":"Kiến","base":2,"good":["meeting"],"avoid":["build"],"source":"xieji","locator":"卷二十至二十一・建日条","verification":"primary_text_family"},
+  {"id":"DUTY-CHU","kind":"duty","raw":"除","vi":"Trừ","base":3,"good":["medical"],"avoid":[],"source":"xieji","locator":"卷二十至二十一・除日条","verification":"primary_text_family"},
+  {"id":"DUTY-MAN","kind":"duty","raw":"满","vi":"Mãn","base":4,"good":["meeting","opening"],"avoid":[],"source":"xieji","locator":"卷二十至二十一・满日条","verification":"primary_text_family"},
+  {"id":"DUTY-PING","kind":"duty","raw":"平","vi":"Bình","base":0,"good":[],"avoid":[],"source":"xieji","locator":"卷二十至二十一・平日条","verification":"primary_text_family"},
+  {"id":"DUTY-DING","kind":"duty","raw":"定","vi":"Định","base":6,"good":["contract","wedding","move","build"],"avoid":[],"source":"xieji","locator":"卷二十至二十一・定日条","verification":"primary_text_family"},
+  {"id":"DUTY-ZHI","kind":"duty","raw":"执","vi":"Chấp","base":2,"good":[],"avoid":[],"source":"xieji","locator":"卷二十至二十一・执日条","verification":"primary_text_family"},
+  {"id":"DUTY-PO","kind":"duty","raw":"破","vi":"Phá","base":-8,"good":[],"avoid":["contract","wedding","move","opening","build"],"source":"xieji","locator":"卷二十至二十一・破日条","verification":"primary_text_family"},
+  {"id":"DUTY-WEI","kind":"duty","raw":"危","vi":"Nguy","base":-5,"good":[],"avoid":["build"],"source":"xieji","locator":"卷二十至二十一・危日条","verification":"primary_text_family"},
+  {"id":"DUTY-CHENG","kind":"duty","raw":"成","vi":"Thành","base":8,"good":["contract","wedding","move","opening","travel","build","meeting"],"avoid":[],"source":"xieji","locator":"卷二十至二十一・成日条","verification":"primary_text_family"},
+  {"id":"DUTY-SHOU","kind":"duty","raw":"收","vi":"Thu","base":3,"good":[],"avoid":[],"source":"xieji","locator":"卷二十至二十一・收日条","verification":"primary_text_family"},
+  {"id":"DUTY-KAI","kind":"duty","raw":"开","vi":"Khai","base":7,"good":["contract","move","opening","travel","medical","meeting"],"avoid":[],"source":"xieji","locator":"卷二十至二十一・开日条","verification":"primary_text_family"},
+  {"id":"DUTY-BI","kind":"duty","raw":"闭","vi":"Bế","base":-6,"good":[],"avoid":["opening","travel"],"source":"xieji","locator":"卷二十至二十一・闭日条","verification":"primary_text_family"},
+
+  {"id":"REL-ZI-WU","kind":"clash","a":"子","b":"午","source":"xieji","locator":"卷六・六合总论附近","verification":"traditional_relation"},
+  {"id":"REL-CHOU-WEI","kind":"clash","a":"丑","b":"未","source":"xieji","locator":"卷六・地支关系","verification":"traditional_relation"},
+  {"id":"REL-YIN-SHEN","kind":"clash","a":"寅","b":"申","source":"xieji","locator":"卷六・地支关系","verification":"traditional_relation"},
+  {"id":"REL-MAO-YOU","kind":"clash","a":"卯","b":"酉","source":"xieji","locator":"卷六・地支关系","verification":"traditional_relation"},
+  {"id":"REL-CHEN-XU","kind":"clash","a":"辰","b":"戌","source":"xieji","locator":"卷六・地支关系","verification":"traditional_relation"},
+  {"id":"REL-SI-HAI","kind":"clash","a":"巳","b":"亥","source":"xieji","locator":"卷六・地支关系","verification":"traditional_relation"},
+
+  {"id":"HARM-ZI-CHOU","kind":"harmony","a":"子","b":"丑","source":"xieji","locator":"卷六・六合总论","verification":"primary_text_family"},
+  {"id":"HARM-YIN-HAI","kind":"harmony","a":"寅","b":"亥","source":"xieji","locator":"卷六・六合总论","verification":"primary_text_family"},
+  {"id":"HARM-MAO-XU","kind":"harmony","a":"卯","b":"戌","source":"xieji","locator":"卷六・六合总论","verification":"primary_text_family"},
+  {"id":"HARM-CHEN-YOU","kind":"harmony","a":"辰","b":"酉","source":"xieji","locator":"卷六・六合总论","verification":"primary_text_family"},
+  {"id":"HARM-SI-SHEN","kind":"harmony","a":"巳","b":"申","source":"xieji","locator":"卷六・六合总论","verification":"primary_text_family"},
+  {"id":"HARM-WU-WEI","kind":"harmony","a":"午","b":"未","source":"xieji","locator":"卷六・六合总论","verification":"primary_text_family"}
+]
