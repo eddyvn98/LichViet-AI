@@ -154,8 +154,8 @@ export async function compareSelectedDays() {
     const winner = data.winner
       ? '<div class="mini-card"><b>Ưu tiên trong nhóm so sánh:</b> ' +
         escapeHtml(data.winner.date) + ' · ' + escapeHtml(data.winner.match) +
-        '</div>'
-      : '<div class="mini-card">Không có ngày nào vượt qua ràng buộc.</div>';
+        '<p class="meta">' + escapeHtml(data.explanation || "") + '</p></div>'
+      : '<div class="mini-card">' + escapeHtml(data.explanation || "Không có ngày nào vượt qua ràng buộc.") + '</div>';
 
     $("#planResults").innerHTML = winner +
       data.candidates.map((d,i) => candidateCard(d,i,true)).join("");
