@@ -14,6 +14,32 @@ export function jdFromDate(day, month, year) {
   return jd;
 }
 
+
+export function jdToDate(jd) {
+  let a, b, c, d, e, m;
+  if (jd > 2299160) {
+    a = jd + 32044;
+    b = Math.floor((4 * a + 3) / 146097);
+    c = a - Math.floor(b * 146097 / 4);
+  } else {
+    b = 0;
+    c = jd + 32082;
+  }
+  d = Math.floor((4 * c + 3) / 1461);
+  e = c - Math.floor(1461 * d / 4);
+  m = Math.floor((5 * e + 2) / 153);
+  const day = e - Math.floor((153 * m + 2) / 5) + 1;
+  const month = m + 3 - 12 * Math.floor(m / 10);
+  const year = b * 100 + d - 4800 + Math.floor(m / 10);
+  return { year, month, day };
+}
+
+function isoDate({ year, month, day }) {
+  return [year, month, day].map((x, i) =>
+    i === 0 ? String(x).padStart(4, "0") : String(x).padStart(2, "0")
+  ).join("-");
+}
+
 function newMoon(k) {
   const T = k / 1236.85;
   const T2 = T * T;
@@ -130,7 +156,88 @@ export function solarToVietnameseLunar(isoDate, timezone = TZ_VIETNAM) {
   if (lunarMonth > 12) lunarMonth -= 12;
   if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
 
-  return { year: lunarYear, month: lunarMonth, day: lunarDay, leap: isLeap, timezone };
+  return {
+    year:lunarYear,
+    month:lunarMonth,
+    day:lunarDay,
+    leap:isLeap,
+    timezone,
+    calculation:{
+      mode:"astronomical-UTC+7",
+      historicalReconstruction:false,
+      evidenceRefs:["VN-UTC7-OFFICIAL","vn-lunar-hnd"]
+    }
+  };
+}
+
+
+export function vietnameseLunarToSolar(input, timezone = TZ_VIETNAM) {
+  const lunarDay = Number(input?.day);
+  const lunarMonth = Number(input?.month);
+  const lunarYear = Number(input?.year);
+  const lunarLeap = Boolean(input?.leap);
+
+  if (!Number.isInteger(lunarDay) || lunarDay < 1 || lunarDay > 30 ||
+      !Number.isInteger(lunarMonth) || lunarMonth < 1 || lunarMonth > 12 ||
+      !Number.isInteger(lunarYear)) {
+    throw new Error("Ngày âm không hợp lệ");
+  }
+
+  let a11;
+  let b11;
+  if (lunarMonth < 11) {
+    a11 = lunarMonth11(lunarYear - 1, timezone);
+    b11 = lunarMonth11(lunarYear, timezone);
+  } else {
+    a11 = lunarMonth11(lunarYear, timezone);
+    b11 = lunarMonth11(lunarYear + 1, timezone);
+  }
+
+  const k = Math.floor(0.5 + (a11 - 2415021.076998695) / 29.530588853);
+  let off = lunarMonth - 11;
+  if (off < 0) off += 12;
+
+  if (b11 - a11 > 365) {
+    const leapOff = leapMonthOffset(a11, timezone);
+    let leapMonth = leapOff - 2;
+    if (leapMonth < 0) leapMonth += 12;
+
+    if (lunarLeap && lunarMonth !== leapMonth) {
+      throw new Error("Tháng nhuận không khớp năm âm lịch");
+    }
+    if (lunarLeap || off >= leapOff) off += 1;
+  } else if (lunarLeap) {
+    throw new Error("Năm âm lịch này không có tháng nhuận đã chọn");
+  }
+
+  const monthStart = newMoonDay(k + off, timezone);
+  const date = jdToDate(monthStart + lunarDay - 1);
+  const iso = isoDate(date);
+  const roundTrip = solarToVietnameseLunar(iso, timezone);
+
+  if (roundTrip.day !== lunarDay ||
+      roundTrip.month !== lunarMonth ||
+      roundTrip.year !== lunarYear ||
+      roundTrip.leap !== lunarLeap) {
+    throw new Error("Ngày âm không tồn tại trong tháng đã chọn");
+  }
+
+  return {
+    ...date,
+    iso,
+    timezone,
+    lunar:{
+      year:lunarYear,
+      month:lunarMonth,
+      day:lunarDay,
+      leap:lunarLeap
+    },
+    calculation:{
+      mode:"astronomical-UTC+7",
+      historicalReconstruction:false,
+      evidenceRefs:["VN-UTC7-OFFICIAL","vn-lunar-hnd"]
+    }
+  };
 }
 
 export function vietnameseLunarLabel(lunar) {
