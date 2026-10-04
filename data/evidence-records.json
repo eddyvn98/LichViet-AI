@@ -1,0 +1,122 @@
+[
+  {
+    "id":"XJ-SANHE",
+    "sourceId":"xieji-benyuan",
+    "claimType":"branch-trine",
+    "locator":"本原一・三合・CTP chapter 530461 lines 90-93",
+    "evidenceLevel":"PRIMARY_EXACT",
+    "applicability":"canonical-traditional-relation",
+    "normalized":{
+      "water":["申","子","辰"],
+      "wood":["亥","卯","未"],
+      "fire":["寅","午","戌"],
+      "metal":["巳","酉","丑"]
+    },
+    "reviewStatus":"reviewed"
+  },
+  {
+    "id":"XJ-LIUHE",
+    "sourceId":"xieji-benyuan",
+    "claimType":"branch-harmony",
+    "locator":"本原一・六合・CTP chapter 530461 lines 94-97",
+    "evidenceLevel":"PRIMARY_EXACT",
+    "applicability":"canonical-traditional-relation",
+    "normalized":[["子","丑"],["寅","亥"],["卯","戌"],["辰","酉"],["巳","申"],["午","未"]],
+    "reviewStatus":"reviewed"
+  },
+  {
+    "id":"XJ-WUSHU",
+    "sourceId":"xieji-benyuan",
+    "claimType":"hour-stem-rule",
+    "locator":"本原一・五鼠遁・CTP chapter 530461 lines 99-101",
+    "evidenceLevel":"PRIMARY_EXACT",
+    "applicability":"bazi-hour-stem",
+    "normalized":{
+      "甲己":"甲子",
+      "乙庚":"丙子",
+      "丙辛":"戊子",
+      "丁壬":"庚子",
+      "戊癸":"壬子"
+    },
+    "reviewStatus":"reviewed"
+  },
+  {
+    "id":"XJ-WUHU",
+    "sourceId":"xieji-benyuan",
+    "claimType":"month-stem-rule",
+    "locator":"本原一・五虎遁・CTP chapter 530461 lines 102-104",
+    "evidenceLevel":"PRIMARY_EXACT",
+    "applicability":"bazi-month-stem",
+    "normalized":{
+      "甲己":"丙寅",
+      "乙庚":"戊寅",
+      "丙辛":"庚寅",
+      "丁壬":"壬寅",
+      "戊癸":"甲寅"
+    },
+    "reviewStatus":"reviewed"
+  },
+  {
+    "id":"XJ-WUHE",
+    "sourceId":"xieji-benyuan",
+    "claimType":"stem-combination",
+    "locator":"本原一・五合化气・CTP chapter 530461 lines 105-107",
+    "evidenceLevel":"PRIMARY_EXACT",
+    "applicability":"canonical-traditional-relation",
+    "normalized":[["甲","己"],["乙","庚"],["丙","辛"],["丁","壬"],["戊","癸"]],
+    "reviewStatus":"reviewed"
+  },
+  {
+    "id":"SHUIHUDI-12-DUTIES",
+    "sourceId":"shuihudi-qinjian",
+    "claimType":"twelve-day-officers",
+    "locator":"日书相关简文・CTP chapter 380254 lines 61-75",
+    "evidenceLevel":"PRIMARY_EXACT",
+    "applicability":"historical-support",
+    "normalized":{
+      "建":"良日/可起事",
+      "除":"除旧、交易等语义",
+      "满":"营建、生产等语义",
+      "平":"嫁娶、起事等语义",
+      "定":"收藏、官府室祠等语义",
+      "执":"出行不利等语义",
+      "破":"不宜有为",
+      "危":"责执攻击等语义",
+      "成":"谋事、兴大事",
+      "收":"收纳、婚娶等语义",
+      "开":"请谒等语义",
+      "闭":"蓄养、池事等语义"
+    },
+    "reviewStatus":"reviewed",
+    "note":"Dùng làm bằng chứng lịch sử cho hệ 12 Trực; không tự động coi nghĩa Tần đại là chuẩn hiện đại."
+  },
+  {
+    "id":"HKO-24-SOLAR-TERMS",
+    "sourceId":"hko-solar-terms",
+    "claimType":"astronomy-definition",
+    "locator":"The 24 Solar Terms・Table 1",
+    "evidenceLevel":"ASTRONOMY_OFFICIAL",
+    "applicability":"solar-longitude",
+    "normalized":{
+      "segmentDegrees":15,
+      "vernalEquinoxLongitude":0,
+      "springCommencesLongitude":315
+    },
+    "reviewStatus":"reviewed"
+  },
+  {
+    "id":"HKO-2026-MAJOR-TERMS",
+    "sourceId":"hko-almanac-2026",
+    "claimType":"astronomy-regression",
+    "locator":"Hong Kong Observatory Almanac 2026・24 Solar Terms",
+    "evidenceLevel":"ASTRONOMY_OFFICIAL",
+    "applicability":"solar-term-regression",
+    "normalized":{
+      "timezone":"UTC+8",
+      "300":"2026-01-20T09:45:00+08:00",
+      "330":"2026-02-18T23:52:00+08:00",
+      "0":"2026-03-20T22:46:00+08:00"
+    },
+    "reviewStatus":"reviewed"
+  }
+]
