@@ -1,5 +1,5 @@
 import {
-  $, $, api, escapeHtml, familyPayload, profilePayload, savePlans,
+  $, $$, api, escapeHtml, familyPayload, profilePayload, savePlans,
   state, todayVN, toast
 } from "./core.js";
 import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
