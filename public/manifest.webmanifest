@@ -1,0 +1,13 @@
+{
+  "name":"Lịch Việt AI",
+  "short_name":"Lịch Việt",
+  "description":"Trợ lý lịch Việt tối giản: hôm nay nên làm gì và chọn ngày.",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#f4f1e9",
+  "theme_color":"#f4f1e9",
+  "lang":"vi",
+  "icons":[
+    {"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

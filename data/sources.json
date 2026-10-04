@@ -1,6 +1,65 @@
 [
-  {"id":"tyme4ts","name":"Tyme4TS","type":"engine","version":"1.5.3","license":"MIT","status":"active"},
-  {"id":"vn-archives-kham-thien-giam","name":"Tư liệu Khâm Thiên Giám triều Nguyễn","type":"vietnam-primary/history","status":"reference"},
-  {"id":"hko-calendar","name":"Hong Kong Observatory Almanac / Calendar Conversion","type":"calendar-reference","status":"validation"},
-  {"id":"xieji","name":"欽定協紀辨方書","type":"classical-day-selection","status":"rule-provenance-in-progress"}
+  {
+    "id":"vn-archives-hiep-ky",
+    "name":"Quy trình biên soạn lịch Hiệp Kỷ dưới triều Nguyễn",
+    "publisher":"Trung tâm Lưu trữ quốc gia / Cục Văn thư và Lưu trữ Nhà nước",
+    "url":"https://www.archives.org.vn/gioi-thieu-tai-lieu-nghiep-vu/quy-trinh-bien-soan-lich-hiep-ky-duoi-trieu-nguyen.htm",
+    "type":"nguồn Việt Nam chính thức về lịch sử",
+    "strength":"cao",
+    "usedFor":"Chứng cứ lịch Hiệp Kỷ do Khâm Thiên Giám biên soạn và triều Nguyễn dùng Hiệp Kỷ Biện Phương làm căn cứ cho ngự lịch."
+  },
+  {
+    "id":"vn-archives-kham-thien",
+    "name":"Khâm Thiên Giám triều Nguyễn",
+    "publisher":"Trung tâm Lưu trữ quốc gia",
+    "url":"https://www.archives.org.vn/kham-thien-giam-trieu-nguyen.htm",
+    "type":"nguồn Việt Nam chính thức về lịch sử",
+    "strength":"cao",
+    "usedFor":"Chứng cứ Khâm Thiên Giám làm lịch và xem ngày giờ tốt/xấu phục vụ triều đình."
+  },
+  {
+    "id":"vn-lunar-hnd",
+    "name":"Thuật toán tính âm lịch Việt Nam – Hồ Ngọc Đức",
+    "publisher":"Hồ Ngọc Đức",
+    "url":"https://honguyenviet.com/amlich/calrules.html",
+    "type":"thuật toán lịch thiên văn Việt Nam",
+    "strength":"cao cho lịch hiện đại",
+    "usedFor":"Chuyển dương lịch sang âm lịch theo múi giờ Việt Nam UTC+7. App triển khai lại công thức, không sao chép mã nguồn."
+  },
+  {
+    "id":"hko-calendar",
+    "name":"Gregorian–Lunar Calendar Conversion Table",
+    "publisher":"Hong Kong Observatory",
+    "url":"https://www.hko.gov.hk/en/gts/time/conversion.htm",
+    "type":"nguồn đối chiếu lịch",
+    "strength":"cao nhưng UTC+8",
+    "usedFor":"Đối chiếu chéo các ngày không nhạy múi giờ; không dùng làm chuẩn Việt Nam."
+  },
+  {
+    "id":"gbt33661",
+    "name":"GB/T 33661-2017 – Calculation and promulgation of the Chinese calendar",
+    "publisher":"Standardization Administration of China",
+    "url":"https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=E107EA4DE9725EDF819F33C60A44B296&refer=outter",
+    "type":"tiêu chuẩn lịch Trung Quốc",
+    "strength":"cao trong phạm vi Trung Quốc",
+    "usedFor":"Tham khảo định nghĩa lịch thiên văn; không coi là tiêu chuẩn lịch Việt Nam."
+  },
+  {
+    "id":"xieji",
+    "name":"欽定協紀辨方書 – Khâm định Hiệp Kỷ Biện Phương Thư",
+    "publisher":"Chinese Text Project (bản số hóa)",
+    "url":"https://ctext.org/wiki.pl?chapter=530461&if=en&remap=gb",
+    "type":"nguồn cổ điển chọn ngày",
+    "strength":"nguồn truyền thống",
+    "usedFor":"Nguồn gốc học thuật/truyền thống của lớp chọn ngày; từng quy tắc cần tiếp tục gắn provenance chi tiết."
+  },
+  {
+    "id":"tyme4ts",
+    "name":"Tyme4TS",
+    "publisher":"6tail",
+    "url":"https://github.com/6tail/tyme4ts",
+    "type":"implementation",
+    "strength":"tham khảo kỹ thuật",
+    "usedFor":"12 Trực, thần trực nhật, nghi/kỵ và giờ hoàng đạo. Không dùng làm chuẩn âm lịch Việt Nam."
+  }
 ]

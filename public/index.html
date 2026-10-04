@@ -1,36 +1,147 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lịch Việt AI</title><meta name="theme-color" content="#f6f4ee">
-<link rel="stylesheet" href="/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f1e9">
+  <meta name="description" content="Trợ lý lịch Việt: hôm nay nên làm gì, chọn ngày và giải thích nguồn.">
+  <title>Lịch Việt AI</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<main class="shell">
-  <header><div><div class="brand">Lịch Việt <b>AI</b></div><p>Hôm nay nên làm gì?</p></div><button id="todayBtn">Hôm nay</button></header>
-  <section class="hero">
-    <input id="date" type="date" aria-label="Chọn ngày">
-    <div id="loading">Đang tính…</div>
-    <div id="content" hidden>
-      <div class="eyebrow" id="solar"></div>
-      <div class="status"><span id="dot"></span><h1 id="label"></h1></div>
-      <p class="lunar" id="lunar"></p>
-      <p class="canchi" id="canchi"></p>
-      <div class="grid">
-        <article><h2>Nên</h2><div id="good"></div></article>
-        <article><h2>Nên tránh</h2><div id="bad"></div></article>
-      </div>
-      <button class="why" id="whyBtn">Vì sao?</button>
+<div class="app">
+  <header class="topbar">
+    <div>
+      <a class="brand" href="/" aria-label="Lịch Việt AI">Lịch Việt <b>AI</b></a>
+      <p class="tagline">Mở ra là biết hôm nay nên làm gì.</p>
     </div>
-  </section>
-  <section id="why" class="whyPanel" hidden>
-    <h2>Giải thích ngắn</h2>
-    <p><b id="route"></b> · <span id="star"></span></p>
-    <p><b>12 Trực:</b> một vòng 12 trạng thái truyền thống dùng để phân loại tính chất ngày.</p>
-    <p><b>Hoàng/Hắc đạo:</b> cách phân loại truyền thống dựa trên 12 thần trực nhật; không phải đánh giá khoa học.</p>
-    <div id="sources"></div>
-  </section>
-  <footer>Engine tính trước, AI chỉ nên dùng để diễn giải. <a href="/sources.html">Nguồn & phương pháp</a></footer>
-</main>
+    <button class="ghost compact" id="todayBtn">Hôm nay</button>
+  </header>
+
+  <nav class="tabs" aria-label="Chức năng">
+    <button class="tab active" data-tab="today">Hôm nay</button>
+    <button class="tab" data-tab="planner">Chọn ngày</button>
+    <button class="tab" data-tab="profile">Hồ sơ</button>
+  </nav>
+
+  <main>
+    <section id="today" class="panel tabpanel">
+      <div class="date-row">
+        <label for="date">Ngày xem</label>
+        <input id="date" type="date">
+      </div>
+
+      <div id="dayLoading" class="loading">Đang tính lịch Việt…</div>
+      <div id="dayContent" hidden>
+        <div class="headline">
+          <span id="statusDot" class="status-dot"></span>
+          <div>
+            <p id="weekday" class="eyebrow"></p>
+            <h1 id="verdict"></h1>
+          </div>
+        </div>
+
+        <p id="summaryMeta" class="meta"></p>
+
+        <div class="two-col">
+          <article class="mini-card">
+            <h2>Nên</h2>
+            <div id="recommended" class="item-list"></div>
+          </article>
+          <article class="mini-card">
+            <h2>Nên tránh</h2>
+            <div id="avoid" class="item-list"></div>
+          </article>
+        </div>
+
+        <article class="hours-card">
+          <div class="section-title"><h2>Giờ thuận</h2><span>theo Hoàng/Hắc đạo giờ</span></div>
+          <div id="goodHours" class="hour-chips"></div>
+        </article>
+
+        <details class="explain" id="why">
+          <summary>Vì sao?</summary>
+          <div class="explain-body">
+            <p id="traditionalLine"></p>
+            <p id="personalLine"></p>
+            <p id="confidenceLine"></p>
+            <div id="glossaryInline" class="glossary-inline"></div>
+            <p class="disclaimer" id="disclaimer"></p>
+          </div>
+        </details>
+
+        <section class="week-section">
+          <div class="section-title">
+            <h2>7 ngày tới</h2>
+            <span>chạm để xem ngày</span>
+          </div>
+          <div id="week" class="week-strip"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="planner" class="panel tabpanel" hidden>
+      <div class="section-head">
+        <div><p class="eyebrow">Kế hoạch</p><h1>Chọn ngày phù hợp</h1></div>
+        <p>App chỉ đưa vài lựa chọn tốt nhất, không dội cả lịch lên màn hình.</p>
+      </div>
+      <div class="form-grid">
+        <label>Việc cần làm
+          <select id="activity"></select>
+        </label>
+        <label>Tìm từ ngày
+          <input id="planFrom" type="date">
+        </label>
+        <label>Khoảng tìm
+          <select id="planDays">
+            <option value="14">14 ngày</option>
+            <option value="30">30 ngày</option>
+            <option value="60">60 ngày</option>
+          </select>
+        </label>
+      </div>
+      <button id="findDays" class="primary">Tìm ngày</button>
+      <div id="planLoading" class="loading" hidden>Đang so sánh các ngày…</div>
+      <div id="planResults" class="plan-results"></div>
+    </section>
+
+    <section id="profile" class="panel tabpanel" hidden>
+      <div class="section-head">
+        <div><p class="eyebrow">Cá nhân hóa</p><h1>Hồ sơ của bạn</h1></div>
+        <p>Dữ liệu được lưu trong trình duyệt. Server không lưu hồ sơ ở V1.</p>
+      </div>
+      <div class="form-grid">
+        <label>Tên hiển thị
+          <input id="profileName" type="text" maxlength="40" placeholder="Không bắt buộc">
+        </label>
+        <label>Ngày sinh
+          <input id="birthDate" type="date" min="1900-01-01" max="2100-12-31">
+        </label>
+        <label>Giờ sinh
+          <input id="birthTime" type="time">
+          <small>Không biết thì để trống; app không tự đoán.</small>
+        </label>
+      </div>
+      <button id="saveProfile" class="primary">Lưu hồ sơ</button>
+      <div id="profileResult" class="profile-result"></div>
+
+      <hr>
+      <div class="section-title"><h2>Nhắc hằng ngày</h2><span>không cần tự vào tra</span></div>
+      <div class="reminder-row">
+        <label>Giờ nhắc <input id="reminderTime" type="time" value="07:30"></label>
+        <button id="enableReminder" class="ghost">Bật thông báo</button>
+      </div>
+      <p class="note" id="reminderNote">V1 nhắc khi web/PWA đang chạy hoặc ngay lần mở tiếp theo sau giờ nhắc. Trình duyệt hỗ trợ Periodic Background Sync có thể đánh thức PWA định kỳ.</p>
+
+      <hr>
+      <a class="source-link" href="/sources.html">Nguồn, phương pháp & giới hạn →</a>
+    </section>
+  </main>
+</div>
+
+<div id="toast" class="toast" hidden></div>
 <script type="module" src="/app.js"></script>
-</body></html>
+</body>
+</html>

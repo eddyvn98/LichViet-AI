@@ -1,20 +1,14 @@
 {
-  "name": "lichviet-ai",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "node server.js",
-    "test": "node --test test/smoke.test.js",
-    "test:e2e": "playwright test"
+  "name":"lichviet-ai",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "scripts":{
+    "start":"node server.js",
+    "test":"node --test test/calendar.test.js test/engine.test.js test/smoke.test.js",
+    "test:e2e":"playwright test"
   },
-  "dependencies": {
-    "tyme4ts": "1.5.3"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.55.0"
-  },
-  "engines": {
-    "node": ">=20"
-  }
+  "dependencies":{"tyme4ts":"1.5.3"},
+  "devDependencies":{"@playwright/test":"^1.55.0"},
+  "engines":{"node":">=20"}
 }

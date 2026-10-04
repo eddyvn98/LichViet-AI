@@ -1,1 +1,33 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nguồn · Lịch Việt AI</title><link rel="stylesheet" href="/styles.css"></head><body><main class="shell"><header><div><div class="brand">Nguồn & phương pháp</div><p>Lịch Việt AI</p></div><a href="/">← Trang chính</a></header><section class="hero"><h2>Thứ tự tin cậy</h2><p><b>1. Lịch pháp / thiên văn:</b> ưu tiên nguồn quan trắc và tiêu chuẩn lịch.</p><p><b>2. Quy tắc xem ngày:</b> ghi rõ đây là hệ truyền thống; không gọi là kết luận khoa học.</p><p><b>3. AI:</b> không được tự tính cát/hung. Chỉ diễn giải output của engine.</p><h2>Nguồn đang dùng / đối chiếu</h2><div class="source"><b>Tyme4TS 1.5.3 (MIT)</b><small>Engine kỹ thuật cho lịch âm, Can Chi, tiết khí, 12 Trực, Hoàng/Hắc đạo, nghi/kỵ.</small></div><div class="source"><b>Trung tâm Lưu trữ quốc gia Việt Nam</b><small>Tư liệu về Khâm Thiên Giám và Lịch Hiệp Kỷ triều Nguyễn.</small></div><div class="source"><b>Hong Kong Observatory</b><small>Bảng chuyển đổi lịch và niên lịch dùng làm nguồn đối chiếu lịch pháp.</small></div><div class="source"><b>《欽定協紀辨方書》</b><small>Nguồn cổ điển cho hệ chọn ngày; đang số hóa provenance từng quy tắc.</small></div><p><b>Trạng thái MVP:</b> phần lịch đã chạy bằng engine xác định. Điểm 0–100 hiện là lớp tóm tắt UX do dự án quy định, chưa phải một “điểm chuẩn cổ truyền”.</p></section></main></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f1e9">
+  <title>Nguồn & phương pháp · Lịch Việt AI</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar"><div><a class="brand" href="/">Lịch Việt <b>AI</b></a><p class="tagline">Nguồn & phương pháp</p></div><a class="source-link" href="/">← Quay lại</a></header>
+  <main class="panel">
+    <div class="section-head"><div><p class="eyebrow">Minh bạch</p><h1>App biết gì, và chưa biết gì?</h1></div><p>Không nguồn nào được dùng để biến niềm tin truyền thống thành sự thật khoa học.</p></div>
+    <div class="mini-card">
+      <h2>Thứ tự xử lý</h2>
+      <p class="meta"><b>1. Lịch Việt UTC+7</b> → <b>2. Can Chi / tiết khí</b> → <b>3. quy tắc chọn ngày truyền thống</b> → <b>4. cá nhân hóa xung/hợp cơ bản</b> → <b>5. AI chỉ diễn giải.</b></p>
+    </div>
+    <div id="sourceList" class="plan-results"></div>
+    <hr>
+    <h2>Giới hạn hiện tại</h2>
+    <p class="meta">Âm lịch hiện đại dùng thuật toán thiên văn UTC+7. Với lịch sử xa, “lịch thực dùng” có thể khác do thay đổi múi giờ và lịch pháp. Quy tắc nghi/kỵ từ engine truyền thống chưa được gắn số trang nguyên điển cho từng mục; app vì vậy ghi mức “tham khảo”, không ghi “đã kiểm chứng tuyệt đối”.</p>
+    <p class="meta">Bát Tự dùng Lập Xuân để đổi năm và 12 tiết để đổi tháng. Mốc đổi ngày mặc định là 00:00 dân dụng; một số trường phái dùng 23:00, nên trường hợp sát giờ Tý cần được ghi rõ trường phái trước khi luận sâu.</p>
+  </main>
+</div>
+<script type="module">
+const list=document.querySelector("#sourceList");
+const data=await fetch("/api/meta").then(r=>r.json());
+list.innerHTML=data.sources.map(s=>`<article class="plan-card" style="grid-template-columns:1fr auto">
+<div><h3>${s.name}</h3><p>${s.publisher} · ${s.type}</p><p>${s.usedFor}</p>
+<a class="source-link" href="${s.url}" target="_blank" rel="noreferrer">Mở nguồn ↗</a></div>
+<span class="badge">${s.strength}</span></article>`).join("");
+</script>
+</body></html>

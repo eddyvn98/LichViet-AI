@@ -1,0 +1,12 @@
+[
+  {"term":"Âm lịch Việt Nam","definition":"Lịch âm dương tính theo thời điểm sóc và tiết khí, với múi giờ Việt Nam UTC+7 trong phiên bản hiện đại của app."},
+  {"term":"Can Chi","definition":"Hệ 10 Thiên Can và 12 Địa Chi ghép thành chu kỳ 60, dùng để gọi tên năm, tháng, ngày và giờ."},
+  {"term":"Bát Tự / Tứ Trụ","definition":"Bốn trụ năm, tháng, ngày, giờ; mỗi trụ gồm một Can và một Chi, tổng cộng tám chữ. App không đoán giờ sinh nếu bạn không biết."},
+  {"term":"Tiết khí","definition":"24 mốc chia quỹ đạo biểu kiến của Mặt Trời thành các đoạn 15°. Bát Tự dùng các mốc tiết để đổi tháng."},
+  {"term":"12 Trực","definition":"Vòng 12 trạng thái Kiến, Trừ, Mãn, Bình, Định, Chấp, Phá, Nguy, Thành, Thu, Khai, Bế dùng trong hệ chọn ngày truyền thống."},
+  {"term":"Hoàng đạo / Hắc đạo","definition":"Phân loại truyền thống dựa trên thần trực nhật. Đây là quy ước văn hóa, không phải kết luận khoa học."},
+  {"term":"Xung tuổi","definition":"Trong MVP, app chỉ kiểm tra lục xung cơ bản giữa Địa Chi ngày và Địa Chi năm sinh; không đồng nghĩa một ngày chắc chắn xấu."},
+  {"term":"Lục hợp","definition":"Sáu cặp Địa Chi được coi là có quan hệ hợp trong hệ truyền thống. App dùng như một tín hiệu phụ, không quyết định duy nhất."},
+  {"term":"Lập Xuân","definition":"Một trong 24 tiết khí, khoảng đầu tháng 2. App dùng Lập Xuân làm mốc đổi năm Bát Tự."},
+  {"term":"Sóc","definition":"Thời điểm trăng non. Ngày chứa thời điểm Sóc là ngày mồng 1 của tháng âm lịch."}
+]
