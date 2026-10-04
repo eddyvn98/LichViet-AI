@@ -73,6 +73,19 @@ test("profile exposes advanced BaZi while keeping deep analysis folded", async (
   await expect(page.getByRole("heading", { name:"Thập thần trên Thiên Can" })).toBeVisible();
 });
 
+test("profile with missing time on Jie boundary shows uncertainty instead of deep analysis", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+  await page.locator("#birthDate").fill("2026-02-04");
+  await page.locator("#birthTime").fill("");
+  await page.getByRole("button", { name:"Lưu hồ sơ" }).click();
+
+  await expect(page.locator(".pillar")).toHaveCount(3);
+  await expect(page.getByText("Phân tích sâu tạm ẩn.", { exact:false })).toBeVisible();
+  await expect(page.getByText("giữ cả khả năng", { exact:false })).toBeVisible();
+  await expect(page.locator(".deep-profile")).toHaveCount(0);
+});
+
 test("sources page exposes rule catalog and limits", async ({ page }) => {
   await page.goto("/sources.html");
   await expect(page.getByRole("heading", { name:"App biết gì, và chưa biết gì?" })).toBeVisible();
@@ -86,8 +99,8 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("4.0.0");
-  expect(healthBody.engine).toBe("verified-engine-v4");
+  expect(healthBody.version).toBe("5.0.0");
+  expect(healthBody.engine).toBe("verified-engine-v5");
 
   const conversion = await request.post("/api/convert/lunar-to-solar", {
     data: { day:24, month:8, year:2026, leap:false }
