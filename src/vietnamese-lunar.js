@@ -64,17 +64,21 @@ function parseSolarIso(value, { allowBoundaryYear = false } = {}) {
 }
 
 function calculationMeta(iso) {
+  const historical = iso < "2002-10-14";
   return {
     mode:"astronomical-UTC+7",
     timezone:"Asia/Ho_Chi_Minh",
-    historicalReconstruction:false,
-    scope:iso >= "2002-10-14"
-      ? "official-current-utc7-reference"
-      : "historical-proleptic-utc7",
-    scopeNote:iso >= "2002-10-14"
-      ? "UTC+7 được gắn với Quyết định 134/2002/QĐ-TTg; engine dùng quy tắc thiên văn hiện đại."
-      : "Engine tính lùi theo quy tắc thiên văn UTC+7 hiện đại; không khẳng định đây là lịch đã được ban hành tại mọi vùng trong lịch sử.",
-    evidenceRefs:["VN-UTC7-OFFICIAL","VN-LUNAR-HND-ALGORITHM"]
+    historicalReconstruction:historical,
+    scope:historical
+      ? "historical-proleptic-utc7"
+      : "official-current-utc7-reference",
+    scopeNote:historical
+      ? "Engine tính lùi theo quy tắc thiên văn UTC+7 hiện đại; không khẳng định đây là lịch đã được ban hành tại mọi vùng trong lịch sử."
+      : "UTC+7 được gắn với Quyết định 134/2002/QĐ-TTg; engine dùng quy tắc thiên văn hiện đại.",
+    evidenceRefs:["VN-UTC7-OFFICIAL","VN-LUNAR-HND-ALGORITHM"],
+    historicalContextEvidenceRefs:historical
+      ? ["VN-ARCHIVES-HIEPKY-XIEJI","VN-ARCHIVES-KHAMTHIEN-DATE-SELECTION"]
+      : []
   };
 }
 
