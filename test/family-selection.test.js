@@ -123,6 +123,7 @@ test("direct comparison preserves rejected dates and explains winner", () => {
     constraints:{ excludeDates:["2026-10-04"] }
   });
 
+  assert.equal(comparison.policy.id, "deterministic-date-comparison-v1");
   assert.equal(comparison.candidates.length, 2);
   assert.equal(
     comparison.candidates.find(x => x.date === "2026-10-04")?.eligible,
