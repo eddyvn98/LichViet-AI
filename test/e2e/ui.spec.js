@@ -104,6 +104,21 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const rules = await request.get("/api/rules");
   expect((await rules.json()).rules.length).toBeGreaterThanOrEqual(24);
 
+  const evidence = await request.get("/api/evidence?id=XJ-HUANGHEI");
+  expect(evidence.ok()).toBeTruthy();
+  const evidenceBody = await evidence.json();
+  expect(evidenceBody.records).toHaveLength(1);
+  expect(evidenceBody.records[0].id).toBe("XJ-HUANGHEI");
+  expect(evidenceBody.records[0].source?.id).toBe("xieji-huanghei");
+  expect(evidenceBody.records[0].locator).toBeTruthy();
+
+  const sources = await request.get("/api/sources");
+  expect(sources.ok()).toBeTruthy();
+  const sourcesBody = await sources.json();
+  expect(sourcesBody.sources.some(x =>
+    x.id === "xieji-huanghei" && Number(x.authorityRank) >= 4
+  )).toBeTruthy();
+
   const brief = await request.post("/api/brief", {
     data: {
       date:"2026-10-04",
