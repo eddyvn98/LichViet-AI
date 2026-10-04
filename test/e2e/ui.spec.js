@@ -41,6 +41,9 @@ test("planner returns five ranked dates with rule provenance", async ({ page }) 
   await page.locator("#activity").selectOption("contract");
   await page.getByRole("button", { name:"Tìm ngày" }).click();
   await expect(page.locator(".plan-card")).toHaveCount(5);
+  await expect(page.locator(".decision-line").first()).toContainText("Decision:");
+  await expect(page.locator(".policy-line").first()).toContainText("activity-composition-v2");
+  await expect(page.locator(".policy-line").first()).toContainText("tie-break-only");
   await expect(page.locator(".rule-line").first()).not.toHaveText("");
 });
 
@@ -89,6 +92,9 @@ test("profile with missing time on Jie boundary shows uncertainty instead of dee
 test("sources page exposes rule catalog and limits", async ({ page }) => {
   await page.goto("/sources.html");
   await expect(page.getByRole("heading", { name:"App biết gì, và chưa biết gì?" })).toBeVisible();
+  await expect(page.getByText("12 Trực · source fact", { exact:true })).toBeVisible();
+  await expect(page.getByText("Activity policy", { exact:true })).toBeVisible();
+  await expect(page.getByText("PRODUCT_POLICY", { exact:true }).first()).toBeVisible();
   await expect(page.getByText("Rule catalog", { exact:true })).toBeVisible();
   await expect(page.getByText("DUTY-CHENG", { exact:true })).toBeVisible();
   await expect(page.getByText("Hồ Ngọc Đức", { exact:false }).first()).toBeVisible();
