@@ -7,7 +7,8 @@ import { solarToVietnameseLunar } from "./vietnamese-lunar.js";
 import { crossCheckDay } from "./crosscheck.js";
 import {
   assessEvidence,
-  evidenceRecordById
+  evidenceRecordById,
+  resolveEvidenceRecords
 } from "./evidence.js";
 import { classifyScore, scoreDayBase } from "./scoring.js";
 import { calculateTwelveDuty } from "./twelve-duty.js";
@@ -291,6 +292,17 @@ export function buildDayInfo(isoDate, profile = null) {
     experimental:false
   });
 
+  const evidenceRecordIds = unique([
+    ...(vnLunar.calculation?.evidenceRefs || []),
+    ...(bazi.calculation?.evidenceRefs || []),
+    ...dutyState.candidates.flatMap(x =>
+      x.evaluation.evidence?.flatMap(e => e.evidenceRefs || []) || []
+    ),
+    ...eclipticState.evidenceRefs,
+    ...(dutyState.transition?.evidenceRefs || []),
+    ...(personal?.evidence?.flatMap(x => x.evidence?.evidenceRefs || []) || [])
+  ]);
+
   return {
     date:isoDate,
     lunar:vnLunar,
@@ -337,6 +349,7 @@ export function buildDayInfo(isoDate, profile = null) {
       baziCalculation:bazi.calculation,
       dutyCalculation:dutyState,
       eclipticCalculation:eclipticState,
+      evidenceRecords:resolveEvidenceRecords(evidenceRecordIds),
       implementationNotes:[
         "12 Trực do verified engine tự tính; ngày giao tiết giữ cả trạng thái trước/sau theo nguyên điển.",
         "Hoàng/Hắc đạo ngày và giờ do verified engine tự tính theo Hiệp Kỷ Biện Phương Thư.",
