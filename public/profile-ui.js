@@ -189,6 +189,7 @@ export async function enableNotifications() {
       body: {
         subscription,
         profile: profilePayload(),
+        profiles:familyPayload(false),
         plans: state.plans,
         reminderTime
       }
