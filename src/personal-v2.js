@@ -1,6 +1,38 @@
 import { branchRelationship } from "./personal.js";
-import { relationRule, ruleSummary } from "./rule-engine.js";
+import { relationRule, ruleSummary, stemCombinationRule, trineRuleFor } from "./rule-engine.js";
 import { tenGodForStem } from "./bazi-profile.js";
+
+function applyBranchSignal({ relation, role, signals, ruleIds }) {
+  if (!relation || relation.type === "neutral") return 0;
+  const kind = relation.type;
+  const rule = relationRule(kind, role.branch, role.current);
+  if (rule) ruleIds.push(rule.id);
+
+  if (kind === "clash") {
+    signals.push({
+      level:"caution",
+      label:`Lục xung với chi ${role.label}`,
+      detail:relation.detail
+    });
+    return role.weight === "day" ? -10 : -8;
+  }
+  if (kind === "harmony") {
+    signals.push({
+      level:"good",
+      label:`Lục hợp với chi ${role.label}`,
+      detail:relation.detail
+    });
+    return role.weight === "day" ? 5 : 4;
+  }
+  if (kind === "harm") {
+    signals.push({
+      level:"info",
+      label:`Lục hại với chi ${role.label}`,
+      detail:relation.detail
+    });
+  }
+  return 0;
+}
 
 export function personalizeDay(profile, dayBazi) {
   if (!profile?.dayMaster?.raw) return null;
@@ -8,32 +40,44 @@ export function personalizeDay(profile, dayBazi) {
   const signals = [];
   let delta = 0;
   const ruleIds = [];
+  const currentBranch = dayBazi.branches.day;
 
-  const yearRel = branchRelationship(profile.yearBranch, dayBazi.branches.day);
-  if (yearRel?.type === "clash") {
-    delta -= 8; signals.push({ level:"caution", label:"Xung chi năm", detail:yearRel.detail });
-    const r = relationRule("clash", profile.yearBranch, dayBazi.branches.day);
-    if (r) ruleIds.push(r.id);
-  } else if (yearRel?.type === "harmony") {
-    delta += 4; signals.push({ level:"good", label:"Hợp chi năm", detail:yearRel.detail });
-    const r = relationRule("harmony", profile.yearBranch, dayBazi.branches.day);
-    if (r) ruleIds.push(r.id);
+  const yearRel = branchRelationship(profile.yearBranch, currentBranch);
+  delta += applyBranchSignal({
+    relation:yearRel,
+    role:{ label:"năm sinh", branch:profile.yearBranch, current:currentBranch, weight:"year" },
+    signals, ruleIds
+  });
+
+  const dayRel = branchRelationship(profile.dayBranch, currentBranch);
+  delta += applyBranchSignal({
+    relation:dayRel,
+    role:{ label:"ngày sinh", branch:profile.dayBranch, current:currentBranch, weight:"day" },
+    signals, ruleIds
+  });
+
+  const trine = trineRuleFor([profile.yearBranch, profile.dayBranch, currentBranch]);
+  if (trine) {
+    ruleIds.push(trine.id);
+    signals.push({
+      level:"info",
+      label:"Đủ bộ Tam hợp",
+      detail:"Ba chi năm sinh, ngày sinh và ngày hiện tại cùng tạo một bộ Tam hợp. App chỉ hiển thị thông tin, chưa cộng điểm."
+    });
   }
 
-  const dayRel = branchRelationship(profile.dayBranch, dayBazi.branches.day);
-  if (dayRel?.type === "clash") {
-    delta -= 10;
-    signals.push({ level:"caution", label:"Xung chi ngày sinh", detail:dayRel.detail.replace("năm sinh","ngày sinh") });
-    const r = relationRule("clash", profile.dayBranch, dayBazi.branches.day);
-    if (r) ruleIds.push(r.id);
-  } else if (dayRel?.type === "harmony") {
-    delta += 5;
-    signals.push({ level:"good", label:"Hợp chi ngày sinh", detail:dayRel.detail.replace("năm sinh","ngày sinh") });
-    const r = relationRule("harmony", profile.dayBranch, dayBazi.branches.day);
-    if (r) ruleIds.push(r.id);
+  const currentStem = dayBazi.raw.day[0];
+  const stemCombination = stemCombinationRule(profile.dayMaster.raw, currentStem);
+  if (stemCombination) {
+    ruleIds.push(stemCombination.id);
+    signals.push({
+      level:"info",
+      label:"Thiên Can có Ngũ hợp",
+      detail:`Nhật chủ và Thiên Can ngày hiện tại thuộc cặp Ngũ hợp; app chưa tự suy diễn hóa khí.`
+    });
   }
 
-  const tenGod = tenGodForStem(profile.dayMaster.raw, dayBazi.raw.day[0]);
+  const tenGod = tenGodForStem(profile.dayMaster.raw, currentStem);
   signals.push({
     level:"info",
     label:`Ngày mang quan hệ ${tenGod}`,
@@ -43,11 +87,14 @@ export function personalizeDay(profile, dayBazi) {
   return {
     delta,
     summary:signals.find(x => x.level === "caution")?.label ||
-      signals.find(x => x.level === "good")?.label || `Ngày ${tenGod}`,
+      signals.find(x => x.level === "good")?.label ||
+      signals.find(x => x.level === "info")?.label ||
+      `Ngày ${tenGod}`,
     tenGod,
     signals,
-    ruleIds,
-    evidence:ruleSummary(ruleIds),
-    confidence:"Theo mô hình Bát Tự V2; Dụng thần chưa được khẳng định tự động."
+    ruleIds:[...new Set(ruleIds)],
+    evidence:ruleSummary([...new Set(ruleIds)]),
+    scoringPolicy:"ranking-heuristic-v1",
+    confidence:"Quan hệ truyền thống có provenance; phần cộng/trừ điểm và strength vẫn là heuristic của ứng dụng."
   };
 }

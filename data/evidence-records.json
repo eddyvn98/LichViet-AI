@@ -1,0 +1,480 @@
+[
+  {
+    "id": "XJ-SANHE",
+    "sourceId": "xieji-benyuan",
+    "claimType": "branch-trine",
+    "locator": "本原一・三合・CTP chapter 530461 lines 90-93",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "canonical-traditional-relation",
+    "normalized": {
+      "water": [
+        "申",
+        "子",
+        "辰"
+      ],
+      "wood": [
+        "亥",
+        "卯",
+        "未"
+      ],
+      "fire": [
+        "寅",
+        "午",
+        "戌"
+      ],
+      "metal": [
+        "巳",
+        "酉",
+        "丑"
+      ]
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XJ-LIUHE",
+    "sourceId": "xieji-benyuan",
+    "claimType": "branch-harmony",
+    "locator": "本原一・六合・CTP chapter 530461 lines 94-97",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "canonical-traditional-relation",
+    "normalized": [
+      [
+        "子",
+        "丑"
+      ],
+      [
+        "寅",
+        "亥"
+      ],
+      [
+        "卯",
+        "戌"
+      ],
+      [
+        "辰",
+        "酉"
+      ],
+      [
+        "巳",
+        "申"
+      ],
+      [
+        "午",
+        "未"
+      ]
+    ],
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XJ-WUSHU",
+    "sourceId": "xieji-benyuan",
+    "claimType": "hour-stem-rule",
+    "locator": "本原一・五鼠遁・CTP chapter 530461 lines 99-101",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-hour-stem",
+    "normalized": {
+      "甲己": "甲子",
+      "乙庚": "丙子",
+      "丙辛": "戊子",
+      "丁壬": "庚子",
+      "戊癸": "壬子"
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XJ-WUHU",
+    "sourceId": "xieji-benyuan",
+    "claimType": "month-stem-rule",
+    "locator": "本原一・五虎遁・CTP chapter 530461 lines 102-104",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-month-stem",
+    "normalized": {
+      "甲己": "丙寅",
+      "乙庚": "戊寅",
+      "丙辛": "庚寅",
+      "丁壬": "壬寅",
+      "戊癸": "甲寅"
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XJ-WUHE",
+    "sourceId": "xieji-benyuan",
+    "claimType": "stem-combination",
+    "locator": "本原一・五合化气・CTP chapter 530461 lines 105-107",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "canonical-traditional-relation",
+    "normalized": [
+      [
+        "甲",
+        "己"
+      ],
+      [
+        "乙",
+        "庚"
+      ],
+      [
+        "丙",
+        "辛"
+      ],
+      [
+        "丁",
+        "壬"
+      ],
+      [
+        "戊",
+        "癸"
+      ]
+    ],
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "SHUIHUDI-12-DUTIES",
+    "sourceId": "shuihudi-qinjian",
+    "claimType": "twelve-day-officers",
+    "locator": "日书相关简文・CTP chapter 380254 lines 61-75",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "historical-support",
+    "normalized": {
+      "建": "良日/可起事",
+      "除": "除旧、交易等语义",
+      "满": "营建、生产等语义",
+      "平": "嫁娶、起事等语义",
+      "定": "收藏、官府室祠等语义",
+      "执": "出行不利等语义",
+      "破": "不宜有为",
+      "危": "责执攻击等语义",
+      "成": "谋事、兴大事",
+      "收": "收纳、婚娶等语义",
+      "开": "请谒等语义",
+      "闭": "蓄养、池事等语义"
+    },
+    "reviewStatus": "reviewed",
+    "note": "Dùng làm bằng chứng lịch sử cho hệ 12 Trực; không tự động coi nghĩa Tần đại là chuẩn hiện đại."
+  },
+  {
+    "id": "HKO-24-SOLAR-TERMS",
+    "sourceId": "hko-solar-terms",
+    "claimType": "astronomy-definition",
+    "locator": "The 24 Solar Terms・Table 1",
+    "evidenceLevel": "ASTRONOMY_OFFICIAL",
+    "applicability": "solar-longitude",
+    "normalized": {
+      "segmentDegrees": 15,
+      "vernalEquinoxLongitude": 0,
+      "springCommencesLongitude": 315
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "HKO-2026-MAJOR-TERMS",
+    "sourceId": "hko-almanac-2026",
+    "claimType": "astronomy-regression",
+    "locator": "Hong Kong Observatory Almanac 2026・24 Solar Terms",
+    "evidenceLevel": "ASTRONOMY_OFFICIAL",
+    "applicability": "solar-term-regression",
+    "normalized": {
+      "0": "2026-03-20T22:46:00+08:00",
+      "300": "2026-01-20T09:45:00+08:00",
+      "330": "2026-02-18T23:52:00+08:00",
+      "timezone": "UTC+8"
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "MLTY-LIUCHONG",
+    "sourceId": "mingli-tanyuan",
+    "claimType": "branch-clash",
+    "locator": "卷一本原・六冲・CTP chapter 184118 lines 5-7",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "supplemental-traditional-relation",
+    "normalized": [
+      [
+        "子",
+        "午"
+      ],
+      [
+        "丑",
+        "未"
+      ],
+      [
+        "寅",
+        "申"
+      ],
+      [
+        "卯",
+        "酉"
+      ],
+      [
+        "辰",
+        "戌"
+      ],
+      [
+        "巳",
+        "亥"
+      ]
+    ],
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "MLTY-LIUHAI",
+    "sourceId": "mingli-tanyuan",
+    "claimType": "branch-harm",
+    "locator": "卷一本原・六害・CTP chapter 184118 lines 8-10",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "supplemental-traditional-relation",
+    "normalized": [
+      [
+        "子",
+        "未"
+      ],
+      [
+        "丑",
+        "午"
+      ],
+      [
+        "寅",
+        "巳"
+      ],
+      [
+        "卯",
+        "辰"
+      ],
+      [
+        "申",
+        "亥"
+      ],
+      [
+        "酉",
+        "戌"
+      ]
+    ],
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "VN-UTC7-OFFICIAL",
+    "sourceId": "vn-timezone-decision-134",
+    "claimType": "official-timezone",
+    "locator": "Điều 1, Quyết định 134/2002/QĐ-TTg ngày 14/10/2002",
+    "evidenceLevel": "OFFICIAL_SECONDARY",
+    "applicability": "vietnam-civil-time",
+    "normalized": {
+      "utcOffsetHours": 7,
+      "official": true
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "HKO-2015-ALL-24-TERMS",
+    "sourceId": "hko-solar-terms-2015",
+    "claimType": "astronomy-regression",
+    "locator": "Official HKO 2015 table: all 24 Solar Terms",
+    "evidenceLevel": "ASTRONOMY_OFFICIAL",
+    "applicability": "solar-term-regression",
+    "normalized": {
+      "timezone": "UTC+8",
+      "coverage": "all-24-terms",
+      "stepDegrees": 15
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "VN-LUNAR-HND-ALGORITHM",
+    "sourceId": "vn-lunar-hnd",
+    "claimType": "vietnamese-lunar-algorithm",
+    "locator": "Thuật toán: New Moon, Sun Longitude, Lunar Month 11, Leap Month Offset, Solar↔Lunar conversion",
+    "evidenceLevel": "PRIMARY_FAMILY",
+    "applicability": "modern-vietnamese-lunar-calculation",
+    "normalized": {
+      "timezone": 7,
+      "basis": "astronomical new moon + solar longitude",
+      "conversion": [
+        "solar-to-lunar",
+        "lunar-to-solar"
+      ]
+    },
+    "reviewStatus": "reviewed",
+    "note": "Reference algorithm for modern UTC+7 calculation; historical promulgated calendars are a separate scope."
+  },
+  {
+    "id": "SFTK-HIDDEN-STEMS",
+    "sourceId": "shenfeng-tongkao",
+    "claimType": "earthly-branch-hidden-stems",
+    "locator": "十二支中所藏法・CTP chapter 472359 lines 169-170",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-hidden-stem-membership",
+    "normalized": {
+      "子": [
+        "癸"
+      ],
+      "丑": [
+        "己",
+        "辛",
+        "癸"
+      ],
+      "寅": [
+        "甲",
+        "丙",
+        "戊"
+      ],
+      "卯": [
+        "乙"
+      ],
+      "辰": [
+        "戊",
+        "乙",
+        "癸"
+      ],
+      "巳": [
+        "丙",
+        "戊",
+        "庚"
+      ],
+      "午": [
+        "丁",
+        "己"
+      ],
+      "未": [
+        "丁",
+        "乙",
+        "己"
+      ],
+      "申": [
+        "庚",
+        "壬",
+        "戊"
+      ],
+      "酉": [
+        "辛"
+      ],
+      "戌": [
+        "丁",
+        "辛",
+        "戊"
+      ],
+      "亥": [
+        "壬",
+        "甲"
+      ]
+    },
+    "reviewStatus": "reviewed",
+    "note": "Chỉ xác nhận thành phần tàng can; không xác nhận tỷ trọng 0.6/0.3/0.1."
+  },
+  {
+    "id": "SFTK-TEN-GODS",
+    "sourceId": "shenfeng-tongkao",
+    "claimType": "ten-gods-relations",
+    "locator": "天干五阳通变/天干五阴通变/阴阳通变妙诀・CTP chapter 472359 lines 447-472",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-ten-god-labels",
+    "normalized": {
+      "basis": "same/generates/controls/generated-by/controlled-by + yin-yang polarity",
+      "labels": [
+        "比肩",
+        "劫财",
+        "食神",
+        "伤官",
+        "偏财",
+        "正财",
+        "七杀",
+        "正官",
+        "偏印",
+        "正印"
+      ]
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "SFTK-STRENGTH-QUALITATIVE",
+    "sourceId": "shenfeng-tongkao",
+    "claimType": "seasonal-strength-qualitative",
+    "locator": "五行生克制化 lines 171-175; 节气歌断 lines 670-678",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-strength-qualitative-only",
+    "normalized": {
+      "numericFormula": false,
+      "seasonalContext": true,
+      "note": "Không xác nhận các trọng số số học của ứng dụng."
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XJ-HUANGHEI",
+    "sourceId": "xieji-huanghei",
+    "claimType": "yellow-black-path",
+    "locator": "卷七・義例五・黃道黑道・考原",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "day-and-hour-ecliptic-deity",
+    "normalized": {
+      "sequence": [
+        "青龙",
+        "明堂",
+        "天刑",
+        "朱雀",
+        "金匮",
+        "天德",
+        "白虎",
+        "玉堂",
+        "天牢",
+        "玄武",
+        "司命",
+        "勾陈"
+      ],
+      "good": [
+        "青龙",
+        "明堂",
+        "金匮",
+        "天德",
+        "玉堂",
+        "司命"
+      ],
+      "starts": {
+        "子": "申",
+        "午": "申",
+        "丑": "戌",
+        "未": "戌",
+        "寅": "子",
+        "申": "子",
+        "卯": "寅",
+        "酉": "寅",
+        "辰": "辰",
+        "戌": "辰",
+        "巳": "午",
+        "亥": "午"
+      }
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "QMDJ-HUANGHEI",
+    "sourceId": "qimen-huanghei",
+    "claimType": "yellow-black-path-crosscheck",
+    "locator": "卷二十・黃黑道日時・CTP chapter 703617 lines 1-3",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "day-and-hour-ecliptic-deity-crosscheck",
+    "normalized": {
+      "good": [
+        "青龙",
+        "明堂",
+        "金匮",
+        "天德",
+        "玉堂",
+        "司命"
+      ]
+    },
+    "reviewStatus": "reviewed"
+  },
+  {
+    "id": "XLKY-DUTY-TRANSITION",
+    "sourceId": "xingli-kaoyuan-yuejian",
+    "claimType": "twelve-duty-transition-day",
+    "locator": "卷五・月建十二神・CTP chapter 656830 lines 4-6",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "twelve-duty-day-transition",
+    "normalized": {
+      "rule": "每月交節則疊兩值日",
+      "interpretation": "Ngày chứa thời điểm giao tiết có hai Trực: trước và sau giao tiết."
+    },
+    "reviewStatus": "reviewed"
+  }
+]

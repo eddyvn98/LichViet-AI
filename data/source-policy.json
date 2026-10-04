@@ -1,5 +1,5 @@
 {
-  "version": "3.0",
+  "version": "4.0",
   "principles": [
     "Nguon goc va nguon chinh thuc co quyen cao hon implementation.",
     "Thu vien pho bien chi dung de cross-check, khong tu tao chan ly.",
@@ -49,5 +49,22 @@
     "medium": "PRIMARY_FAMILY hoac nhieu implementation dong thuan nhung chua co locator nguyen dien chinh xac.",
     "low": "Chi co implementation, heuristic, hoac co bat dong chua giai quyet.",
     "disputed": "Bat ky cross-check quan trong nao mau thuan voi engine; AI phai noi ro chua du can cu."
-  }
+  },
+  "authorityModel": {
+    "note": "Evidence precision và source authority là hai trục riêng. Locator chính xác không tự biến một nguồn bổ trợ thành canonical.",
+    "ranks": {
+      "0": "heuristic nội bộ",
+      "1": "tham khảo cộng đồng",
+      "2": "implementation cross-check",
+      "3": "tư liệu lịch sử/cổ thư bổ trợ",
+      "4": "nguồn cơ quan chính thức hoặc thuật toán tham chiếu mạnh",
+      "5": "nguồn chính thức thiên văn/tiêu chuẩn hoặc nguyên điển canonical trong đúng phạm vi"
+    }
+  },
+  "strongClaimRequirements": [
+    "không có dispute quan trọng",
+    "không phải heuristic",
+    "evidence đúng applicability",
+    "PRIMARY_EXACT cần authorityRank >= 4, hoặc ASTRONOMY_OFFICIAL"
+  ]
 }

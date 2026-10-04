@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { solarToVietnameseLunar } from "../src/vietnamese-lunar.js";
+import { solarToVietnameseLunar, vietnameseLunarToSolar, vietnameseLunarYearStructure } from "../src/vietnamese-lunar.js";
 import { getBaZi } from "../src/bazi.js";
 import { branchRelationship } from "../src/personal.js";
 
@@ -37,4 +37,54 @@ test("basic branch clash and harmony", () => {
   assert.equal(branchRelationship("卯","酉").type, "clash");
   assert.equal(branchRelationship("子","丑").type, "harmony");
   assert.equal(branchRelationship("子","寅").type, "neutral");
+});
+
+test("BaZi supports explicit 23:00 day-boundary school without changing default", () => {
+  const civil = getBaZi("2026-10-04", "23:30");
+  const zi = getBaZi("2026-10-04", "23:30", { dayBoundary:"zi-hour" });
+  assert.notEqual(civil.raw.day, zi.raw.day);
+  assert.match(civil.calculation.dayBoundary, /00:00/);
+  assert.match(zi.calculation.dayBoundary, /23:00/);
+});
+
+test("BaZi carries primary evidence refs and solar-term boundary metadata", () => {
+  const x = getBaZi("2026-10-04", "12:00");
+  assert.ok(x.calculation.evidenceRefs.includes("XJ-WUHU"));
+  assert.ok(x.calculation.evidenceRefs.includes("XJ-WUSHU"));
+  assert.equal(typeof x.boundary.distanceDegrees, "number");
+});
+
+test("Vietnam lunar conversion round-trips across representative dates", () => {
+  for (const date of ["2025-01-29","2025-08-01","2026-02-17","2026-03-19","2026-10-04","2027-02-06"]) {
+    const lunar = solarToVietnameseLunar(date);
+    const solar = vietnameseLunarToSolar(lunar);
+    assert.equal(solar.iso, date, `${date} -> ${JSON.stringify(lunar)} -> ${solar.iso}`);
+  }
+});
+
+test("Vietnam lunar reverse conversion rejects impossible leap flag", () => {
+  const normal = solarToVietnameseLunar("2026-10-04");
+  assert.equal(normal.leap, false);
+  assert.throws(
+    () => vietnameseLunarToSolar({ ...normal, leap:true }),
+    /nhuận|không tồn tại/i
+  );
+});
+
+test("Vietnam lunar year structure has 12/13 valid months", () => {
+  for (const year of [2024,2025,2026,2027]) {
+    const structure = vietnameseLunarYearStructure(year);
+    assert.ok([12,13].includes(structure.monthCount));
+    assert.ok(structure.months.every(x => x.days === 29 || x.days === 30));
+    assert.equal(structure.months.filter(x => x.leap).length <= 1, true);
+    assert.deepEqual(
+      [...new Set(structure.months.filter(x => !x.leap).map(x => x.month))].sort((a,b)=>a-b),
+      [1,2,3,4,5,6,7,8,9,10,11,12]
+    );
+  }
+});
+
+test("Vietnam lunar core rejects nonexistent Gregorian dates", () => {
+  assert.throws(() => solarToVietnameseLunar("2026-02-31"), /không tồn tại/i);
+  assert.throws(() => solarToVietnameseLunar("2026-13-01"), /không hợp lệ|phạm vi/i);
 });

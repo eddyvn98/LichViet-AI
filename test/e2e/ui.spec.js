@@ -86,8 +86,14 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("3.0.0");
-  expect(healthBody.engine).toBe("verified-engine");
+  expect(healthBody.version).toBe("4.0.0");
+  expect(healthBody.engine).toBe("verified-engine-v4");
+
+  const conversion = await request.post("/api/convert/lunar-to-solar", {
+    data: { day:24, month:8, year:2026, leap:false }
+  });
+  expect(conversion.ok()).toBeTruthy();
+  expect((await conversion.json()).iso).toBe("2026-10-04");
 
   const verification = await request.get("/api/verification");
   expect(verification.ok()).toBeTruthy();
@@ -97,6 +103,21 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
 
   const rules = await request.get("/api/rules");
   expect((await rules.json()).rules.length).toBeGreaterThanOrEqual(24);
+
+  const evidence = await request.get("/api/evidence?id=XJ-HUANGHEI");
+  expect(evidence.ok()).toBeTruthy();
+  const evidenceBody = await evidence.json();
+  expect(evidenceBody.records).toHaveLength(1);
+  expect(evidenceBody.records[0].id).toBe("XJ-HUANGHEI");
+  expect(evidenceBody.records[0].source?.id).toBe("xieji-huanghei");
+  expect(evidenceBody.records[0].locator).toBeTruthy();
+
+  const sources = await request.get("/api/sources");
+  expect(sources.ok()).toBeTruthy();
+  const sourcesBody = await sources.json();
+  expect(sourcesBody.sources.some(x =>
+    x.id === "xieji-huanghei" && Number(x.authorityRank) >= 4
+  )).toBeTruthy();
 
   const brief = await request.post("/api/brief", {
     data: {

@@ -3,7 +3,12 @@
     "id": "VN-LUNAR-2026-03-01",
     "date": "2026-03-01",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 1, "day": 13, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 1,
+      "day": 13,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED",
     "note": "Ca vang noi bo; khong dung de tu tuyen bo la primary-source verified."
   },
@@ -11,21 +16,36 @@
     "id": "VN-LUNAR-2026-03-19",
     "date": "2026-03-19",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 2, "day": 1, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 2,
+      "day": 1,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED"
   },
   {
     "id": "VN-LUNAR-2026-07-14",
     "date": "2026-07-14",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 6, "day": 1, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 6,
+      "day": 1,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED"
   },
   {
     "id": "VN-LUNAR-2026-10-04",
     "date": "2026-10-04",
     "kind": "vietnamese-lunar",
-    "expected": { "year": 2026, "month": 8, "day": 24, "leap": false },
+    "expected": {
+      "year": 2026,
+      "month": 8,
+      "day": 24,
+      "leap": false
+    },
     "status": "REGRESSION_LOCKED"
   },
   {
@@ -40,6 +60,306 @@
       "solarTerm": "Thu phân"
     },
     "status": "REGRESSION_LOCKED",
-    "crossCheck": ["lunar-javascript", "tyme4ts"]
+    "crossCheck": [
+      "lunar-javascript",
+      "tyme4ts"
+    ]
+  },
+  {
+    "id": "HKO-SOLAR-2026-300",
+    "kind": "solar-longitude-official",
+    "date": "2026-01-20",
+    "time": "08:45",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 300,
+    "toleranceDegrees": 0.25,
+    "evidenceRef": "HKO-2026-MAJOR-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-SOLAR-2026-330",
+    "kind": "solar-longitude-official",
+    "date": "2026-02-18",
+    "time": "22:52",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 330,
+    "toleranceDegrees": 0.25,
+    "evidenceRef": "HKO-2026-MAJOR-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-SOLAR-2026-000",
+    "kind": "solar-longitude-official",
+    "date": "2026-03-20",
+    "time": "21:46",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 0,
+    "toleranceDegrees": 0.25,
+    "evidenceRef": "HKO-2026-MAJOR-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-285",
+    "kind": "solar-longitude-official",
+    "date": "2015-01-05",
+    "time": "23:21",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 285,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-300",
+    "kind": "solar-longitude-official",
+    "date": "2015-01-20",
+    "time": "16:43",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 300,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-315",
+    "kind": "solar-longitude-official",
+    "date": "2015-02-04",
+    "time": "10:58",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 315,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-330",
+    "kind": "solar-longitude-official",
+    "date": "2015-02-19",
+    "time": "06:50",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 330,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-345",
+    "kind": "solar-longitude-official",
+    "date": "2015-03-06",
+    "time": "04:56",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 345,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-000",
+    "kind": "solar-longitude-official",
+    "date": "2015-03-21",
+    "time": "05:45",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 0,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-015",
+    "kind": "solar-longitude-official",
+    "date": "2015-04-05",
+    "time": "09:39",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 15,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-030",
+    "kind": "solar-longitude-official",
+    "date": "2015-04-20",
+    "time": "16:42",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 30,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-045",
+    "kind": "solar-longitude-official",
+    "date": "2015-05-06",
+    "time": "02:53",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 45,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-060",
+    "kind": "solar-longitude-official",
+    "date": "2015-05-21",
+    "time": "15:45",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 60,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-075",
+    "kind": "solar-longitude-official",
+    "date": "2015-06-06",
+    "time": "06:58",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 75,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-090",
+    "kind": "solar-longitude-official",
+    "date": "2015-06-21",
+    "time": "23:38",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 90,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-105",
+    "kind": "solar-longitude-official",
+    "date": "2015-07-07",
+    "time": "17:12",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 105,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-120",
+    "kind": "solar-longitude-official",
+    "date": "2015-07-23",
+    "time": "10:30",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 120,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-135",
+    "kind": "solar-longitude-official",
+    "date": "2015-08-08",
+    "time": "03:01",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 135,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-150",
+    "kind": "solar-longitude-official",
+    "date": "2015-08-23",
+    "time": "17:37",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 150,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-165",
+    "kind": "solar-longitude-official",
+    "date": "2015-09-08",
+    "time": "06:00",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 165,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-180",
+    "kind": "solar-longitude-official",
+    "date": "2015-09-23",
+    "time": "15:21",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 180,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-195",
+    "kind": "solar-longitude-official",
+    "date": "2015-10-08",
+    "time": "21:43",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 195,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-210",
+    "kind": "solar-longitude-official",
+    "date": "2015-10-24",
+    "time": "00:47",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 210,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-225",
+    "kind": "solar-longitude-official",
+    "date": "2015-11-08",
+    "time": "00:59",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 225,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-240",
+    "kind": "solar-longitude-official",
+    "date": "2015-11-22",
+    "time": "22:25",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 240,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-255",
+    "kind": "solar-longitude-official",
+    "date": "2015-12-07",
+    "time": "17:53",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 255,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "HKO-2015-TERM-270",
+    "kind": "solar-longitude-official",
+    "date": "2015-12-22",
+    "time": "11:48",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "expectedDegrees": 270,
+    "toleranceDegrees": 0.35,
+    "evidenceRef": "HKO-2015-ALL-24-TERMS",
+    "status": "OFFICIAL_GOLDEN"
   }
 ]

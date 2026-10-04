@@ -3,13 +3,16 @@ import { readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { analyzeBirthProfile } from "./src/bazi-profile.js";
+import { solarTermsForYear } from "./src/bazi.js";
 import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-service.js";
 import { buildBrief } from "./src/brief.js";
 import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
 import { allRules } from "./src/rule-engine.js";
 import { verificationCases, verificationSummary } from "./src/verification.js";
+import { allEvidenceRecords } from "./src/evidence.js";
 import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src/push.js";
 import { buildDayInfo, publicDay } from "./src/traditional.js";
+import { vietnameseLunarToSolar, vietnameseLunarYearStructure } from "./src/vietnamese-lunar.js";
 import { telegramStatus } from "./src/telegram.js";
 import {
   getNotificationSettings,
@@ -63,10 +66,27 @@ function queryDate(url,key="date") {
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:"3.0.0", engine:"verified-engine", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+    return json(res,200,{ ok:true, version:"4.0.0", engine:"verified-engine-v4", calendar:"Vietnam UTC+7", push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
+  }
+  if (req.method === "GET" && url.pathname === "/api/solar-terms") {
+    const year = Number(url.searchParams.get("year") || new Date().getFullYear());
+    return json(res,200,{ year, terms:solarTermsForYear(year) },"public, max-age=86400");
+  }
+  if (req.method === "GET" && url.pathname === "/api/lunar-year") {
+    const year = Number(url.searchParams.get("year") || new Date().getFullYear());
+    return json(res,200,vietnameseLunarYearStructure(year),"public, max-age=86400");
+  }
+  if (req.method === "POST" && url.pathname === "/api/convert/lunar-to-solar") {
+    const payload = await bodyJson(req);
+    return json(res,200,vietnameseLunarToSolar({
+      day:payload.day,
+      month:payload.month,
+      year:payload.year,
+      leap:Boolean(payload.leap)
+    }));
   }
   if (req.method === "GET" && url.pathname === "/api/range") {
     return json(res,200,{ days:rangeDays({
@@ -95,6 +115,17 @@ async function api(req,url,res) {
   }
   if (req.method === "GET" && url.pathname === "/api/rules") {
     return json(res,200,{ rules:allRules() },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/evidence") {
+    const id = url.searchParams.get("id");
+    const claimType = url.searchParams.get("claimType");
+    let records = allEvidenceRecords();
+    if (id) records = records.filter(x => x.id === id);
+    if (claimType) records = records.filter(x => x.claimType === claimType);
+    return json(res,200,{ records },"public, max-age=3600");
+  }
+  if (req.method === "GET" && url.pathname === "/api/sources") {
+    return json(res,200,{ sources },"public, max-age=3600");
   }
   if (req.method === "GET" && url.pathname === "/api/verification") {
     return json(res,200,verificationSummary(),"public, max-age=3600");
@@ -204,6 +235,6 @@ http.createServer(async(req,res) => {
     json(res,error.code === "ENOENT" ? 404 : 400,{ error:error.message || "Có lỗi xảy ra" });
   }
 }).listen(port,() => {
-  console.log(`LichViet AI v3 verified engine listening on ${port}`);
+  console.log(`LichViet AI v4 verified engine listening on ${port}`);
   startLocalNotificationScheduler();
 });

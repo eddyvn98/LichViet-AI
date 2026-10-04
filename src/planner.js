@@ -1,5 +1,6 @@
 import { buildDayInfo, publicDay } from "./traditional.js";
 import { evaluateDuty, ruleSummary } from "./rule-engine.js";
+import { scoreActivity } from "./scoring.js";
 
 export const ACTIVITIES = {
   contract:{ label:"Ký hợp đồng / giao dịch", positive:["交易","立券","纳财","开市"] },
@@ -20,21 +21,41 @@ function addDays(iso, n) {
 
 function activityScore(day, activity) {
   const cfg = ACTIVITIES[activity];
-  const dutyEval = evaluateDuty(day._dutyRaw, activity);
-  let score = day._ranking + dutyEval.score;
+  const dutyRaws = Array.isArray(day._dutyRaws) && day._dutyRaws.length
+    ? day._dutyRaws
+    : [day._dutyRaw];
+  const dutyEvaluations = dutyRaws.map(raw => evaluateDuty(raw, activity));
+  const dutyEval = {
+    activityDelta:Math.min(...dutyEvaluations.map(x => x.activityDelta)),
+    reasons:[...new Set(dutyEvaluations.flatMap(x => x.reasons))],
+    ruleIds:[...new Set(dutyEvaluations.flatMap(x => x.ruleIds))]
+  };
   const reasons = [...dutyEval.reasons];
   const ruleIds = [...dutyEval.ruleIds];
 
-  const recommendedHit = cfg.positive.find(x => day._rawRecommended.includes(x));
-  const avoidHit = cfg.positive.find(x => day._rawAvoid.includes(x));
+  if (dutyRaws.length > 1) {
+    reasons.unshift(
+      "Ngày giao tiết có hai Trực; planner dùng mức điểm bảo thủ hơn giữa trạng thái trước và sau giao tiết."
+    );
+  }
+
+  const advisoryAllowed = day._implementationAdviceUsable === true;
+  const recommendedHit = advisoryAllowed
+    ? cfg.positive.find(x => day._rawRecommended.includes(x))
+    : null;
+  const avoidHit = advisoryAllowed
+    ? cfg.positive.find(x => day._rawAvoid.includes(x))
+    : null;
+  const ranking = scoreActivity({
+    baseScore:day._ranking,
+    activityDelta:dutyEval.activityDelta
+  });
 
   if (recommendedHit) {
-    score += 28;
-    reasons.unshift("Việc này nằm trực tiếp trong nhóm “nên” của ngày.");
+    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên làm; chỉ hiển thị tham khảo, không cộng điểm.");
   }
   if (avoidHit) {
-    score -= 40;
-    reasons.unshift("Việc này nằm trực tiếp trong nhóm “nên tránh” của ngày.");
+    reasons.unshift("Implementation nghi/kỵ xếp việc này vào nhóm nên tránh; chỉ hiển thị tham khảo, không trừ điểm.");
   }
   if (day.personal?.signals?.some(x => x.level === "caution")) {
     reasons.push(day.personal.signals.find(x => x.level === "caution").detail);
@@ -42,9 +63,15 @@ function activityScore(day, activity) {
   if (day.personal?.signals?.some(x => x.level === "good")) {
     reasons.push(day.personal.signals.find(x => x.level === "good").detail);
   }
-  if (!reasons.length) reasons.push("Không có tín hiệu mạnh; xếp hạng theo tính chất chung của ngày.");
+  if (!reasons.length) {
+    reasons.push("Không có tín hiệu mạnh; xếp hạng theo chính sách heuristic công khai của app.");
+  }
 
-  return { score, reasons, ruleIds };
+  if (!advisoryAllowed) {
+    reasons.push("Nghi/kỵ chi tiết từ implementation bị loại khỏi điểm vì lịch UTC+7 không khớp reference ngày này.");
+  }
+
+  return { score:ranking.score, ranking, reasons, ruleIds, advisoryAllowed };
 }
 
 export function rankDays({ from, days = 14, activity = "contract", profile = null }) {
@@ -55,11 +82,16 @@ export function rankDays({ from, days = 14, activity = "contract", profile = nul
   for (let i = 0; i < count; i += 1) {
     const date = addDays(from, i);
     const day = buildDayInfo(date, profile);
-    const { score, reasons, ruleIds } = activityScore(day, activity);
+    const {
+      score, ranking, reasons, ruleIds, advisoryAllowed
+    } = activityScore(day, activity);
     ranked.push({
       ...publicDay(day),
-      match:score >= 78 ? "Ưu tiên" : score >= 62 ? "Có thể cân nhắc" : "Không ưu tiên",
+      match:score >= 72 ? "Ưu tiên" : score >= 52 ? "Có thể cân nhắc" : "Không ưu tiên",
       reasons,
+      activityRanking:ranking,
+      advisoryImplementationUsed:false,
+      advisoryImplementationVisible:advisoryAllowed,
       rankingProvenance:ruleSummary(ruleIds),
       _score:score
     });

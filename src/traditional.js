@@ -1,22 +1,41 @@
 import { SolarDay, SolarTime } from "tyme4ts";
-import { getBaZi } from "./bazi.js";
+import { getBaZi, jieMonthTransitionForDate } from "./bazi.js";
 import { personalizeDay } from "./personal-v2.js";
 import { evaluateDuty, ruleSummary } from "./rule-engine.js";
 import { branchVi, translateDuty, translateStar, translateTaboos } from "./i18n.js";
 import { solarToVietnameseLunar } from "./vietnamese-lunar.js";
 import { crossCheckDay } from "./crosscheck.js";
-import { assessEvidence } from "./evidence.js";
+import {
+  assessEvidence,
+  evidenceRecordById,
+  resolveEvidenceRecords
+} from "./evidence.js";
+import { classifyScore, scoreDayBase } from "./scoring.js";
+import { calculateTwelveDuty } from "./twelve-duty.js";
+import {
+  calculateEclipticDay,
+  eclipticHoursForDay,
+  goodEclipticHours
+} from "./ecliptic.js";
 
 const DUTY_FALLBACK = {
   "建":["khởi động việc nhỏ","lập kế hoạch"],
   "除":["dọn dẹp","loại bỏ việc tồn"],
   "满":["gặp gỡ","hoàn thiện việc đang làm"],
-  "平":["xử lý việc thường ngày"],"定":["chốt kế hoạch","ổn định công việc"],
-  "执":["theo đuổi việc đã định"],"破":["rà soát và sửa sai"],
-  "危":["việc quen thuộc, ít rủi ro"],"成":["hoàn tất việc quan trọng","ký kết"],
-  "收":["thu hồi, tổng kết"],"开":["bắt đầu công việc","gặp gỡ"],
+  "平":["xử lý việc thường ngày"],
+  "定":["chốt kế hoạch","ổn định công việc"],
+  "执":["theo đuổi việc đã định"],
+  "破":["rà soát và sửa sai"],
+  "危":["việc quen thuộc, ít rủi ro"],
+  "成":["hoàn tất việc quan trọng","ký kết"],
+  "收":["thu hồi, tổng kết"],
+  "开":["bắt đầu công việc","gặp gỡ"],
   "闭":["nghỉ ngơi, hoàn thiện nội bộ"]
 };
+
+const HOUR_BRANCHES = [
+  "子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"
+];
 
 function parseDate(iso) {
   const [y,m,d] = iso.split("-").map(Number);
@@ -26,41 +45,141 @@ function parseDate(iso) {
   return { y,m,d };
 }
 
-function verdict(score) {
-  if (score >= 70) return { code:"good", label:"Khá thuận" };
-  if (score >= 54) return { code:"normal", label:"Bình thường" };
-  return { code:"careful", label:"Nên thận trọng" };
+function normalizeDeity(raw) {
+  return raw === "元武" ? "玄武" : raw;
 }
 
-function hourRange(hour) {
-  if (hour === 0) return "23:00–00:59";
-  return `${String(hour - 1).padStart(2,"0")}:00–${String(hour).padStart(2,"0")}:59`;
+function verifiedGoodHours(dayBranch) {
+  return goodEclipticHours(dayBranch).map(x => ({
+    range:x.range,
+    branch:branchVi(x.branch),
+    star:translateStar(x.deity),
+    rawBranch:x.branch,
+    rawStar:x.deity,
+    source:"verified-engine",
+    evidenceLevel:"PRIMARY_EXACT",
+    evidenceRefs:x.evidenceRefs
+  }));
 }
 
-function goodHours(y,m,d) {
-  const out = [];
+function crossCheckEclipticHours(y, m, d, dayBranch) {
+  const expected = new Map(
+    eclipticHoursForDay(dayBranch).map(x => [x.branch, x])
+  );
+  const differences = [];
+
   for (let hour = 0; hour < 24; hour += 2) {
     const lunarHour = SolarTime.fromYmdHms(y,m,d,hour,0,0).getLunarHour();
     const star = lunarHour.getTwelveStar();
-    if (star.getEcliptic().getLuck().getName() === "吉") {
-      const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-      const branchRaw = branches[Math.floor((hour + 1) / 2) % 12];
-      out.push({
-        range:hourRange(hour),
-        branch:branchVi(branchRaw),
-        star:translateStar(star.getName()),
-        source:"tyme4ts",
-        evidenceLevel:"IMPLEMENTATION_CROSSCHECK"
+    const branch = HOUR_BRANCHES[Math.floor((hour + 1) / 2) % 12];
+    const actualDeity = normalizeDeity(star.getName());
+    const actualGood = star.getEcliptic().getLuck().getName() === "吉";
+    const engine = expected.get(branch);
+
+    if (!engine || engine.deity !== actualDeity || engine.good !== actualGood) {
+      differences.push({
+        branch,
+        engine:engine ? { deity:engine.deity, good:engine.good } : null,
+        reference:{ deity:actualDeity, good:actualGood }
       });
     }
   }
-  return out.slice(0, 6);
+
+  return {
+    id:"XCHK-ECLIPTIC-HOURS-TYME4TS",
+    provider:"tyme4ts",
+    family:"6tail",
+    scope:"ecliptic-hours",
+    status:differences.length ? "disputed" : "agree",
+    differences,
+    note:"Giờ Hoàng/Hắc đạo do engine tự tính; Tyme4TS chỉ dùng để cross-check."
+  };
 }
 
 function alignedWithVietnameseLunar(engineLunar, vn) {
   return Math.abs(engineLunar.getMonth()) === vn.month &&
     engineLunar.getDay() === vn.day &&
     engineLunar.getYear() === vn.year;
+}
+
+function unique(values) {
+  return [...new Set(values)];
+}
+
+function buildDutyState(isoDate, bazi) {
+  const transition = jieMonthTransitionForDate(isoDate);
+  const monthBranches = transition
+    ? [transition.previousMonthBranch, transition.newMonthBranch]
+    : [bazi.branches.month];
+
+  const candidates = monthBranches.map(monthBranch => {
+    const calculation = calculateTwelveDuty(
+      monthBranch,
+      bazi.branches.day
+    );
+    const evaluation = evaluateDuty(calculation.raw);
+    return {
+      monthBranch,
+      raw:calculation.raw,
+      calculation,
+      evaluation
+    };
+  });
+
+  const primary = candidates[candidates.length - 1];
+  return {
+    transition:transition ? {
+      ...transition,
+      evidenceRefs:[
+        ...transition.evidenceRefs,
+        "XLKY-DUTY-TRANSITION"
+      ]
+    } : null,
+    candidates,
+    primary,
+    dutyRaws:unique(candidates.map(x => x.raw)),
+    baseScore:Math.min(...candidates.map(x => x.evaluation.baseScore)),
+    ruleIds:unique(candidates.flatMap(x => x.evaluation.ruleIds)),
+    evidence:candidates.flatMap(x => x.evaluation.evidence || []),
+    scoringPolicy:transition ? "conservative-minimum" : "single-duty"
+  };
+}
+
+function buildEclipticState(dutyState, bazi) {
+  const monthBranches = dutyState.candidates.map(x => x.monthBranch);
+  const candidates = monthBranches.map(monthBranch =>
+    calculateEclipticDay(monthBranch, bazi.branches.day)
+  );
+  const primary = candidates[candidates.length - 1];
+
+  return {
+    transition:dutyState.transition,
+    candidates,
+    primary,
+    conservativeGood:candidates.every(x => x.good),
+    evidenceRefs:["XJ-HUANGHEI","QMDJ-HUANGHEI"]
+  };
+}
+
+function displayDuty(state) {
+  return state.candidates
+    .map(x => translateDuty(x.raw))
+    .filter((x,i,a) => a.indexOf(x) === i)
+    .join(" → ");
+}
+
+function displayDeity(state) {
+  return state.candidates
+    .map(x => translateStar(x.deity))
+    .filter((x,i,a) => a.indexOf(x) === i)
+    .join(" → ");
+}
+
+function displayEcliptic(state) {
+  return state.candidates
+    .map(x => x.good ? "Hoàng đạo" : "Hắc đạo")
+    .filter((x,i,a) => a.indexOf(x) === i)
+    .join(" → ");
 }
 
 export function buildDayInfo(isoDate, profile = null) {
@@ -70,33 +189,49 @@ export function buildDayInfo(isoDate, profile = null) {
   const vnLunar = solarToVietnameseLunar(isoDate);
   const aligned = alignedWithVietnameseLunar(engineLunar, vnLunar);
 
-  const dutyRaw = engineLunar.getDuty().getName();
-  const dutyEval = evaluateDuty(dutyRaw);
-  const star = engineLunar.getTwelveStar();
-  const eclipticGood = star.getEcliptic().getLuck().getName() === "吉";
+  const bazi = getBaZi(isoDate, "12:00");
+  const dutyState = buildDutyState(isoDate, bazi);
+  const eclipticState = buildEclipticState(dutyState, bazi);
+
+  const tymeDutyRaw = engineLunar.getDuty().getName();
+  const tymeStar = engineLunar.getTwelveStar();
+  const tymeStarRaw = normalizeDeity(tymeStar.getName());
   const rawRecommended = engineLunar.getRecommends().map(x => x.getName());
   const rawAvoid = engineLunar.getAvoids().map(x => x.getName());
 
   let recommended = aligned ? translateTaboos(rawRecommended) : [];
   let avoid = aligned ? translateTaboos(rawAvoid) : [];
-  let recommendationOrigin = aligned ? "tyme4ts-crosscheck" : "duty-fallback";
+  let recommendationOrigin = aligned ? "tyme4ts-advisory" : "duty-fallback";
 
   if (!recommended.length) {
-    recommended = DUTY_FALLBACK[dutyRaw] || ["việc thường ngày"];
+    recommended = unique(
+      dutyState.dutyRaws.flatMap(raw => DUTY_FALLBACK[raw] || [])
+    );
+    if (!recommended.length) recommended = ["việc thường ngày"];
     recommendationOrigin = "duty-fallback";
   }
   if (!avoid.length) {
     avoid = ["không có kiêng kỵ nổi bật trong lớp quy tắc đang bật"];
   }
 
-  const bazi = getBaZi(isoDate, "12:00");
   const personal = personalizeDay(profile, bazi);
+  const ranking = {
+    ...scoreDayBase({
+      dutyBase:dutyState.baseScore,
+      eclipticGood:eclipticState.conservativeGood,
+      personalDelta:personal?.delta || 0
+    }),
+    transitionPolicy:dutyState.transition
+      ? "conservative-minimum-across-jie-transition"
+      : "single-state"
+  };
 
-  let score = 55 + dutyEval.score + (eclipticGood ? 6 : -5);
-  if (personal) score += personal.delta;
-
-  const ruleIds = [...dutyEval.ruleIds, ...(personal?.ruleIds || [])];
+  const ruleIds = unique([
+    ...dutyState.ruleIds,
+    ...(personal?.ruleIds || [])
+  ]);
   const rules = ruleSummary(ruleIds);
+
   const crossChecks = crossCheckDay({
     date:isoDate,
     time:"12:00",
@@ -104,60 +239,185 @@ export function buildDayInfo(isoDate, profile = null) {
     bazi,
     tymeAligned:aligned
   });
-  const evidence = rules.map(r => r.evidence).filter(Boolean);
-  const evidenceConfidence = assessEvidence({
+
+  const dutyMatch = dutyState.dutyRaws.includes(tymeDutyRaw);
+  crossChecks.push({
+    id:"XCHK-DUTY-TYME4TS",
+    provider:"tyme4ts",
+    family:"6tail",
+    scope:"twelve-duty",
+    status:dutyMatch ? "agree" : "disputed",
+    differences:dutyMatch ? [] : [{
+      field:"duty",
+      engine:dutyState.dutyRaws,
+      reference:tymeDutyRaw
+    }],
+    note:dutyState.transition
+      ? "Ngày giao tiết có thể chồng hai Trực theo nguyên điển; Tyme4TS chỉ cần khớp một trạng thái hợp lệ."
+      : "12 Trực do engine tự tính; Tyme4TS chỉ dùng để cross-check."
+  });
+
+  const deityCandidates = eclipticState.candidates.map(x => x.deity);
+  const deityMatch = deityCandidates.includes(tymeStarRaw);
+  crossChecks.push({
+    id:"XCHK-ECLIPTIC-DAY-TYME4TS",
+    provider:"tyme4ts",
+    family:"6tail",
+    scope:"ecliptic-day",
+    status:deityMatch ? "agree" : "disputed",
+    differences:deityMatch ? [] : [{
+      field:"deity",
+      engine:deityCandidates,
+      reference:tymeStarRaw
+    }],
+    note:dutyState.transition
+      ? "Ngày giao tiết có hai neo tháng hợp lệ; Tyme4TS chỉ cần khớp một trạng thái."
+      : "Thần Hoàng/Hắc đạo ngày do engine tự tính; Tyme4TS chỉ dùng để cross-check."
+  });
+  crossChecks.push(
+    crossCheckEclipticHours(y,m,d,bazi.branches.day)
+  );
+
+  const evidence = [
+    ...rules.map(r => r.evidence).filter(Boolean),
+    evidenceRecordById("XJ-HUANGHEI"),
+    ...(dutyState.transition
+      ? [evidenceRecordById("XLKY-DUTY-TRANSITION")]
+      : [])
+  ].filter(Boolean);
+
+  const factConfidence = assessEvidence({
     evidence,
     crossChecks,
-    experimental:Boolean(personal)
+    experimental:false
   });
+
+  const evidenceRecordIds = unique([
+    ...(vnLunar.calculation?.evidenceRefs || []),
+    ...(bazi.calculation?.evidenceRefs || []),
+    ...dutyState.candidates.flatMap(x =>
+      x.evaluation.evidence?.flatMap(e => e.evidenceRefs || []) || []
+    ),
+    ...eclipticState.evidenceRefs,
+    ...(dutyState.transition?.evidenceRefs || []),
+    ...(personal?.evidence?.flatMap(x => x.evidence?.evidenceRefs || []) || [])
+  ]);
 
   return {
     date:isoDate,
     lunar:vnLunar,
-    canChi:{ year:bazi.vi.year, month:bazi.vi.month, day:bazi.vi.day },
+    canChi:{
+      year:bazi.vi.year,
+      month:bazi.vi.month,
+      day:bazi.vi.day
+    },
     solarTerm:bazi.solarTerm,
-    duty:translateDuty(dutyRaw),
-    twelveStar:translateStar(star.getName()),
-    ecliptic:eclipticGood ? "Hoàng đạo" : "Hắc đạo",
-    verdict:verdict(score),
+    baziBoundary:bazi.boundary,
+    duty:displayDuty(dutyState),
+    dutyTransition:dutyState.transition ? {
+      term:dutyState.transition.term,
+      at:dutyState.transition.moment.iso,
+      before:translateDuty(dutyState.candidates[0].raw),
+      after:translateDuty(dutyState.candidates[1].raw),
+      evidenceRefs:dutyState.transition.evidenceRefs
+    } : null,
+    twelveStar:displayDeity(eclipticState),
+    ecliptic:displayEcliptic(eclipticState),
+    eclipticTransition:dutyState.transition ? {
+      at:dutyState.transition.moment.iso,
+      before:{
+        deity:translateStar(eclipticState.candidates[0].deity),
+        type:eclipticState.candidates[0].good ? "Hoàng đạo" : "Hắc đạo"
+      },
+      after:{
+        deity:translateStar(eclipticState.candidates[1].deity),
+        type:eclipticState.candidates[1].good ? "Hoàng đạo" : "Hắc đạo"
+      },
+      evidenceRefs:eclipticState.evidenceRefs
+    } : null,
+    verdict:classifyScore(ranking.score),
+    ranking,
     recommended,
     avoid,
     recommendationOrigin,
-    goodHours:goodHours(y,m,d),
+    goodHours:verifiedGoodHours(bazi.branches.day),
     personal,
     provenance:{
       ruleIds,
       rules,
       crossChecks,
+      baziCalculation:bazi.calculation,
+      dutyCalculation:dutyState,
+      eclipticCalculation:eclipticState,
+      evidenceRecords:resolveEvidenceRecords(evidenceRecordIds),
       implementationNotes:[
-        "Tyme4TS cung cấp nghi/kỵ, 12 Trực, thần trực nhật và giờ hoàng/hắc đạo.",
+        "12 Trực do verified engine tự tính; ngày giao tiết giữ cả trạng thái trước/sau theo nguyên điển.",
+        "Hoàng/Hắc đạo ngày và giờ do verified engine tự tính theo Hiệp Kỷ Biện Phương Thư.",
+        "Tyme4TS chỉ cung cấp nghi/kỵ chi tiết dạng advisory và cross-check các phép tính cốt lõi.",
         "lunar-javascript dùng để cross-check Can Chi và lịch âm.",
-        "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập."
+        "Tyme4TS và lunar-javascript cùng family 6tail nên không được tính là hai nguồn độc lập.",
+        "Điểm ranking là heuristic của app, tách biệt với độ tin cậy của facts."
       ]
     },
     confidence:{
-      overall:evidenceConfidence,
-      calendar:crossChecks.some(x => x.scope === "lunar-calendar" && x.status === "disputed")
-        ? "cần rà soát"
-        : "cao cho engine Việt UTC+7",
-      traditionalRules:evidenceConfidence.code,
-      personalization:personal ? "experimental-heuristic" : "chưa bật",
-      note:evidenceConfidence.code === "disputed"
+      facts:factConfidence,
+      ranking:{
+        code:"experimental",
+        label:"Điểm xếp hạng là heuristic",
+        canMakeStrongClaim:false,
+        policy:ranking.policy.id
+      },
+      calendar:crossChecks.some(x =>
+        x.scope === "lunar-calendar" && x.status === "disputed"
+      ) ? "cần rà soát" : "cao cho engine Việt UTC+7",
+      traditionalRules:factConfidence.code,
+      advisoryRecommendations:aligned
+        ? "implementation-advisory"
+        : "disabled-because-calendar-not-aligned",
+      personalization:personal
+        ? "mixed-provenance-plus-heuristic-score"
+        : "chưa bật",
+      boundary:dutyState.transition
+        ? "jie-transition-day"
+        : bazi.boundary.nearBoundary
+          ? "near-solar-term-boundary"
+          : "normal",
+      note:factConfidence.code === "disputed"
         ? "Có bất đồng kỹ thuật trong cross-check; AI phải trình bày thận trọng."
-        : aligned
-          ? "Engine Việt và implementation cross-check trùng ngày âm ở ngày này."
-          : "Có khác biệt với implementation lịch Trung Quốc; giữ kết quả UTC+7 và hạ mức tin cậy phần nghi/kỵ."
+        : dutyState.transition
+          ? `Ngày giao ${dutyState.transition.term}; Trực và Hoàng/Hắc đạo ngày có trạng thái trước/sau tại ${dutyState.transition.moment.time}.`
+          : bazi.boundary.nearBoundary
+            ? "Gần ranh giới tiết khí; ca quan trọng cần xác minh thời điểm tiết khí chính xác."
+            : aligned
+              ? "Engine Việt và implementation cross-check trùng ngày âm ở ngày này."
+              : "Có khác biệt với implementation lịch Trung Quốc; nghi/kỵ advisory bị loại khỏi ranking."
     },
-    evidence:["vn-lunar-hnd","vn-archives-hiep-ky","xieji","tyme4ts","lunar-javascript"],
+    evidence:[
+      "VN-LUNAR-HND-ALGORITHM",
+      "VN-UTC7-OFFICIAL",
+      "XJ-HUANGHEI",
+      "tyme4ts",
+      "lunar-javascript"
+    ],
     disclaimer:"Cát/hung là diễn giải theo hệ truyền thống, không phải dự đoán khoa học hay bảo đảm kết quả.",
-    _ranking:score,
+    _ranking:ranking.score,
     _rawRecommended:rawRecommended,
     _rawAvoid:rawAvoid,
-    _dutyRaw:dutyRaw
+    _implementationAdviceUsable:aligned,
+    _dutyRaw:dutyState.primary.raw,
+    _dutyRaws:dutyState.dutyRaws
   };
 }
 
 export function publicDay(info) {
-  const { _ranking, _rawRecommended, _rawAvoid, _dutyRaw, ...publicInfo } = info;
+  const {
+    _ranking,
+    _rawRecommended,
+    _rawAvoid,
+    _implementationAdviceUsable,
+    _dutyRaw,
+    _dutyRaws,
+    ...publicInfo
+  } = info;
   return publicInfo;
 }
