@@ -22,12 +22,14 @@ export async function listSubscriptions() {
   return readAll();
 }
 
-export async function upsertSubscription({ subscription, profile = null, plans = [], reminderTime = "07:30" }) {
+export async function upsertSubscription({ subscription, profile = null, profiles = [], plans = [], reminderTime = "07:30" }) {
   if (!subscription?.endpoint) throw new Error("Push subscription không hợp lệ");
   const all = await readAll();
   const id = idFor(subscription.endpoint);
   const item = {
-    id, subscription, profile, plans:plans.slice(0,20), reminderTime,
+    id, subscription, profile,
+    profiles:Array.isArray(profiles) ? profiles.slice(0,8) : [],
+    plans:plans.slice(0,20), reminderTime,
     updatedAt:new Date().toISOString()
   };
   const index = all.findIndex(x => x.id === id);
