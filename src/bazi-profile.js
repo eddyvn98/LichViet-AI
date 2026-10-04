@@ -1,4 +1,4 @@
-import { getBaZi } from "./bazi.js";
+import { birthPillarUncertainty, getBaZi } from "./bazi.js";
 import { BRANCH, STEM, pillarVi } from "./i18n.js";
 
 const STEM_META = {
@@ -116,45 +116,66 @@ export function analyzeBirthProfile(birthDate, birthTime = "", options = {}) {
   if (!birthDate) return null;
   const hasTime = /^\d{2}:\d{2}$/.test(birthTime);
   const bazi = getBaZi(birthDate, hasTime ? birthTime : "12:00", options);
+  const uncertainty = hasTime ? null : birthPillarUncertainty(birthDate, options);
+  const ambiguous = new Set(uncertainty?.ambiguousFields || []);
   const rawPillars = hasTime
     ? [bazi.raw.year,bazi.raw.month,bazi.raw.day,bazi.raw.hour]
     : [bazi.raw.year,bazi.raw.month,bazi.raw.day];
-  const dayStem = bazi.raw.day[0];
-  const balance = elementBalance(rawPillars);
-  const strength = strengthHeuristic(dayStem, bazi.branches.month, balance);
+  const dayStable = !ambiguous.has("day");
+  const yearStable = !ambiguous.has("year");
+  const advancedAnalysisAvailable = !uncertainty?.ambiguous;
+  const dayStem = dayStable ? bazi.raw.day[0] : null;
+  const balance = advancedAnalysisAvailable ? elementBalance(rawPillars) : null;
+  const strength = advancedAnalysisAvailable
+    ? strengthHeuristic(dayStem, bazi.branches.month, balance)
+    : null;
 
-  const stemGods = rawPillars.map((p, i) => ({
-    pillar:["Năm","Tháng","Ngày","Giờ"][i],
-    stem:STEM[p[0]] || p[0],
-    rawStem:p[0],
-    relation:i === 2 ? "Nhật chủ" : tenGod(dayStem, p[0])
-  }));
+  const stemGods = advancedAnalysisAvailable
+    ? rawPillars.map((p, i) => ({
+        pillar:["Năm","Tháng","Ngày","Giờ"][i],
+        stem:STEM[p[0]] || p[0],
+        rawStem:p[0],
+        relation:i === 2 ? "Nhật chủ" : tenGod(dayStem, p[0])
+      }))
+    : [];
+
+  const displayPillar = field => uncertainty?.candidates?.[field]?.length > 1
+    ? uncertainty.candidates[field].map(pillarVi).join(" / ")
+    : bazi.vi[field];
 
   return {
     birthDate,
     birthTime:hasTime ? birthTime : null,
-    pillars:rawPillars.map(pillarVi),
+    pillars:hasTime
+      ? rawPillars.map(pillarVi)
+      : [displayPillar("year"), displayPillar("month"), displayPillar("day")],
     rawPillars,
-    yearBranch:bazi.branches.year,
-    dayBranch:bazi.branches.day,
-    yearBranchVi:BRANCH[bazi.branches.year],
-    dayBranchVi:BRANCH[bazi.branches.day],
+    pillarUncertainty:uncertainty,
+    yearBranch:yearStable ? bazi.branches.year : null,
+    dayBranch:dayStable ? bazi.branches.day : null,
+    yearBranchVi:yearStable ? BRANCH[bazi.branches.year] : null,
+    dayBranchVi:dayStable ? BRANCH[bazi.branches.day] : null,
     boundary:bazi.boundary,
     calculation:bazi.calculation,
-    dayMaster:{
+    dayMaster:dayStable ? {
       raw:dayStem,
       name:STEM[dayStem],
       element:ELEMENT_VI[STEM_META[dayStem][0]],
       polarity:STEM_META[dayStem][1] === "yang" ? "Dương" : "Âm"
-    },
+    } : null,
     elements:balance,
     elementBalanceMethod:{
       id:"weighted-hidden-stems-v1",
       evidenceLevel:"EXPERIMENTAL",
       affectsRanking:false,
-      note:"Tàng can membership có provenance; trọng số số học dùng cho biểu đồ là heuristic."
+      available:advancedAnalysisAvailable,
+      note:advancedAnalysisAvailable
+        ? "Tàng can membership có provenance; trọng số số học dùng cho biểu đồ là heuristic."
+        : "Tạm ẩn vì thiếu giờ sinh đúng ngày có ranh giới trụ; không chọn tùy ý một phía của ranh giới."
     },
-    hiddenStems:hiddenStemDetails(rawPillars, dayStem),
+    hiddenStems:advancedAnalysisAvailable
+      ? hiddenStemDetails(rawPillars, dayStem)
+      : [],
     hiddenStemEvidence:{
       evidenceRefs:["SFTK-HIDDEN-STEMS"],
       membershipVerified:true,
@@ -167,12 +188,20 @@ export function analyzeBirthProfile(birthDate, birthTime = "", options = {}) {
       evidenceLevel:"PRIMARY_EXACT",
       sourceAuthority:"supplemental-classic-authority-3",
       evidenceRefs:["SFTK-TEN-GODS"],
-      affectsRanking:false
+      affectsRanking:false,
+      available:advancedAnalysisAvailable
     },
-    completeness:hasTime ? "four-pillars" : "three-pillars",
+    advancedAnalysisAvailable,
+    completeness:hasTime
+      ? "four-pillars"
+      : uncertainty?.ambiguous
+        ? "three-pillars-boundary-ambiguous"
+        : "three-pillars",
     note:hasTime
       ? "Đủ 4 trụ theo giờ sinh đã nhập."
-      : "Chưa có giờ sinh nên phần giờ và các suy luận phụ thuộc giờ bị bỏ qua; app không tự đoán."
+      : uncertainty?.ambiguous
+        ? "Thiếu giờ sinh đúng ngày có ranh giới tiết khí; app giữ cả khả năng trước/sau và tạm ẩn phân tích sâu phụ thuộc trụ chưa chốt."
+        : "Chưa có giờ sinh nên phần giờ và các suy luận phụ thuộc giờ bị bỏ qua; app không tự đoán."
   };
 }
 
