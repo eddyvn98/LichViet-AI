@@ -204,5 +204,21 @@
       "branch-relations-supplement"
     ],
     "usedFor": "Locator rõ cho Lục xung và Lục hại; dùng bổ trợ, không vượt quyền Hiệp Kỷ."
+  },
+  {
+    "id": "vn-timezone-decision-134",
+    "name": "Quyết định 134/2002/QĐ-TTg về tính lịch và quản lý lịch",
+    "publisher": "Thủ tướng Chính phủ / Cổng Thông tin điện tử Chính phủ",
+    "url": "https://vanban.chinhphu.vn/default.aspx?docid=11139&pageid=27160",
+    "type": "văn bản pháp quy chính thức",
+    "strength": "rất cao trong phạm vi giờ chính thức Việt Nam",
+    "role": "official-law",
+    "family": "vietnam-government",
+    "evidenceLevel": "OFFICIAL_SECONDARY",
+    "authorityRank": 5,
+    "canonicalFor": [
+      "vietnam-civil-time"
+    ],
+    "usedFor": "Xác lập múi giờ thứ 7 là giờ chính thức của Việt Nam."
   }
 ]
