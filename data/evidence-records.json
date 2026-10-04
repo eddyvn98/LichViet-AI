@@ -295,5 +295,69 @@
     },
     "reviewStatus": "reviewed",
     "note": "Reference algorithm for modern UTC+7 calculation; historical promulgated calendars are a separate scope."
+  },
+  {
+    "id": "SFTK-HIDDEN-STEMS",
+    "sourceId": "shenfeng-tongkao",
+    "claimType": "earthly-branch-hidden-stems",
+    "locator": "十二支中所藏法・CTP chapter 472359 lines 169-170",
+    "evidenceLevel": "PRIMARY_EXACT",
+    "applicability": "bazi-hidden-stem-membership",
+    "normalized": {
+      "子": [
+        "癸"
+      ],
+      "丑": [
+        "己",
+        "辛",
+        "癸"
+      ],
+      "寅": [
+        "甲",
+        "丙",
+        "戊"
+      ],
+      "卯": [
+        "乙"
+      ],
+      "辰": [
+        "戊",
+        "乙",
+        "癸"
+      ],
+      "巳": [
+        "丙",
+        "戊",
+        "庚"
+      ],
+      "午": [
+        "丁",
+        "己"
+      ],
+      "未": [
+        "丁",
+        "乙",
+        "己"
+      ],
+      "申": [
+        "庚",
+        "壬",
+        "戊"
+      ],
+      "酉": [
+        "辛"
+      ],
+      "戌": [
+        "丁",
+        "辛",
+        "戊"
+      ],
+      "亥": [
+        "壬",
+        "甲"
+      ]
+    },
+    "reviewStatus": "reviewed",
+    "note": "Chỉ xác nhận thành phần tàng can; không xác nhận tỷ trọng 0.6/0.3/0.1."
   }
 ]
