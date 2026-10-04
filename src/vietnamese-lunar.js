@@ -68,12 +68,12 @@ function calculationMeta(iso) {
     mode:"astronomical-UTC+7",
     timezone:"Asia/Ho_Chi_Minh",
     historicalReconstruction:false,
-    scope:iso >= "1976-01-01"
-      ? "modern-national-utc7"
-      : "proleptic-modern-utc7",
-    scopeNote:iso >= "1976-01-01"
-      ? "Dùng quy tắc thiên văn UTC+7 cho lịch Việt Nam hiện đại."
-      : "Ngày lịch sử được tính lùi theo quy tắc UTC+7 hiện đại; không khẳng định trùng lịch đã được ban hành tại mọi vùng ở thời điểm đó.",
+    scope:iso >= "2002-10-14"
+      ? "official-current-utc7-reference"
+      : "historical-proleptic-utc7",
+    scopeNote:iso >= "2002-10-14"
+      ? "UTC+7 được gắn với Quyết định 134/2002/QĐ-TTg; engine dùng quy tắc thiên văn hiện đại."
+      : "Engine tính lùi theo quy tắc thiên văn UTC+7 hiện đại; không khẳng định đây là lịch đã được ban hành tại mọi vùng trong lịch sử.",
     evidenceRefs:["VN-UTC7-OFFICIAL","VN-LUNAR-HND-ALGORITHM"]
   };
 }
