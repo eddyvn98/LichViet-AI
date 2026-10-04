@@ -361,5 +361,137 @@
     "toleranceDegrees": 0.35,
     "evidenceRef": "HKO-2015-ALL-24-TERMS",
     "status": "OFFICIAL_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-5EFA",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "建",
+    "expected": {
+      "traditionalClass": "bad",
+      "tier": "bad"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-9664",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "除",
+    "expected": {
+      "traditionalClass": "good",
+      "tier": "second-good"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-6EE1",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "满",
+    "expected": {
+      "traditionalClass": "bad",
+      "tier": "bad"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-5E73",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "平",
+    "expected": {
+      "traditionalClass": "bad",
+      "tier": "bad"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-5B9A",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "定",
+    "expected": {
+      "traditionalClass": "good",
+      "tier": "second-good"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-6267",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "执",
+    "expected": {
+      "traditionalClass": "good",
+      "tier": "good"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-7834",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "破",
+    "expected": {
+      "traditionalClass": "bad",
+      "tier": "very-bad"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-5371",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "危",
+    "expected": {
+      "traditionalClass": "good",
+      "tier": "top-good"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-6210",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "成",
+    "expected": {
+      "traditionalClass": "good",
+      "tier": "top-good"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-6536",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "收",
+    "expected": {
+      "traditionalClass": "bad",
+      "tier": "bad"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-5F00",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "开",
+    "expected": {
+      "traditionalClass": "good",
+      "tier": "top-good"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
+  },
+  {
+    "id": "XLKY-DUTY-95ED",
+    "kind": "twelve-duty-primary-golden",
+    "raw": "闭",
+    "expected": {
+      "traditionalClass": "bad",
+      "tier": "bad"
+    },
+    "evidenceRef": "XLKY-12-DUTY-CLASSIFICATION",
+    "status": "PRIMARY_GOLDEN"
   }
 ]
