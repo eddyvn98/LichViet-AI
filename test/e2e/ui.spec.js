@@ -182,11 +182,32 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const health = await request.get("/api/health");
   const healthBody = await health.json();
   expect(health.ok()).toBeTruthy();
-  expect(healthBody.version).toBe("7.0.0");
-  expect(healthBody.engine).toBe("verified-engine-v7");
+  expect(healthBody.version).toBe("8.0.0");
+  expect(healthBody.engine).toBe("verified-engine-v8");
   expect(healthBody.familyPolicy).toBe("family-personalization-v1");
   expect(healthBody.constraintPolicy).toBe("selection-constraints-v1");
   expect(healthBody.comparisonPolicy).toBe("deterministic-date-comparison-v1");
+
+  const ops = await request.get("/api/ops/status");
+  expect(ops.ok()).toBeTruthy();
+  const opsBody = await ops.json();
+  expect(opsBody.engine).toBe("verified-engine-v8");
+  expect(opsBody.runtimePolicy).toBe("atomic-runtime-store-v1");
+  expect("token" in opsBody).toBe(false);
+
+  const familyDay = await request.post("/api/family/day", {
+    data:{
+      date:"2026-10-04",
+      profiles:[
+        { id:"a", name:"A", birthDate:"1995-04-14", birthTime:"12:00" },
+        { id:"b", name:"B", birthDate:"1997-11-17", birthTime:"12:00" }
+      ]
+    }
+  });
+  expect(familyDay.ok()).toBeTruthy();
+  const familyDayBody = await familyDay.json();
+  expect(familyDayBody.policy.id).toBe("family-daily-summary-v1");
+  expect(familyDayBody.selectedCount).toBe(2);
 
   const conversion = await request.post("/api/convert/lunar-to-solar", {
     data: { day:24, month:8, year:2026, leap:false }
@@ -258,7 +279,7 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   });
   expect(feedback.ok()).toBeTruthy();
   const feedbackBody = await feedback.json();
-  expect(feedbackBody.engine).toBe("verified-engine-v7");
+  expect(feedbackBody.engine).toBe("verified-engine-v8");
   expect(feedbackBody.familyPolicy).toBe("family-personalization-v1");
   expect(feedbackBody.constraintPolicy).toBe("selection-constraints-v1");
 
@@ -335,4 +356,41 @@ test("notification topics can be selected and saved", async ({ page, request }) 
   expect(body.topics.plans).toBe(true);
   expect(body.topics.upcoming).toBe(false);
   expect(body.topics.personal).toBe(true);
+});
+
+
+test("V8 device backup round-trips family data", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+  await page.locator("#profileName").fill("Backup A");
+  await page.locator("#birthDate").fill("1995-04-14");
+  await page.locator("#birthTime").fill("12:00");
+  await page.getByRole("button", { name:"Lưu thành viên" }).click();
+
+  const payload = await page.evaluate(() => {
+    const keys = [
+      "lichviet.family.v1",
+      "lichviet.family.selection.v1",
+      "lichviet.family.active.v1",
+      "lichviet.profile.v2",
+      "lichviet.plans.v2",
+      "lichviet.reminder.v2"
+    ];
+    const data = {};
+    for (const key of keys) {
+      const raw = localStorage.getItem(key);
+      if (raw !== null) data[key] = JSON.parse(raw);
+    }
+    return { schema:"lichviet-device-backup-v1", version:1, data };
+  });
+
+  await page.evaluate(() => localStorage.clear());
+  await page.setInputFiles("#importBackupFile", {
+    name:"backup.json",
+    mimeType:"application/json",
+    buffer:Buffer.from(JSON.stringify(payload))
+  });
+  await page.waitForLoadState("domcontentloaded");
+  await page.getByRole("button", { name:"Hồ sơ" }).click();
+  await expect(page.locator("#familyMembers")).toContainText("Backup A");
 });
