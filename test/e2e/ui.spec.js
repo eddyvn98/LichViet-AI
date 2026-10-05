@@ -208,6 +208,10 @@ test("V2 APIs include rules, brief and push status", async ({ request }) => {
   const familyDayBody = await familyDay.json();
   expect(familyDayBody.policy.id).toBe("family-daily-summary-v1");
   expect(familyDayBody.selectedCount).toBe(2);
+  expect(JSON.stringify(familyDayBody)).not.toContain("1995-04-14");
+
+  const blockedTask = await request.post("/api/notifications/run-now");
+  expect(blockedTask.status()).toBe(401);
 
   const conversion = await request.post("/api/convert/lunar-to-solar", {
     data: { day:24, month:8, year:2026, leap:false }
@@ -385,12 +389,14 @@ test("V8 device backup round-trips family data", async ({ page }) => {
   });
 
   await page.evaluate(() => localStorage.clear());
-  await page.setInputFiles("#importBackupFile", {
-    name:"backup.json",
-    mimeType:"application/json",
-    buffer:Buffer.from(JSON.stringify(payload))
-  });
-  await page.waitForLoadState("domcontentloaded");
+  await Promise.all([
+    page.waitForNavigation({ waitUntil:"domcontentloaded" }),
+    page.setInputFiles("#importBackupFile", {
+      name:"backup.json",
+      mimeType:"application/json",
+      buffer:Buffer.from(JSON.stringify(payload))
+    })
+  ]);
   await page.getByRole("button", { name:"Hồ sơ" }).click();
   await expect(page.locator("#familyMembers")).toContainText("Backup A");
 });
