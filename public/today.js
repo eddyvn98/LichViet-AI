@@ -1,5 +1,5 @@
 import {
-  $, $$, api, escapeHtml, profileQuery, renderItems, shortDay, state, vnDate
+  $, $, api, escapeHtml, profileQuery, renderItems, selectedFamilyPayload, shortDay, state, vnDate
 } from "./core.js";
 
 function verdictColor(code) {
@@ -29,6 +29,34 @@ function renderPersonal(d) {
 
   $("#personalLine").innerHTML =
     "<b>Cá nhân:</b> " + escapeHtml(d.personal.summary) + " · " + signals;
+}
+
+async function loadFamilyDay(date) {
+  const el = $("#familyToday");
+  if (!el) return;
+  const profiles = selectedFamilyPayload();
+  if (!profiles.length) {
+    el.innerHTML = '<p class="note">Chưa chọn thành viên trong tab Hồ sơ.</p>';
+    return;
+  }
+  try {
+    const data = await api("/api/family/day", {
+      method:"POST",
+      body:{ date, profiles }
+    });
+    el.innerHTML =
+      '<b>' + escapeHtml(data.summary) + '</b>' +
+      '<small>Đang xét ' + data.availableCount + '/' + data.selectedCount + ' thành viên.</small>' +
+      (data.signals?.length
+        ? '<div class="family-today-signals">' +
+          data.signals.slice(0,4).map(x =>
+            '<span class="signal ' + escapeHtml(x.level) + '">' +
+            escapeHtml(x.memberName + ": " + x.label) + '</span>'
+          ).join("") + '</div>'
+        : '');
+  } catch (e) {
+    el.innerHTML = '<p class="note">' + escapeHtml(e.message) + '</p>';
+  }
 }
 
 async function loadWeek(from, onSelect) {
@@ -84,11 +112,11 @@ export async function loadDay() {
     $("#dayLoading").hidden = true;
     $("#dayContent").hidden = false;
 
-    await loadWeek(date, selected => {
+    await Promise.all([loadFamilyDay(date), loadWeek(date, selected => {
       $("#date").value = selected;
       loadDay();
       window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    })]);
   } catch (e) {
     $("#dayLoading").textContent = e.message;
   }
