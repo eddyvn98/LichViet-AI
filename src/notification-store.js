@@ -1,4 +1,4 @@
-import { readJsonFile, writeJsonAtomic } from "./atomic-json-store.js";
+import { readJsonFile, updateJsonAtomic } from "./atomic-json-store.js";
 
 const PATH = process.env.NOTIFICATION_SETTINGS_PATH ||
   "./data/runtime/notification-settings.json";
@@ -59,14 +59,15 @@ export async function saveNotificationSettings(input = {}) {
     updatedAt: new Date().toISOString()
   };
 
-  await writeJsonAtomic(PATH, next);
+  await updateJsonAtomic(PATH, DEFAULTS, () => next);
   return next;
 }
 
 export async function markNotificationSent(date) {
-  const current = await getNotificationSettings();
-  current.lastSentDate = date;
-  current.lastSentAt = new Date().toISOString();
-  await writeJsonAtomic(PATH, current);
-  return current;
+  return updateJsonAtomic(PATH, DEFAULTS, current => ({
+    ...DEFAULTS,
+    ...current,
+    lastSentDate:date,
+    lastSentAt:new Date().toISOString()
+  }));
 }
