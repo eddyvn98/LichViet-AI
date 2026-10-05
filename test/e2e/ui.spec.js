@@ -114,17 +114,35 @@ test("family registry drives constrained planner compare and feedback", async ({
   await page.locator("#planFrom").fill("2026-10-01");
   await page.locator("#activity").selectOption("meeting");
   await page.locator("#planDayType").selectOption("weekend");
-  await page.getByRole("button", { name:"Tìm ngày" }).click();
-
-  const count = await page.locator(".plan-card").count();
-  expect(count).toBeGreaterThan(0);
+  const [planResponse] = await Promise.all([
+    page.waitForResponse(r =>
+      r.url().endsWith("/api/plan") && r.request().method() === "POST"
+    ),
+    page.getByRole("button", { name:"Tìm ngày" }).click()
+  ]);
+  expect(planResponse.ok()).toBeTruthy();
+  const planBody = await planResponse.json();
+  expect(planBody.results.length).toBeGreaterThan(0);
+  await expect(page.locator(".plan-card")).toHaveCount(planBody.results.length);
   await expect(page.locator(".plan-card").first()).toContainText("gia đình 2/2");
 
   await page.locator("#compareDates").fill("2026-10-04, 2026-10-05");
-  await page.getByRole("button", { name:"So sánh trực tiếp" }).click();
+  const [compareResponse] = await Promise.all([
+    page.waitForResponse(r =>
+      r.url().endsWith("/api/compare") && r.request().method() === "POST"
+    ),
+    page.getByRole("button", { name:"So sánh trực tiếp" }).click()
+  ]);
+  expect(compareResponse.ok()).toBeTruthy();
   await expect(page.getByText("Ưu tiên trong nhóm so sánh:", { exact:false })).toBeVisible();
 
-  await page.locator('[data-feedback="review"]').first().click();
+  const [feedbackResponse] = await Promise.all([
+    page.waitForResponse(r =>
+      r.url().endsWith("/api/feedback") && r.request().method() === "POST"
+    ),
+    page.locator('[data-feedback="review"]').first().click()
+  ]);
+  expect(feedbackResponse.ok()).toBeTruthy();
   await page.getByRole("button", { name:"Hồ sơ" }).click();
   await expect(page.locator("#feedbackHistory")).toContainText("Cần rà");
 });
@@ -143,7 +161,9 @@ test("legacy single profile migrates into family registry", async ({ page }) => 
   await page.goto("/");
   await page.getByRole("button", { name:"Hồ sơ" }).click();
   await expect(page.locator(".family-member")).toHaveCount(1);
-  await expect(page.getByText("Hồ sơ cũ", { exact:true })).toBeVisible();
+  await expect(
+    page.locator("#familyMembers").getByText("Hồ sơ cũ", { exact:true })
+  ).toBeVisible();
 });
 
 test("sources page exposes rule catalog and limits", async ({ page }) => {
