@@ -1,5 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { readJsonFile, writeJsonAtomic } from "./atomic-json-store.js";
 import { engineManifest } from "./version.js";
 
 const PATH = process.env.SELECTION_FEEDBACK_PATH ||
@@ -7,12 +6,8 @@ const PATH = process.env.SELECTION_FEEDBACK_PATH ||
 const MAX_ITEMS = 500;
 
 async function readAll() {
-  try {
-    const parsed = JSON.parse(await readFile(PATH, "utf8"));
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  const parsed = await readJsonFile(PATH, []);
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 function cleanText(value, max) {
@@ -54,10 +49,7 @@ export async function saveSelectionFeedback(input = {}) {
 
   const items = await readAll();
   items.unshift(item);
-  await mkdir(dirname(PATH), { recursive:true });
-  await writeFile(PATH, JSON.stringify(items.slice(0,MAX_ITEMS),null,2), {
-    mode:0o600
-  });
+  await writeJsonAtomic(PATH, items.slice(0,MAX_ITEMS));
   return item;
 }
 
