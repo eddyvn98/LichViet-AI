@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { readJsonFile, writeJsonAtomic } from "./atomic-json-store.js";
 
 const PATH = process.env.PUSH_STORE_PATH || "./data/runtime/push-subscriptions.json";
 
@@ -9,13 +8,12 @@ function idFor(endpoint) {
 }
 
 async function readAll() {
-  try { return JSON.parse(await readFile(PATH, "utf8")); }
-  catch { return []; }
+  const parsed = await readJsonFile(PATH, []);
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 async function writeAll(items) {
-  await mkdir(dirname(PATH), { recursive:true });
-  await writeFile(PATH, JSON.stringify(items, null, 2), { mode:0o600 });
+  await writeJsonAtomic(PATH, items);
 }
 
 export async function listSubscriptions() {
