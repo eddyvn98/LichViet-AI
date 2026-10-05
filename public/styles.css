@@ -74,3 +74,13 @@ hr{border:0;border-top:1px solid var(--line);margin:26px 0}.reminder-row{display
 .family-actions,.feedback-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .active-family{outline:2px solid rgba(69,99,77,.16)}
 .feedback-actions{margin-top:10px}
+
+.family-today-card{margin-top:12px}
+.family-today{margin-top:10px}
+.family-today>b,.family-today>small{display:block}
+.family-today>small{margin-top:4px;color:var(--muted);font-size:12px}
+.family-today-signals{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.ops-status{align-items:flex-start;flex-direction:column}
+.ops-status small{display:block;margin-top:4px}
+.data-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.data-tools .ghost{margin:0}
