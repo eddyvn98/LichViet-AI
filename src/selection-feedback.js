@@ -1,4 +1,4 @@
-import { readJsonFile, writeJsonAtomic } from "./atomic-json-store.js";
+import { readJsonFile, updateJsonAtomic } from "./atomic-json-store.js";
 import { engineManifest } from "./version.js";
 
 const PATH = process.env.SELECTION_FEEDBACK_PATH ||
@@ -47,9 +47,10 @@ export async function saveSelectionFeedback(input = {}) {
     comparisonPolicy:manifest.comparisonPolicy
   };
 
-  const items = await readAll();
-  items.unshift(item);
-  await writeJsonAtomic(PATH, items.slice(0,MAX_ITEMS));
+  await updateJsonAtomic(PATH, [], items => {
+    const safe = Array.isArray(items) ? items : [];
+    return [item, ...safe].slice(0,MAX_ITEMS);
+  });
   return item;
 }
 
