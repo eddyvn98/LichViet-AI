@@ -30,11 +30,24 @@ function profileFromSettings(settings) {
     : null;
 }
 
+function profilesFromSettings(settings) {
+  return (Array.isArray(settings.profiles) ? settings.profiles : [])
+    .filter(x => x?.birthDate)
+    .slice(0,8)
+    .map((item,index) => ({
+      ...analyzeBirthProfile(item.birthDate,item.birthTime || ""),
+      id:String(item.id || `member-${index + 1}`).slice(0,80),
+      name:String(item.name || `Thành viên ${index + 1}`).slice(0,40)
+    }));
+}
+
 function buildContext(settings, date) {
   const profile = profileFromSettings(settings);
+  const profiles = profilesFromSettings(settings);
   const brief = buildBrief({
     date,
     profile,
+    profiles,
     plans: settings.plans || []
   });
 
@@ -70,7 +83,10 @@ function buildContext(settings, date) {
 
   if (settings.topics.personal) {
     context.selectedTopics.push("personal");
-    context.items.personal = brief.today.personal?.signals?.slice(0, 2) || [];
+    context.items.personal = {
+      activeProfile:brief.today.personal?.signals?.slice(0,2) || [],
+      familyProfileCount:profiles.length
+    };
   }
 
   return context;

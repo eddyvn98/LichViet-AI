@@ -29,6 +29,9 @@ jobs:
       - name: Validate knowledge base
         run: npm run validate:knowledge
 
+      - name: Frontend module syntax
+        run: npm run check:frontend
+
       - name: Unit smoke tests
         run: npm test
 

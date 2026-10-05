@@ -105,6 +105,8 @@
         <p>So sánh tối đa 60 ngày nhưng chỉ trả 5 lựa chọn đáng xem nhất.</p>
       </div>
 
+      <p class="note" id="plannerFamilyNote"></p>
+
       <div class="form-grid">
         <label>Việc cần làm
           <select id="activity"></select>
@@ -119,9 +121,41 @@
             <option value="60">60 ngày</option>
           </select>
         </label>
+        <label>Loại ngày
+          <select id="planDayType">
+            <option value="any">Bất kỳ</option>
+            <option value="weekend">Chỉ cuối tuần</option>
+            <option value="weekday">Chỉ ngày thường</option>
+          </select>
+        </label>
+        <label>Tránh ngày âm
+          <input id="avoidLunarDays" type="text" maxlength="40" placeholder="Ví dụ: 1, 15">
+        </label>
+        <label>Loại ngày cụ thể
+          <input id="excludeDates" type="text" maxlength="200" placeholder="2026-10-10, 2026-10-18">
+        </label>
       </div>
 
+      <label class="topic-option">
+        <input id="avoidJieTransition" type="checkbox">
+        <span><b>Tránh ngày giao tiết</b><small>Loại các ngày có hai trạng thái Trực trước/sau thời điểm giao tiết.</small></span>
+      </label>
+
       <button id="findDays" class="primary">Tìm ngày</button>
+
+      <hr>
+      <div class="section-title">
+        <h2>So sánh ngày cụ thể</h2>
+        <span>2–5 ngày</span>
+      </div>
+      <div class="form-grid">
+        <label>Ngày cần so sánh
+          <input id="compareDates" type="text" maxlength="100"
+            placeholder="2026-10-10, 2026-10-18">
+        </label>
+      </div>
+      <button id="compareDays" class="ghost">So sánh trực tiếp</button>
+
       <div id="planLoading" class="loading" hidden>Đang so sánh các ngày…</div>
       <div id="planResults" class="plan-results"></div>
     </section>
@@ -166,7 +200,25 @@
         <label>Đến
           <input id="intentTo" type="date">
         </label>
+        <label>Loại ngày
+          <select id="intentDayType">
+            <option value="any">Bất kỳ</option>
+            <option value="weekend">Chỉ cuối tuần</option>
+            <option value="weekday">Chỉ ngày thường</option>
+          </select>
+        </label>
+        <label>Tránh ngày âm
+          <input id="intentAvoidLunarDays" type="text" maxlength="40" placeholder="Ví dụ: 1, 15">
+        </label>
+        <label>Loại ngày cụ thể
+          <input id="intentExcludeDates" type="text" maxlength="200" placeholder="2026-10-10, 2026-10-18">
+        </label>
       </div>
+      <p class="note" id="intentFamilyNote"></p>
+      <label class="topic-option">
+        <input id="intentAvoidJieTransition" type="checkbox">
+        <span><b>Tránh ngày giao tiết</b><small>Áp dụng cho kế hoạch này khi trợ lý tự tìm ngày.</small></span>
+      </label>
       <button id="addPlan" class="primary">Theo dõi kế hoạch</button>
 
       <p class="note">
@@ -179,10 +231,19 @@
       <div class="section-head">
         <div>
           <p class="eyebrow">Cá nhân hóa</p>
-          <h1>Hồ sơ Bát Tự</h1>
+          <h1>Gia đình & Bát Tự</h1>
         </div>
         <p>Dữ liệu vẫn lưu ở trình duyệt, trừ khi bạn chủ động bật server push.</p>
       </div>
+
+      <div class="section-title">
+        <h2>Thành viên</h2>
+        <button id="newFamilyMember" class="ghost compact">+ Thêm người</button>
+      </div>
+      <p class="note" id="familySelectionNote"></p>
+      <div id="familyMembers" class="saved-plans"></div>
+
+      <hr>
 
       <div class="form-grid">
         <label>Tên hiển thị
@@ -197,7 +258,7 @@
         </label>
       </div>
 
-      <button id="saveProfile" class="primary">Lưu hồ sơ</button>
+      <button id="saveProfile" class="primary">Lưu thành viên</button>
       <div id="profileResult" class="profile-result"></div>
 
       <hr>
@@ -238,6 +299,13 @@
       <p class="note" id="reminderNote">
         Telegram chỉ dùng cho thông báo chủ động hằng ngày, không mirror mọi câu hỏi trên web.
       </p>
+
+      <hr>
+      <div class="section-title">
+        <h2>Kết quả đã đánh dấu</h2>
+        <span>fingerprint để rà lại</span>
+      </div>
+      <div id="feedbackHistory" class="saved-plans"></div>
 
       <hr>
       <a class="source-link" href="/sources.html">Nguồn, rule, phương pháp & giới hạn →</a>

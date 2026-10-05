@@ -1,5 +1,7 @@
 import {
-  $, api, escapeHtml, profilePayload, saveProfile, saveReminder, state, toast
+  $, $$, api, escapeHtml, familyPayload, profilePayload, removeFamilyMember,
+  saveProfile, saveReminder, setActiveFamilyMember, setSelectedFamilyIds,
+  startNewFamilyMember, state, toast
 } from "./core.js";
 import { refreshBrief } from "./assistant-ui.js";
 import { syncNotificationSettingsIfEnabled } from "./notification-ui.js";
@@ -13,7 +15,109 @@ function elementBars(elements) {
   ).join("");
 }
 
+export function renderFamilyMembers() {
+  const el = $("#familyMembers");
+  if (!el) return;
+
+  if (!state.family.length) {
+    el.innerHTML =
+      '<p class="note">Chưa có thành viên. Thêm hồ sơ đầu tiên bên dưới.</p>';
+    return;
+  }
+
+  el.innerHTML = state.family.map(member => {
+    const selected = state.selectedFamilyIds.includes(member.id);
+    const active = state.activeFamilyId === member.id;
+    return '<article class="saved-plan family-member' +
+      (active ? ' active-family' : '') + '">' +
+      '<label class="family-select">' +
+        '<input type="checkbox" data-family-select="' +
+        escapeHtml(member.id) + '"' + (selected ? ' checked' : '') + '>' +
+        '<span><b>' + escapeHtml(member.name || "Thành viên") + '</b>' +
+        '<small>' + escapeHtml(member.birthDate) +
+        (member.birthTime ? ' · ' + escapeHtml(member.birthTime) : ' · chưa có giờ sinh') +
+        '</small></span></label>' +
+      '<div class="family-actions">' +
+        '<button class="ghost compact" data-family-edit="' +
+        escapeHtml(member.id) + '">Sửa</button>' +
+        '<button class="icon-btn" data-family-remove="' +
+        escapeHtml(member.id) + '" aria-label="Xóa thành viên">×</button>' +
+      '</div>' +
+    '</article>';
+  }).join("");
+
+  $$("[data-family-select]").forEach(input => {
+    input.onchange = () => {
+      const selected = $$("[data-family-select]")
+        .filter(x => x.checked)
+        .map(x => x.dataset.familySelect);
+      setSelectedFamilyIds(selected);
+      $("#familySelectionNote").textContent =
+        selected.length
+          ? `Đang xét ${selected.length} thành viên khi chọn ngày.`
+          : "Chưa chọn thành viên; planner sẽ dùng rule chung.";
+    };
+  });
+
+  $$("[data-family-edit]").forEach(button => {
+    button.onclick = async () => {
+      setActiveFamilyMember(button.dataset.familyEdit);
+      await renderProfile();
+    };
+  });
+
+  $$("[data-family-remove]").forEach(button => {
+    button.onclick = async () => {
+      removeFamilyMember(button.dataset.familyRemove);
+      await renderProfile();
+      await Promise.all([loadDay(), refreshBrief()]);
+      await syncNotificationSettingsIfEnabled();
+      toast("Đã xóa thành viên.");
+    };
+  });
+
+  $("#familySelectionNote").textContent = state.selectedFamilyIds.length
+    ? `Đang xét ${state.selectedFamilyIds.length} thành viên khi chọn ngày.`
+    : "Chưa chọn thành viên; planner sẽ dùng rule chung.";
+}
+
+export function newFamilyMemberForm() {
+  if (state.family.length >= 8) return toast("Tối đa 8 thành viên.");
+  startNewFamilyMember();
+  $("#profileName").value = "";
+  $("#birthDate").value = "";
+  $("#birthTime").value = "";
+  $("#profileResult").innerHTML =
+    '<p class="note">Nhập thông tin thành viên mới. Không biết giờ sinh thì để trống.</p>';
+  renderFamilyMembers();
+}
+
+export async function renderFeedbackHistory() {
+  const el = $("#feedbackHistory");
+  if (!el) return;
+  try {
+    const data = await api("/api/feedback?limit=10");
+    el.innerHTML = data.items?.length
+      ? data.items.map(item =>
+          '<article class="saved-plan">' +
+            '<div><b>' +
+              (item.feedback === "review" ? "⚑ Cần rà" : "✓ Hợp lý") +
+            '</b><small>' + escapeHtml(item.date) +
+              (item.activity ? ' · ' + escapeHtml(item.activity) : '') +
+              ' · ' + escapeHtml((item.traceHash || "").slice(0,12)) +
+            '</small></div>' +
+            '<span class="badge">' + escapeHtml(item.engine || "") + '</span>' +
+          '</article>'
+        ).join("")
+      : '<p class="note">Chưa có kết quả nào được đánh dấu.</p>';
+  } catch (e) {
+    el.innerHTML = '<p class="note">' + escapeHtml(e.message) + '</p>';
+  }
+}
+
 export async function renderProfile() {
+  renderFamilyMembers();
+  renderFeedbackHistory();
   if (!state.profile?.birthDate) {
     $("#profileResult").innerHTML =
       '<p class="note">Chưa có hồ sơ. App vẫn dùng được; hồ sơ chỉ thêm lớp Bát Tự cá nhân hóa.</p>';
@@ -71,10 +175,11 @@ export async function saveProfileForm() {
     birthTime: $("#birthTime").value || null
   });
 
+  renderFamilyMembers();
   await renderProfile();
   await Promise.all([loadDay(), refreshBrief()]);
   await syncNotificationSettingsIfEnabled();
-  toast("Đã lưu hồ sơ trên thiết bị.");
+  toast("Đã lưu thành viên trên thiết bị.");
 }
 
 function urlBase64ToUint8Array(base64String) {
@@ -108,6 +213,7 @@ export async function enableNotifications() {
       body: {
         subscription,
         profile: profilePayload(),
+        profiles:familyPayload(false),
         plans: state.plans,
         reminderTime
       }

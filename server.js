@@ -6,7 +6,7 @@ import { analyzeBirthProfile } from "./src/bazi-profile.js";
 import { solarTermsForYear } from "./src/bazi.js";
 import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-service.js";
 import { buildBrief } from "./src/brief.js";
-import { ACTIVITIES, rangeDays, rankDays } from "./src/planner.js";
+import { ACTIVITIES, compareDays, rangeDays, rankDays } from "./src/planner.js";
 import { allActivityPolicies, allDutyClassifications, allRules } from "./src/rule-engine.js";
 import { verificationCases, verificationSummary } from "./src/verification.js";
 import { allEvidenceRecords } from "./src/evidence.js";
@@ -14,6 +14,7 @@ import { pushStatus, sendDailyPush, subscribePush, unsubscribePush } from "./src
 import { buildDayInfo, publicDay } from "./src/traditional.js";
 import { vietnameseLunarToSolar, vietnameseLunarYearStructure } from "./src/vietnamese-lunar.js";
 import { telegramStatus } from "./src/telegram.js";
+import { listSelectionFeedback, saveSelectionFeedback } from "./src/selection-feedback.js";
 import { engineManifest } from "./src/version.js";
 import {
   getNotificationSettings,
@@ -62,13 +63,24 @@ function profileFromPayload(payload) {
   return analyzeBirthProfile(payload.birthDate,payload.birthTime || "");
 }
 
+function profilesFromPayload(payload) {
+  const input = Array.isArray(payload) ? payload.slice(0,8) : [];
+  return input
+    .filter(item => item?.birthDate)
+    .map((item,index) => ({
+      ...analyzeBirthProfile(item.birthDate,item.birthTime || ""),
+      id:String(item.id || `member-${index + 1}`).slice(0,80),
+      name:String(item.name || `Thành viên ${index + 1}`).slice(0,40)
+    }));
+}
+
 function queryDate(url,key="date") {
   return url.searchParams.get(key) || todayVN();
 }
 
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
-    return json(res,200,{ ok:true, version:manifest.version, engine:manifest.engine, calendar:manifest.calendar, decisionPolicy:manifest.decisionPolicy, rankingPolicy:manifest.rankingPolicy, push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+    return json(res,200,{ ok:true, version:manifest.version, engine:manifest.engine, calendar:manifest.calendar, decisionPolicy:manifest.decisionPolicy, rankingPolicy:manifest.rankingPolicy, familyPolicy:manifest.familyPolicy, constraintPolicy:manifest.constraintPolicy, comparisonPolicy:manifest.comparisonPolicy, push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -105,6 +117,31 @@ async function api(req,url,res) {
       })
     });
   }
+  if (req.method === "POST" && url.pathname === "/api/plan") {
+    const payload = await bodyJson(req);
+    const activity = payload.activity || "contract";
+    return json(res,200,{
+      activity:{ id:activity,label:ACTIVITIES[activity]?.label || activity },
+      results:rankDays({
+        from:payload.from || todayVN(),
+        days:payload.days || 14,
+        activity,
+        profile:profileFromPayload(payload.profile),
+        profiles:profilesFromPayload(payload.profiles),
+        constraints:payload.constraints || {}
+      })
+    });
+  }
+  if (req.method === "POST" && url.pathname === "/api/compare") {
+    const payload = await bodyJson(req);
+    return json(res,200,compareDays({
+      dates:Array.isArray(payload.dates) ? payload.dates : [],
+      activity:payload.activity || "contract",
+      profile:profileFromPayload(payload.profile),
+      profiles:profilesFromPayload(payload.profiles),
+      constraints:payload.constraints || {}
+    }));
+  }
   if (req.method === "GET" && url.pathname === "/api/profile") {
     const profile = profileFromQuery(url);
     return profile ? json(res,200,profile) : json(res,400,{ error:"Cần ngày sinh" });
@@ -115,6 +152,9 @@ async function api(req,url,res) {
       glossary,sources,ruleCount:allRules().length,
       decisionPolicy:manifest.decisionPolicy,
       rankingPolicy:manifest.rankingPolicy,
+      familyPolicy:manifest.familyPolicy,
+      constraintPolicy:manifest.constraintPolicy,
+      comparisonPolicy:manifest.comparisonPolicy,
       verification:verificationSummary(),push:pushStatus()
     },"public, max-age=3600");
   }
@@ -149,6 +189,7 @@ async function api(req,url,res) {
     return json(res,200,buildBrief({
       date:payload.date || todayVN(),
       profile:profileFromPayload(payload.profile),
+      profiles:profilesFromPayload(payload.profiles),
       plans:Array.isArray(payload.plans) ? payload.plans : []
     }));
   }
@@ -168,12 +209,22 @@ async function api(req,url,res) {
     const brief = buildBrief({
       date:payload.date || todayVN(),
       profile:profileFromPayload(payload.profile),
+      profiles:profilesFromPayload(payload.profiles),
       plans:Array.isArray(payload.plans) ? payload.plans : []
     });
     return json(res,200,await rewriteBriefWithGemini(brief));
   }
   if (req.method === "GET" && url.pathname === "/api/telegram/status") {
     return json(res,200,telegramStatus(),"public, max-age=60");
+  }
+  if (req.method === "POST" && url.pathname === "/api/feedback") {
+    const payload = await bodyJson(req);
+    return json(res,200,await saveSelectionFeedback(payload));
+  }
+  if (req.method === "GET" && url.pathname === "/api/feedback") {
+    return json(res,200,{
+      items:await listSelectionFeedback(url.searchParams.get("limit") || 50)
+    });
   }
   if (req.method === "GET" && url.pathname === "/api/notifications/settings") {
     return json(res,200,await getNotificationSettings());

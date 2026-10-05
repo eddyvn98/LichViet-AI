@@ -1,72 +1,80 @@
-# Lịch Việt AI — Verified Engine V6
+# Lịch Việt AI — Verified Engine V7
 
-Trợ lý lịch Việt cá nhân: lịch Việt UTC+7, chọn ngày, Bát Tự, kế hoạch chủ động, Gemini CLI và Telegram.
+Trợ lý lịch Việt cho cá nhân và gia đình: lịch Việt UTC+7, chọn ngày, Bát Tự, kế hoạch chủ động, Gemini CLI và Telegram.
 
-## Trọng tâm V6
+## Trọng tâm V7
 
-V6 ưu tiên **độ tin cậy và khả năng audit** hơn số lượng tính năng:
+V7 giữ nguyên nền evidence của V6 và thêm **Family Selection Intelligence**:
 
-- Lịch, Can Chi, tiết khí và rule cốt lõi được tính deterministic.
-- Fact từ nguồn và `PRODUCT_POLICY` của app được tách riêng.
-- 12 Trực có corpus phân loại cát/hung từ `御定星歷考原 卷五`.
-- Recommendation dùng `support / caution / veto`, không dùng score làm kết luận.
-- Numeric score chỉ còn vai trò `tie-break-only`.
-- Ngày giao tiết luôn composition bảo thủ giữa các trạng thái hợp lệ.
-- Confidence tách theo calendar / BaZi / traditional.
-- Lịch trước phạm vi hiện đại được gắn `historical-proleptic-utc7`.
-- AI không được nâng heuristic hoặc product policy thành nguyên điển.
-- Kết quả có SHA-256 reproducibility fingerprint.
-- CI chạy validator, unit tests, strict audit, multi-year property audit và Playwright.
+- Registry tối đa 8 thành viên, lưu local trên trình duyệt.
+- Tự migrate hồ sơ đơn V6 thành thành viên đầu tiên.
+- Planner có thể xét nhiều người cùng lúc.
+- Caution của một thành viên không bị good của người khác xóa; family layer không tự tạo canonical veto.
+- Constraint thực tế: ngày thường/cuối tuần, ngày âm gia đình muốn tránh, loại ngày cụ thể, tránh ngày giao tiết.
+- Compare trực tiếp 2–5 ngày và nói rõ thắng bằng decision band hay chỉ tie-break.
+- Saved plan nhớ participant IDs + constraints để daily brief/Telegram/PWA tính cùng một bài toán.
+- Feedback `Hợp lý / Cần rà` lưu engine/policy/SHA-256 fingerprint, không lưu ngày sinh.
+- UI cho xem feedback gần đây để rà lại rule/evidence.
+- Multi-year property audit kiểm cả family planner và compare.
+
+## Nền engine V6 vẫn giữ nguyên
+
+V7 **không tạo evidence corpus mới**. Manifest vẫn dùng `evidence-corpus-v6`.
+
+- Lịch, Can Chi, tiết khí deterministic.
+- Fact nguồn tách khỏi `PRODUCT_POLICY`.
+- 12 Trực có corpus từ `御定星歷考原 卷五`.
+- Recommendation dùng `support / caution / veto`.
+- Numeric score chỉ `tie-break-only`.
+- Confidence tách calendar / BaZi / traditional.
+- Ngày lịch sử dùng nhãn `historical-proleptic-utc7`.
+- Implementation advisory không đổi decision/ranking.
+
+## Policy V7
+
+- `activity-composition-v2` — composition theo loại việc.
+- `general-day-composition-v1` — verdict tổng quát.
+- `ranking-tiebreak-v2` — score chỉ tie-break.
+- `family-personalization-v1` — gộp nhiều thành viên theo hướng bảo thủ.
+- `selection-constraints-v1` — sở thích/ràng buộc của gia đình.
+- `deterministic-date-comparison-v1` — so sánh ngày deterministic.
+
+Family/constraint đều là `PRODUCT_POLICY`, không được mô tả như cổ thư.
 
 ## Evidence levels
 
-- `ASTRONOMY_OFFICIAL` — nguồn thiên văn/tiêu chuẩn chính thức.
-- `PRIMARY_EXACT` — nguyên điển với locator chính xác.
-- `PRIMARY_FAMILY` — đúng họ/nguyên điển nhưng locator chưa đủ mạnh.
-- `OFFICIAL_SECONDARY` — tài liệu cơ quan/lưu trữ chính thức.
-- `IMPLEMENTATION_CROSSCHECK` — implementation dùng để đối chiếu.
-- `COMMUNITY_REFERENCE` — tham khảo cộng đồng.
-- `EXPERIMENTAL` — heuristic thử nghiệm.
-- `PRODUCT_POLICY` — normalization/chính sách của app; không bao giờ tạo strong claim.
+- `ASTRONOMY_OFFICIAL`
+- `PRIMARY_EXACT`
+- `PRIMARY_FAMILY`
+- `OFFICIAL_SECONDARY`
+- `IMPLEMENTATION_CROSSCHECK`
+- `COMMUNITY_REFERENCE`
+- `EXPERIMENTAL`
+- `PRODUCT_POLICY`
 
 Xem `data/source-policy.json`.
 
-## Recommendation V6
+## API chính
 
-Luồng chọn ngày:
-
-1. Tính lịch Việt UTC+7, Can Chi, tiết khí.
-2. Xác định Trực và Hoàng/Hắc đạo bằng verified engine.
-3. Đọc fact phân loại Trực từ corpus nguồn.
-4. Đọc activity mapping từ `data/activity-policies.json` với nhãn `PRODUCT_POLICY`.
-5. Compose nhiều tín hiệu thành `preferred / neutral / caution / blocked`.
-6. Chỉ khi cùng decision band mới dùng numeric score để tie-break.
-7. Tyme4TS nghi/kỵ chỉ hiển thị advisory, không đổi decision/ranking.
-
-Nguyên tắc này bám theo chính cảnh báo trong `御定星歷考原`: không chấp một yếu tố đơn lẻ để luận cát/hung.
-
-## Nguồn cốt lõi
-
-- Âm lịch Việt UTC+7: thuật toán Hồ Ngọc Đức + regression/property tests.
-- Việt Nam lịch sử: tài liệu Trung tâm Lưu trữ Quốc gia về Lịch Hiệp Kỷ và Khâm Thiên Giám.
-- 12 Trực và nguyên tắc composition: `御定星歷考原 卷五・月建十二神`.
-- Quan hệ Can Chi / Hoàng-Hắc đạo: các evidence record có locator trong `data/evidence-records.json`.
-- Thiên văn: Hong Kong Observatory.
-- Implementation cross-check: Tyme4TS + lunar-javascript, cùng family 6tail.
-
-## API kiểm chứng
-
+- `GET /api/day`
+- `GET /api/plan` — compatibility single-profile.
+- `POST /api/plan` — family profiles + constraints.
+- `POST /api/compare` — so sánh 2–5 ngày.
+- `POST /api/feedback`
+- `GET /api/feedback`
 - `GET /api/verification`
-- `GET /api/verification/cases`
 - `GET /api/rules`
 - `GET /api/evidence`
 - `GET /api/sources`
 - `GET /api/duty-classification`
 - `GET /api/activity-policies`
-- `GET /api/day`
-- `GET /api/plan`
 
-`/api/day` và kết quả planner có provenance, confidence và reproducibility trace.
+## Dữ liệu gia đình
+
+- Registry mặc định ở `localStorage`.
+- Telegram/PWA chỉ nhận family profile khi người dùng bật đồng bộ/thông báo.
+- Feedback server local chỉ lưu ngày cần rà, activity, decision, engine/policy IDs và trace hash.
+- `data/runtime/` bị gitignore.
 
 ## Kiểm thử
 
@@ -80,26 +88,25 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
+CI gate: validator → unit/regression → strict audit → multi-year property audit → Playwright desktop/mobile.
+
 ## Runtime cá nhân
 
 - Windows 11 Pro.
 - Node.js trực tiếp, không Docker.
-- AI duy nhất: Gemini CLI, Google OAuth.
-- Model mặc định: `gemini-3.8-flash`.
-- Telegram dùng Bot API.
-- Security/auth của module có thể đặt sau lớp bảo mật chung của web chính.
+- Gemini CLI + Google OAuth.
+- Telegram Bot API.
+- Cloudflare Tunnel / lớp bảo mật chung có thể đặt phía ngoài module.
 
-Xem `docs/WINDOWS_HOSTING.md` và `docs/ENGINE_V6.md`.
+Xem `docs/WINDOWS_HOSTING.md`, `docs/ENGINE_V6.md` và `docs/ENGINE_V7.md`.
 
 ## Nguyên tắc
 
 1. Lịch trước, AI sau.
-2. Việt Nam trước.
-3. Evidence trước lời giải thích.
-4. Fact nguồn và product policy không được trộn.
-5. Không biến implementation phổ biến thành bằng chứng đúng.
-6. Không giả khoa học.
-7. Không đoán dữ liệu thiếu.
-8. Bất đồng phải nhìn thấy được.
-9. Score không được quyết định verdict.
-10. Chỉ nâng strong claim khi evidence đúng applicability và authority.
+2. Evidence trước lời giải thích.
+3. Fact nguồn và product policy không trộn.
+4. Gia đình có thể đặt constraint nhưng app phải gọi đúng đó là preference.
+5. Good của một người không được che caution của người khác.
+6. Không tự thay người đã bị xóa trong plan bằng hồ sơ active.
+7. Score không quyết định verdict.
+8. Feedback phải tái hiện được bằng fingerprint/version.

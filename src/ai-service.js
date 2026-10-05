@@ -25,6 +25,9 @@ export function aiGuardrailPolicy() {
     "PRODUCT_POLICY là chính sách của ứng dụng, không được gọi là cổ thư, nguyên điển hoặc fact canonical.",
     "recommendationDecision/verdict là kết quả composition; ranking.score chỉ tie-break và không được dùng để thay đổi nhãn decision.",
     "Nếu confidence.calendarScope=historical-proleptic-utc7, phải nói đây là phép tính lùi hiện đại; không gọi là lịch chính thức lịch sử.",
+    "family hoặc family-personalization-v1 là lớp tổng hợp PRODUCT_POLICY/heuristic cho gia đình; không được gọi caution cá nhân là veto canonical.",
+    "selection-constraints-v1 là ràng buộc do gia đình tự chọn (cuối tuần, ngày loại, ngày âm tránh, giao tiết); không được mô tả như kiêng kỵ cổ điển.",
+    "Nếu CONTEXT có compare/explanation, giữ nguyên lý do deterministic; không tự chọn một ngày khác.",
     "Không nói các hệ cát/hung là sự thật khoa học.",
     "Viết ngắn, rõ, dùng từ phổ thông.",
     "Không nói mơ hồ hoặc cao siêu.",
@@ -41,7 +44,10 @@ export function aiStatus() {
     ...geminiConfig(),
     evidencePolicy:manifest.engine,
     decisionPolicy:manifest.decisionPolicy,
-    rankingPolicy:manifest.rankingPolicy
+    rankingPolicy:manifest.rankingPolicy,
+    familyPolicy:manifest.familyPolicy,
+    constraintPolicy:manifest.constraintPolicy,
+    comparisonPolicy:manifest.comparisonPolicy
   };
 }
 

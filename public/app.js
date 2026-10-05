@@ -2,9 +2,9 @@ import { $, $$, api, setMeta, state, todayVN } from "./core.js";
 import { askGemini } from "./ai-ui.js";
 import { loadNotificationSettings, saveNotificationPreferences } from "./notification-ui.js";
 import { addPlan, refreshBrief, renderPlans } from "./assistant-ui.js";
-import { findDays } from "./planner-ui.js";
+import { compareSelectedDays, findDays, refreshPlannerFamilyNote } from "./planner-ui.js";
 import {
-  renderProfile, saveProfileForm
+  newFamilyMemberForm, renderProfile, saveProfileForm
 } from "./profile-ui.js";
 import { loadDay } from "./today.js";
 
@@ -15,7 +15,12 @@ function setupTabs() {
       $$(".tabpanel").forEach(x => {
         x.hidden = x.id !== btn.dataset.tab;
       });
-      if (btn.dataset.tab === "assistant") refreshBrief();
+      if (btn.dataset.tab === "assistant") {
+        renderPlans();
+        refreshBrief();
+      }
+      if (btn.dataset.tab === "planner") refreshPlannerFamilyNote();
+      if (btn.dataset.tab === "profile") renderProfile();
     };
   });
 }
@@ -51,9 +56,11 @@ async function init() {
   };
   $("#date").onchange = loadDay;
   $("#findDays").onclick = findDays;
+  $("#compareDays").onclick = compareSelectedDays;
   $("#addPlan").onclick = addPlan;
   $("#refreshBrief").onclick = refreshBrief;
   $("#saveProfile").onclick = saveProfileForm;
+  $("#newFamilyMember").onclick = newFamilyMemberForm;
   $("#enableReminder").onclick = saveNotificationPreferences;
   $("#askGemini").onclick = askGemini;
 

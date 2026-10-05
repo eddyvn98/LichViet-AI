@@ -14,6 +14,7 @@ const DEFAULTS = {
     personal: true
   },
   profile: null,
+  profiles: [],
   plans: [],
   lastSentDate: null
 };
@@ -25,6 +26,7 @@ export async function getNotificationSettings() {
       ...DEFAULTS,
       ...data,
       topics: { ...DEFAULTS.topics, ...(data.topics || {}) },
+      profiles: Array.isArray(data.profiles) ? data.profiles.slice(0,8) : [],
       plans: Array.isArray(data.plans) ? data.plans.slice(0, 20) : []
     };
   } catch {
@@ -50,6 +52,14 @@ export async function saveNotificationSettings(input = {}) {
       birthDate: input.profile.birthDate,
       birthTime: input.profile.birthTime || null
     } : null,
+    profiles:Array.isArray(input.profiles)
+      ? input.profiles.filter(x => x?.birthDate).slice(0,8).map((x,index) => ({
+          id:String(x.id || `member-${index + 1}`).slice(0,80),
+          name:String(x.name || `Thành viên ${index + 1}`).slice(0,40),
+          birthDate:x.birthDate,
+          birthTime:x.birthTime || null
+        }))
+      : [],
     plans: Array.isArray(input.plans) ? input.plans.slice(0, 20) : [],
     updatedAt: new Date().toISOString()
   };

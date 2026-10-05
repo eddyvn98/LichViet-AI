@@ -58,7 +58,7 @@ test("daily brief proactively scans saved plans", () => {
       to: "2026-10-11"
     }]
   });
-  assert.equal(brief.generatedBy, "deterministic-brief-v3");
+  assert.equal(brief.generatedBy, "deterministic-brief-v4");
   assert.ok(brief.headline);
   assert.ok(Array.isArray(brief.alerts));
   assert.ok(brief.alerts.length >= 1);
@@ -75,4 +75,48 @@ test("V6 rules expose policy-locked evidence metadata", () => {
   assert.ok(duty?.evidence?.records?.some(x =>
     x.family === "xingli-kaoyuan"
   ));
+});
+
+
+test("daily brief resolves plan participant IDs against family profiles", () => {
+  const profiles = [
+    { ...analyzeBirthProfile("1995-04-14", "12:00"), id:"a", name:"A" },
+    { ...analyzeBirthProfile("1997-11-17", "12:00"), id:"b", name:"B" }
+  ];
+  const brief = buildBrief({
+    date:"2026-10-04",
+    profiles,
+    plans:[{
+      id:"family-plan",
+      title:"Việc gia đình",
+      activity:"meeting",
+      from:"2026-10-04",
+      to:"2026-10-11",
+      participantIds:["a","b"]
+    }]
+  });
+  assert.equal(brief.generatedBy, "deterministic-brief-v4");
+  assert.ok(brief.alerts.length >= 1);
+  assert.equal(brief.alerts[0].familyMemberCount, 2);
+});
+
+
+test("deleted family participant is not replaced by active profile", () => {
+  const active = analyzeBirthProfile("1995-04-14", "12:00");
+  const brief = buildBrief({
+    date:"2026-10-04",
+    profile:active,
+    profiles:[],
+    plans:[{
+      id:"stale-plan",
+      title:"Kế hoạch cũ",
+      activity:"meeting",
+      from:"2026-10-04",
+      to:"2026-10-11",
+      participantIds:["deleted-member"]
+    }]
+  });
+  assert.ok(brief.alerts.length >= 1);
+  assert.equal(brief.alerts[0].familyMemberCount, 0);
+  assert.equal(brief.alerts[0].unresolvedParticipantCount, 1);
 });

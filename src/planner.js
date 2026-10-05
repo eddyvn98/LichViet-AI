@@ -3,6 +3,15 @@ import { evaluateDuty, ruleSummary } from "./rule-engine.js";
 import { scoreActivity } from "./scoring.js";
 import { composeActivityDecision } from "./recommendation-engine.js";
 import { reproducibilityTrace } from "./trace.js";
+import { getBaZi } from "./bazi.js";
+import { personalizeFamily } from "./family-selection.js";
+import { evaluateSelectionConstraints, normalizeSelectionConstraints } from "./selection-constraints.js";
+
+export const COMPARISON_POLICY = {
+  id:"deterministic-date-comparison-v1",
+  evidenceLevel:"PRODUCT_POLICY",
+  note:"So sánh ưu tiên decision band trước; numeric score chỉ tie-break trong cùng band."
+};
 
 export const ACTIVITIES = {
   contract:{ label:"Ký hợp đồng / giao dịch", positive:["交易","立券","纳财","开市"] },
@@ -21,7 +30,7 @@ function addDays(iso, n) {
   return new Intl.DateTimeFormat("en-CA",{ timeZone:"Asia/Ho_Chi_Minh" }).format(d);
 }
 
-function activityScore(day, activity) {
+function activityScore(day, activity, personal = day.personal) {
   const cfg = ACTIVITIES[activity];
   const dutyRaws = Array.isArray(day._dutyRaws) && day._dutyRaws.length
     ? day._dutyRaws
@@ -36,7 +45,7 @@ function activityScore(day, activity) {
     activity,
     dutyRaws,
     eclipticGoods:day._eclipticGoods || [],
-    personal:day.personal
+    personal
   });
   const reasons = [
     ...decision.vetoes.map(x => x.detail),
@@ -84,43 +93,104 @@ function activityScore(day, activity) {
   };
 }
 
-export function rankDays({ from, days = 14, activity = "contract", profile = null }) {
+export function evaluatePlannerDay({
+  date,
+  activity = "contract",
+  profile = null,
+  profiles = [],
+  constraints = {}
+} = {}) {
+  if (!ACTIVITIES[activity]) throw new Error("Loại việc không hợp lệ");
+
+  const familyProfiles = Array.isArray(profiles)
+    ? profiles.filter(Boolean).slice(0,8)
+    : [];
+  const familyMode = familyProfiles.length > 0;
+  const day = buildDayInfo(date, familyMode ? null : profile);
+  const family = familyMode
+    ? personalizeFamily(familyProfiles, getBaZi(date, "12:00"))
+    : null;
+  const personal = family || day.personal;
+  const constraintEvaluation = evaluateSelectionConstraints(
+    day,
+    date,
+    constraints
+  );
+
+  const {
+    score, ranking, decision, reasons, ruleIds, advisoryAllowed
+  } = activityScore(day, activity, personal);
+  const familyCautions = family?.signals?.filter(x => x.level === "caution").length || 0;
+  const familySupports = family?.signals?.filter(x => x.level === "good").length || 0;
+
+  const recommendationTrace = reproducibilityTrace({
+    type:"activity-recommendation",
+    date,
+    activity,
+    decision:decision.code,
+    stateCodes:decision.states.map(x => x.code),
+    dutyRaws:decision.states.map(x => x.raw),
+    evidenceRefs:decision.evidenceRefs,
+    ruleIds,
+    constraints:constraintEvaluation.constraints,
+    family:{
+      memberCount:family?.memberCount || (profile ? 1 : 0),
+      cautionCount:familyCautions,
+      supportCount:familySupports,
+      unresolvedCount:family?.unresolvedMembers?.length || 0
+    },
+    tieBreakScore:score
+  });
+
+  return {
+    ...publicDay(day),
+    eligible:constraintEvaluation.accepted,
+    constraintEvaluation,
+    family,
+    match:constraintEvaluation.accepted
+      ? decision.label
+      : "Bị loại bởi ràng buộc",
+    reasons:constraintEvaluation.accepted
+      ? reasons
+      : [
+          ...constraintEvaluation.failures.map(x => x.detail),
+          ...reasons
+        ],
+    recommendationDecision:{ ...decision, trace:recommendationTrace },
+    activityRanking:{
+      ...ranking,
+      role:"tie-break-only"
+    },
+    advisoryImplementationUsed:false,
+    advisoryImplementationVisible:advisoryAllowed,
+    rankingProvenance:ruleSummary(ruleIds),
+    _decisionRank:decision.rank,
+    _score:score
+  };
+}
+
+export function rankDays({
+  from,
+  days = 14,
+  activity = "contract",
+  profile = null,
+  profiles = [],
+  constraints = {}
+}) {
   if (!ACTIVITIES[activity]) throw new Error("Loại việc không hợp lệ");
   const count = Math.max(1, Math.min(Number(days) || 14, 60));
   const ranked = [];
 
   for (let i = 0; i < count; i += 1) {
     const date = addDays(from, i);
-    const day = buildDayInfo(date, profile);
-    const {
-      score, ranking, decision, reasons, ruleIds, advisoryAllowed
-    } = activityScore(day, activity);
-    const recommendationTrace = reproducibilityTrace({
-      type:"activity-recommendation",
+    const result = evaluatePlannerDay({
       date,
       activity,
-      decision:decision.code,
-      stateCodes:decision.states.map(x => x.code),
-      dutyRaws:decision.states.map(x => x.raw),
-      evidenceRefs:decision.evidenceRefs,
-      ruleIds,
-      tieBreakScore:score
+      profile,
+      profiles,
+      constraints
     });
-    ranked.push({
-      ...publicDay(day),
-      match:decision.label,
-      reasons,
-      recommendationDecision:{ ...decision, trace:recommendationTrace },
-      activityRanking:{
-        ...ranking,
-        role:"tie-break-only"
-      },
-      advisoryImplementationUsed:false,
-      advisoryImplementationVisible:advisoryAllowed,
-      rankingProvenance:ruleSummary(ruleIds),
-      _decisionRank:decision.rank,
-      _score:score
-    });
+    if (result.eligible) ranked.push(result);
   }
 
   return ranked
@@ -131,6 +201,83 @@ export function rankDays({ from, days = 14, activity = "contract", profile = nul
     )
     .slice(0,5)
     .map(({ _decisionRank, _score, ...x }) => x);
+}
+
+export function compareDays({
+  dates = [],
+  activity = "contract",
+  profile = null,
+  profiles = [],
+  constraints = {}
+} = {}) {
+  if (!ACTIVITIES[activity]) throw new Error("Loại việc không hợp lệ");
+  const normalizedDates = [...new Set(
+    (Array.isArray(dates) ? dates : [])
+      .map(String)
+      .filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x))
+  )].slice(0,5);
+  if (normalizedDates.length < 2) {
+    throw new Error("Cần ít nhất 2 ngày hợp lệ để so sánh");
+  }
+
+  const candidates = normalizedDates.map(date =>
+    evaluatePlannerDay({
+      date,
+      activity,
+      profile,
+      profiles,
+      constraints
+    })
+  );
+
+  const sortedEligible = candidates
+    .filter(x => x.eligible)
+    .sort((a,b) =>
+      b._decisionRank - a._decisionRank ||
+      b._score - a._score ||
+      a.date.localeCompare(b.date)
+    );
+  const winner = sortedEligible[0] || null;
+  const runnerUp = sortedEligible[1] || null;
+  const explanation = !winner
+    ? "Không có ngày nào vượt qua ràng buộc."
+    : !runnerUp
+      ? "Chỉ có một ngày vượt qua ràng buộc."
+      : winner._decisionRank > runnerUp._decisionRank
+        ? `${winner.date} có decision band cao hơn ${runnerUp.date}; score không cần quyết định.`
+        : winner._score > runnerUp._score
+          ? `${winner.date} và ${runnerUp.date} cùng decision band; ${winner.date} đứng trước nhờ tie-break score.`
+          : `Các tín hiệu chính ngang nhau; dùng thứ tự ngày làm tie-break cuối.`;
+
+  return {
+    policy:COMPARISON_POLICY,
+    activity:{
+      id:activity,
+      label:ACTIVITIES[activity].label
+    },
+    constraints:normalizeSelectionConstraints(constraints),
+    familyMemberCount:Array.isArray(profiles) && profiles.length
+      ? Math.min(profiles.length,8)
+      : profile ? 1 : 0,
+    winner: winner ? {
+      date:winner.date,
+      match:winner.match,
+      decision:winner.recommendationDecision.code,
+      traceHash:winner.recommendationDecision.trace.hash
+    } : null,
+    explanation,
+    candidates:candidates.map(({ _decisionRank, _score, ...item }) => ({
+      ...item,
+      comparison:{
+        decisionRank:_decisionRank,
+        tieBreakScore:_score,
+        supportCount:item.recommendationDecision.supports.length,
+        cautionCount:item.recommendationDecision.cautions.length,
+        vetoCount:item.recommendationDecision.vetoes.length,
+        familyCautionCount:item.family?.signals?.filter(x => x.level === "caution").length || 0
+      }
+    }))
+  };
 }
 
 export function rangeDays({ from, days = 7, profile = null }) {

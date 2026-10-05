@@ -1,5 +1,5 @@
 import {
-  $, api, profilePayload, state, toast
+  $, api, familyPayload, profilePayload, state, toast
 } from "./core.js";
 
 function readTopics() {
@@ -47,6 +47,7 @@ export async function saveNotificationPreferences() {
     reminderTime: $("#reminderTime").value || "07:30",
     topics,
     profile: profilePayload(),
+    profiles:familyPayload(false),
     plans: state.plans
   };
 
@@ -73,6 +74,7 @@ export async function syncNotificationSettingsIfEnabled() {
         reminderTime: current.reminderTime,
         topics: current.topics,
         profile: profilePayload(),
+        profiles:familyPayload(false),
         plans: state.plans
       }
     });

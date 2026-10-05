@@ -1,3 +1,4 @@
+import { analyzeBirthProfile } from "./bazi-profile.js";
 import { buildBrief } from "./brief.js";
 import { listSubscriptions, removeSubscription, upsertSubscription } from "./push-store.js";
 
@@ -35,7 +36,23 @@ export async function sendDailyPush(date) {
 
   for (const item of all) {
     try {
-      const brief = buildBrief({ date, profile:item.profile, plans:item.plans });
+      const profiles = (Array.isArray(item.profiles) ? item.profiles : [])
+        .filter(x => x?.birthDate)
+        .slice(0,8)
+        .map((x,index) => ({
+          ...analyzeBirthProfile(x.birthDate,x.birthTime || ""),
+          id:String(x.id || `member-${index + 1}`).slice(0,80),
+          name:String(x.name || `Thành viên ${index + 1}`).slice(0,40)
+        }));
+      const profile = item.profile?.birthDate
+        ? analyzeBirthProfile(item.profile.birthDate,item.profile.birthTime || "")
+        : null;
+      const brief = buildBrief({
+        date,
+        profile,
+        profiles,
+        plans:item.plans
+      });
       const payload = JSON.stringify({
         title:`Lịch Việt · ${brief.today.verdict.label}`,
         body:brief.alerts[0]?.message || brief.headline,

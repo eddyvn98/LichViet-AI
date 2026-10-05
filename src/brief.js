@@ -11,9 +11,16 @@ function inRange(date, from, to) {
   return date >= from && date <= to;
 }
 
-export function buildBrief({ date, profile = null, plans = [] }) {
+export function buildBrief({ date, profile = null, profiles = [], plans = [] }) {
   const today = publicDay(buildDayInfo(date, profile));
   const alerts = [];
+  const familyProfiles = Array.isArray(profiles) ? profiles.slice(0,8) : [];
+  const profileById = new Map(
+    familyProfiles.map((item,index) => [
+      String(item?.id || `member-${index + 1}`),
+      item
+    ])
+  );
 
   for (const plan of plans.slice(0, 20)) {
     if (!plan?.activity || !ACTIVITIES[plan.activity]) continue;
@@ -22,7 +29,20 @@ export function buildBrief({ date, profile = null, plans = [] }) {
     const days = Math.min(60, Math.max(1,
       Math.floor((Date.parse(to+"T12:00:00+07:00") - Date.parse(from+"T12:00:00+07:00")) / 86400000) + 1
     ));
-    const best = rankDays({ from, days, activity:plan.activity, profile })[0];
+    const participantIds = Array.isArray(plan.participantIds)
+      ? plan.participantIds.map(String).slice(0,8)
+      : [];
+    const planProfiles = participantIds.length
+      ? participantIds.map(id => profileById.get(id)).filter(Boolean)
+      : [];
+    const best = rankDays({
+      from,
+      days,
+      activity:plan.activity,
+      profile:participantIds.length ? null : profile,
+      profiles:planProfiles,
+      constraints:plan.constraints || {}
+    })[0];
     if (!best || !inRange(best.date, from, to)) continue;
 
     const distance = Math.round(
@@ -39,6 +59,11 @@ export function buildBrief({ date, profile = null, plans = [] }) {
         urgency:preferred && distance <= 1 ? "high" : distance <= 3 ? "medium" : "normal",
         decision:best.recommendationDecision || null,
         match:best.match,
+        familyMemberCount:participantIds.length
+          ? planProfiles.length
+          : best.family?.memberCount || (profile ? 1 : 0),
+        unresolvedParticipantCount:participantIds.length - planProfiles.length,
+        constraints:best.constraintEvaluation?.constraints || null,
         message:preferred
           ? distance === 0
             ? "Hôm nay là lựa chọn ưu tiên trong khoảng bạn đã lưu."
@@ -72,7 +97,7 @@ export function buildBrief({ date, profile = null, plans = [] }) {
       confidence:today.confidence
     },
     alerts:alerts.sort((a,b) => a.date.localeCompare(b.date)).slice(0,5),
-    generatedBy:"deterministic-brief-v3",
+    generatedBy:"deterministic-brief-v4",
     aiPolicy:"AI may rephrase only; it must preserve decision, confidence, evidence scope and PRODUCT_POLICY labels."
   };
 }
