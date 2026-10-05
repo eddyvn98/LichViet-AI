@@ -1,5 +1,6 @@
 import { $, $$, api, setMeta, state, todayVN } from "./core.js";
 import { askGemini } from "./ai-ui.js";
+import { setupDataTools } from "./backup-ui.js";
 import { loadNotificationSettings, saveNotificationPreferences } from "./notification-ui.js";
 import { addPlan, refreshBrief, renderPlans } from "./assistant-ui.js";
 import { compareSelectedDays, findDays, refreshPlannerFamilyNote } from "./planner-ui.js";
@@ -63,6 +64,7 @@ async function init() {
   $("#newFamilyMember").onclick = newFamilyMemberForm;
   $("#enableReminder").onclick = saveNotificationPreferences;
   $("#askGemini").onclick = askGemini;
+  setupDataTools();
 
   if (state.reminder?.time) {
     $("#reminderTime").value = state.reminder.time;
