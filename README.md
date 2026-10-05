@@ -1,8 +1,21 @@
-# Lịch Việt AI — Verified Engine V7
+# Lịch Việt AI — Verified Engine V8
 
 Trợ lý lịch Việt cho cá nhân và gia đình: lịch Việt UTC+7, chọn ngày, Bát Tự, kế hoạch chủ động, Gemini CLI và Telegram.
 
-## Trọng tâm V7
+## Trọng tâm V8
+
+V8 giữ nguyên evidence/rule đã xác minh của V7 và tập trung **dùng thật hằng ngày**:
+
+- Runtime JSON quan trọng ghi atomic để giảm rủi ro file dở dang.
+- Có `GET /api/ops/status` để nhìn nhanh sức khỏe runtime/tích hợp mà không lộ secret.
+- HTTP task chủ động fail-closed nếu chưa cấu hình `CRON_SECRET`.
+- Trang Hôm nay có tóm tắt cho các thành viên đang chọn qua `family-daily-summary-v1`.
+- Có export/import backup thiết bị cho family registry, selection, plan và reminder.
+- Knowledge base vẫn là `evidence-corpus-v6`; V8 không tự nâng claim truyền thống.
+
+Xem `docs/ENGINE_V8.md`.
+
+## Nền V7
 
 V7 giữ nguyên nền evidence của V6 và thêm **Family Selection Intelligence**:
 
@@ -98,7 +111,7 @@ CI gate: validator → unit/regression → strict audit → multi-year property 
 - Telegram Bot API.
 - Cloudflare Tunnel / lớp bảo mật chung có thể đặt phía ngoài module.
 
-Xem `docs/WINDOWS_HOSTING.md`, `docs/ENGINE_V6.md` và `docs/ENGINE_V7.md`.
+Xem `docs/WINDOWS_HOSTING.md`, `docs/ENGINE_V6.md`, `docs/ENGINE_V7.md` và `docs/ENGINE_V8.md`.
 
 ## Nguyên tắc
 

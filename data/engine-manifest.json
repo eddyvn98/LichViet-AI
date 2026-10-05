@@ -1,14 +1,16 @@
 {
-  "version": "7.0.0",
-  "verificationVersion": "7.0",
-  "engine": "verified-engine-v7",
+  "version": "8.0.0",
+  "verificationVersion": "8.0",
+  "engine": "verified-engine-v8",
   "knowledgeBase": "evidence-corpus-v6",
   "decisionPolicy": "activity-composition-v2",
   "generalVerdictPolicy": "general-day-composition-v1",
   "rankingPolicy": "ranking-tiebreak-v2",
   "calendar": "Vietnam UTC+7",
-  "releaseFocus": "family selection intelligence, practical constraints, deterministic comparison and feedback review",
+  "releaseFocus": "daily operations, atomic runtime persistence, family daily summary and device backup",
   "familyPolicy": "family-personalization-v1",
   "constraintPolicy": "selection-constraints-v1",
-  "comparisonPolicy": "deterministic-date-comparison-v1"
+  "comparisonPolicy": "deterministic-date-comparison-v1",
+  "familyDailyPolicy": "family-daily-summary-v1",
+  "runtimePolicy": "atomic-runtime-store-v1"
 }

@@ -1,5 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { readJsonFile, updateJsonAtomic } from "./atomic-json-store.js";
 
 const PATH = process.env.NOTIFICATION_SETTINGS_PATH ||
   "./data/runtime/notification-settings.json";
@@ -20,18 +19,14 @@ const DEFAULTS = {
 };
 
 export async function getNotificationSettings() {
-  try {
-    const data = JSON.parse(await readFile(PATH, "utf8"));
-    return {
-      ...DEFAULTS,
-      ...data,
-      topics: { ...DEFAULTS.topics, ...(data.topics || {}) },
-      profiles: Array.isArray(data.profiles) ? data.profiles.slice(0,8) : [],
-      plans: Array.isArray(data.plans) ? data.plans.slice(0, 20) : []
-    };
-  } catch {
-    return structuredClone(DEFAULTS);
-  }
+  const data = await readJsonFile(PATH, DEFAULTS);
+  return {
+    ...DEFAULTS,
+    ...data,
+    topics:{ ...DEFAULTS.topics, ...(data.topics || {}) },
+    profiles:Array.isArray(data.profiles) ? data.profiles.slice(0,8) : [],
+    plans:Array.isArray(data.plans) ? data.plans.slice(0,20) : []
+  };
 }
 
 export async function saveNotificationSettings(input = {}) {
@@ -64,16 +59,15 @@ export async function saveNotificationSettings(input = {}) {
     updatedAt: new Date().toISOString()
   };
 
-  await mkdir(dirname(PATH), { recursive: true });
-  await writeFile(PATH, JSON.stringify(next, null, 2), { mode: 0o600 });
+  await updateJsonAtomic(PATH, DEFAULTS, () => next);
   return next;
 }
 
 export async function markNotificationSent(date) {
-  const current = await getNotificationSettings();
-  current.lastSentDate = date;
-  current.lastSentAt = new Date().toISOString();
-  await mkdir(dirname(PATH), { recursive: true });
-  await writeFile(PATH, JSON.stringify(current, null, 2), { mode: 0o600 });
-  return current;
+  return updateJsonAtomic(PATH, DEFAULTS, current => ({
+    ...DEFAULTS,
+    ...current,
+    lastSentDate:date,
+    lastSentAt:new Date().toISOString()
+  }));
 }

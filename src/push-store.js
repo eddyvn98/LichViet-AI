@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { readJsonFile, updateJsonAtomic } from "./atomic-json-store.js";
 
 const PATH = process.env.PUSH_STORE_PATH || "./data/runtime/push-subscriptions.json";
 
@@ -9,13 +8,8 @@ function idFor(endpoint) {
 }
 
 async function readAll() {
-  try { return JSON.parse(await readFile(PATH, "utf8")); }
-  catch { return []; }
-}
-
-async function writeAll(items) {
-  await mkdir(dirname(PATH), { recursive:true });
-  await writeFile(PATH, JSON.stringify(items, null, 2), { mode:0o600 });
+  const parsed = await readJsonFile(PATH, []);
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 export async function listSubscriptions() {
@@ -24,7 +18,6 @@ export async function listSubscriptions() {
 
 export async function upsertSubscription({ subscription, profile = null, profiles = [], plans = [], reminderTime = "07:30" }) {
   if (!subscription?.endpoint) throw new Error("Push subscription không hợp lệ");
-  const all = await readAll();
   const id = idFor(subscription.endpoint);
   const item = {
     id, subscription, profile,
@@ -32,15 +25,19 @@ export async function upsertSubscription({ subscription, profile = null, profile
     plans:plans.slice(0,20), reminderTime,
     updatedAt:new Date().toISOString()
   };
-  const index = all.findIndex(x => x.id === id);
-  if (index >= 0) all[index] = item; else all.push(item);
-  await writeAll(all);
+  await updateJsonAtomic(PATH, [], current => {
+    const all = Array.isArray(current) ? current : [];
+    const index = all.findIndex(x => x.id === id);
+    if (index >= 0) all[index] = item; else all.push(item);
+    return all;
+  });
   return { id };
 }
 
 export async function removeSubscription(endpoint) {
   const id = idFor(endpoint || "");
-  const all = await readAll();
-  await writeAll(all.filter(x => x.id !== id));
+  await updateJsonAtomic(PATH, [], current =>
+    (Array.isArray(current) ? current : []).filter(x => x.id !== id)
+  );
   return { removed:true };
 }

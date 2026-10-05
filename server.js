@@ -6,6 +6,8 @@ import { analyzeBirthProfile } from "./src/bazi-profile.js";
 import { solarTermsForYear } from "./src/bazi.js";
 import { aiStatus, explainWithGemini, rewriteBriefWithGemini } from "./src/ai-service.js";
 import { buildBrief } from "./src/brief.js";
+import { buildFamilyDailySummary } from "./src/family-daily.js";
+import { opsStatus } from "./src/ops.js";
 import { ACTIVITIES, compareDays, rangeDays, rankDays } from "./src/planner.js";
 import { allActivityPolicies, allDutyClassifications, allRules } from "./src/rule-engine.js";
 import { verificationCases, verificationSummary } from "./src/verification.js";
@@ -81,6 +83,16 @@ function queryDate(url,key="date") {
 async function api(req,url,res) {
   if (req.method === "GET" && url.pathname === "/api/health") {
     return json(res,200,{ ok:true, version:manifest.version, engine:manifest.engine, calendar:manifest.calendar, decisionPolicy:manifest.decisionPolicy, rankingPolicy:manifest.rankingPolicy, familyPolicy:manifest.familyPolicy, constraintPolicy:manifest.constraintPolicy, comparisonPolicy:manifest.comparisonPolicy, push:pushStatus().enabled, ai:aiStatus(), telegram:telegramStatus() });
+  }
+  if (req.method === "GET" && url.pathname === "/api/ops/status") {
+    return json(res,200,await opsStatus());
+  }
+  if (req.method === "POST" && url.pathname === "/api/family/day") {
+    const payload = await bodyJson(req);
+    return json(res,200,buildFamilyDailySummary({
+      date:payload.date || todayVN(),
+      profiles:profilesFromPayload(payload.profiles)
+    }));
   }
   if (req.method === "GET" && url.pathname === "/api/day") {
     return json(res,200,publicDay(buildDayInfo(queryDate(url),profileFromQuery(url))),"public, max-age=300");
@@ -235,7 +247,7 @@ async function api(req,url,res) {
   }
   if (req.method === "POST" && url.pathname === "/api/notifications/run-now") {
     const secret = req.headers["x-cron-secret"] || "";
-    if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+    if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
       return json(res,401,{ error:"Unauthorized" });
     }
     return json(res,200,await sendDueTelegramNotification(new Date()));

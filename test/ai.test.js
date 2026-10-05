@@ -46,7 +46,7 @@ test("Telegram status hides secrets", () => {
 });
 
 
-test("V7 AI guardrail preserves policy, family and constraint semantics", () => {
+test("V8 AI guardrail preserves policy, family and constraint semantics", () => {
   const policy = aiGuardrailPolicy();
   assert.match(policy, /PRODUCT_POLICY/);
   assert.match(policy, /không được gọi là cổ thư|không được gọi là.*nguyên điển/);
@@ -57,9 +57,9 @@ test("V7 AI guardrail preserves policy, family and constraint semantics", () => 
   assert.match(policy, /không dùng nguồn mạnh của miền này để nâng kết luận miền khác/);
 });
 
-test("AI status exposes v7 family selection policies", () => {
+test("AI status exposes v8 family selection policies", () => {
   const status = aiStatus();
-  assert.equal(status.evidencePolicy, "verified-engine-v7");
+  assert.equal(status.evidencePolicy, "verified-engine-v8");
   assert.equal(status.decisionPolicy, "activity-composition-v2");
   assert.equal(status.rankingPolicy, "ranking-tiebreak-v2");
   assert.equal(status.familyPolicy, "family-personalization-v1");
