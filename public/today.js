@@ -1,5 +1,5 @@
 import {
-  $, $, api, escapeHtml, profileQuery, renderItems, selectedFamilyPayload, shortDay, state, vnDate
+  $, $$, api, escapeHtml, profileQuery, renderItems, selectedFamilyPayload, shortDay, state, vnDate
 } from "./core.js";
 
 function verdictColor(code) {
